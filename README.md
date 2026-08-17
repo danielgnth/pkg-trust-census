@@ -12,7 +12,7 @@ registries, as a reproducible point-in-time snapshot with an adoption-over-time 
 | **Signals** | identity-bound publish · artifact signature · build provenance · transparency log · MFA enforcement |
 | **Sample** | top 250 per ecosystem (pilot: 50) |
 | **Backfill** | quarterly anchors to 2024-01, derived from a single snapshot |
-| **Stack** | Bun + TypeScript + `bun:sqlite`, no build step, no native modules |
+| **Stack** | Bun + TypeScript + Drizzle ORM over `bun:sqlite`, no build step, no native modules |
 
 ## Documents
 
@@ -23,23 +23,48 @@ registries, as a reproducible point-in-time snapshot with an adoption-over-time 
 
 ```sh
 bun install
-bun test                     # unit tests, no network
-bun run src/cli.ts status    # snapshot + cache state
+bun test              # unit tests, no network
+bun run cli status    # snapshots, cache and coverage
+bun run cli --help
 ```
 
 Pipeline stages, each independently re-runnable and keyed by snapshot id:
 
 ```sh
-bun run src/cli.ts rank      --ecosystem pypi --n 50
-bun run src/cli.ts fetch     --ecosystem pypi --snapshot <id>
-bun run src/cli.ts extract   --ecosystem pypi --snapshot <id>
-bun run src/cli.ts aggregate --snapshot <id>
-bun run src/cli.ts report    --snapshot <id>
+bun run cli rank      --ecosystem pypi --n 50
+bun run cli fetch     --snapshot <id>     # omit --snapshot to continue the latest
+bun run cli extract   --snapshot <id>
+bun run cli aggregate --snapshot <id>
+bun run cli report    --snapshot <id>
 ```
 
 `fetch` is the only stage that touches the network, and it skips anything already cached — an
 interrupted run resumes for free. `extract` is pure, so parsers can be refined and re-run offline
 without re-hitting any registry.
+
+The CLI prompts only when it is attached to a TTY *and* a needed choice was not given on the command
+line (for example, which snapshot to continue when several exist). Under `CI=1` or a pipe it always
+takes the non-interactive default, so a scheduled run cannot block on a prompt.
+
+### Database
+
+Drizzle ORM over `bun:sqlite`. [`src/db/schema.ts`](src/db/schema.ts) is the single source of truth;
+migrations in [`drizzle/`](drizzle) are generated from it and applied automatically on open.
+
+```sh
+bun run db:generate   # after editing src/db/schema.ts
+bun run db:studio     # browse the data
+```
+
+Writes are guarded twice. [`src/db/validation.ts`](src/db/validation.ts) derives zod schemas from the
+Drizzle tables via `drizzle-zod`, so column types cannot drift, and layers on the rules SQL cannot
+express — timestamp formats, quarter labels (`2024Q1`), sha256 shape, and cross-field consistency such
+as *a row sampled by downloads must carry a download count*. CHECK constraints in the schema enforce
+the enum domains and non-negative counts at the database level.
+
+Both layers earn their place: a CHECK violation reports only `SQLITE_CONSTRAINT_CHECK` with no
+indication of which of several thousand rows was at fault, whereas the zod layer names the package and
+the field. The constraints remain as the backstop for any future caller that writes without the helpers.
 
 ## Why five signals instead of two
 

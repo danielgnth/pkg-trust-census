@@ -1,0 +1,202 @@
+import { describe, expect, test } from "bun:test";
+import {
+  packageInsert,
+  packageVersionInsert,
+  signalAvailabilityInsert,
+  snapshotInsert,
+  validateAll,
+  versionSignalInsert,
+} from "../src/db/validation.ts";
+
+const basePackage = {
+  snapshotId: "snap-1",
+  ecosystem: "pypi",
+  packageName: "requests",
+  rankFrame: "downloads",
+  rank: 1,
+  downloadCount: 100,
+};
+
+describe("packageInsert", () => {
+  test("accepts a well-formed row", () => {
+    expect(packageInsert.parse(basePackage)).toMatchObject({ packageName: "requests", rank: 1 });
+  });
+
+  test.each([
+    ["unknown ecosystem", { ecosystem: "cargo" }],
+    ["rank below 1", { rank: 0 }],
+    ["negative downloads", { downloadCount: -5 }],
+    ["negative maintainer count", { maintainerCount: -1 }],
+    ["unknown rank frame", { rankFrame: "stars" }],
+    ["empty package name", { packageName: "" }],
+    ["unparseable timestamp", { fetchTimestamp: "last tuesday" }],
+    ["non-url repository", { repositoryUrl: "github.com/psf/requests" }],
+  ])("rejects %s", (_label, override) => {
+    expect(packageInsert.safeParse({ ...basePackage, ...override }).success).toBe(false);
+  });
+
+  /**
+   * The cross-field rules SQL cannot express: a row sampled by downloads with no download
+   * count means the ranking source silently returned nothing useful.
+   */
+  test("requires a downloadCount when sampled by downloads", () => {
+    const r = packageInsert.safeParse({ ...basePackage, downloadCount: null });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toContain("requires a downloadCount");
+  });
+
+  test("requires a dependentCount when sampled by dependents", () => {
+    const r = packageInsert.safeParse({
+      ...basePackage,
+      rankFrame: "dependents",
+      downloadCount: null,
+      dependentCount: null,
+    });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toContain("requires a dependentCount");
+  });
+
+  test("accepts a dependents-framed row for Go, which publishes no download counts", () => {
+    expect(
+      packageInsert.safeParse({
+        ...basePackage,
+        ecosystem: "go",
+        packageName: "github.com/gorilla/mux",
+        rankFrame: "dependents",
+        downloadCount: null,
+        dependentCount: 179073,
+      }).success,
+    ).toBe(true);
+  });
+});
+
+describe("packageVersionInsert", () => {
+  const base = {
+    snapshotId: "snap-1",
+    ecosystem: "crates",
+    packageName: "bon",
+    version: "3.9.3",
+  };
+
+  test.each([
+    ["2024Q1", true],
+    ["2024Q1,2024Q2", true],
+    ["2024Q1,2024Q2,2024Q3", true],
+    ["2024Q5", false],
+    ["24Q1", false],
+    ["2024-Q1", false],
+    ["Q1", false],
+  ])("quarter anchor %s -> valid=%s", (quarterAnchor, valid) => {
+    expect(packageVersionInsert.safeParse({ ...base, quarterAnchor }).success).toBe(valid);
+  });
+
+  test("rejects a malformed sha256", () => {
+    expect(packageVersionInsert.safeParse({ ...base, rawSha256: "deadbeef" }).success).toBe(false);
+  });
+
+  test("accepts a real sha256", () => {
+    expect(
+      packageVersionInsert.safeParse({ ...base, rawSha256: "a".repeat(64) }).success,
+    ).toBe(true);
+  });
+
+  test("allows a null publish date, which several registries omit", () => {
+    expect(packageVersionInsert.safeParse({ ...base, publishedAt: null }).success).toBe(true);
+  });
+});
+
+describe("versionSignalInsert", () => {
+  const base = {
+    snapshotId: "snap-1",
+    ecosystem: "crates",
+    packageName: "bon",
+    version: "3.9.3",
+    signalId: "identity_publish",
+    value: "true",
+    evidence: "elastio/bon",
+    signalSource: "GET /api/v1/crates/{c}/versions -> versions[].trustpub_data",
+  };
+
+  test("accepts a well-formed signal", () => {
+    expect(versionSignalInsert.parse(base).value).toBe("true");
+  });
+
+  test("rejects a signal id outside the five dimensions", () => {
+    expect(versionSignalInsert.safeParse({ ...base, signalId: "has_sbom" }).success).toBe(false);
+  });
+
+  test("rejects a value outside the three states", () => {
+    expect(versionSignalInsert.safeParse({ ...base, value: "maybe" }).success).toBe(false);
+  });
+
+  /** Without a source an aggregate number cannot be traced back to an endpoint. */
+  test("requires a signalSource", () => {
+    expect(versionSignalInsert.safeParse({ ...base, signalSource: "" }).success).toBe(false);
+  });
+
+  test("requires evidence behind a positive claim", () => {
+    const r = versionSignalInsert.safeParse({ ...base, evidence: null });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toContain("must carry evidence");
+  });
+
+  test("allows unknown and false without evidence", () => {
+    expect(versionSignalInsert.safeParse({ ...base, value: "unknown", evidence: null }).success).toBe(true);
+    expect(versionSignalInsert.safeParse({ ...base, value: "false", evidence: null }).success).toBe(true);
+  });
+});
+
+describe("signalAvailabilityInsert", () => {
+  test.each(["observable", "inferred", "not_exposed", "no_mechanism"])("accepts %s", (availability) => {
+    expect(
+      signalAvailabilityInsert.safeParse({
+        ecosystem: "rubygems",
+        signalId: "identity_publish",
+        availability,
+      }).success,
+    ).toBe(true);
+  });
+
+  test("rejects an availability outside the four states", () => {
+    expect(
+      signalAvailabilityInsert.safeParse({
+        ecosystem: "rubygems",
+        signalId: "identity_publish",
+        availability: "missing",
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("snapshotInsert", () => {
+  test("rejects config that is not valid JSON", () => {
+    const r = snapshotInsert.safeParse({
+      snapshotId: "s",
+      startedAt: new Date().toISOString(),
+      toolVersion: "0.1.0",
+      configJson: "{not json",
+    });
+    expect(r.success).toBe(false);
+  });
+});
+
+describe("validateAll", () => {
+  test("names the offending row and field", () => {
+    const rows = [basePackage, { ...basePackage, packageName: "urllib3", rank: -1 }];
+    expect(() => validateAll(packageInsert, rows, "packages")).toThrow(
+      /invalid packages row 1 \(pypi\/urllib3\).*rank/s,
+    );
+  });
+
+  test("returns parsed rows when every row is valid", () => {
+    const out = validateAll(packageInsert, [basePackage], "packages");
+    expect(out).toHaveLength(1);
+    expect(out[0]!.packageName).toBe("requests");
+  });
+
+  /** Dropping bad rows would understate adoption in the aggregate results. */
+  test("throws rather than filtering, so a bad row cannot silently vanish", () => {
+    const rows = [{ ...basePackage, ecosystem: "nope" }, basePackage];
+    expect(() => validateAll(packageInsert, rows, "packages")).toThrow(/row 0/);
+  });
+});

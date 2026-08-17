@@ -16,7 +16,7 @@
 | Ecosystems | **Seven**: PyPI, npm, crates.io, RubyGems, Go, Maven Central, Packagist |
 | Sampling frame | Downloads where published; **dependents for Go and Maven** (neither publishes download counts anywhere) |
 | Sample size | Pilot **N=50** across all seven, then scale to **N=250** (1,750 packages) |
-| Runtime / storage | Bun + `bun:sqlite` + TypeScript |
+| Runtime / storage | Bun + TypeScript + Drizzle ORM over `bun:sqlite`; zod validation at the insert boundary; citty + `@clack/prompts` CLI |
 | Raw cache | Gzipped, git-ignored, with a committed `manifest.jsonl` of URL + sha256 + size + timestamp |
 | Repeat runs | Manual CLI, but headless + idempotent + snapshot-keyed so a cron workflow can be switched on later |
 | Outputs | CSV + paste-ready Markdown matrix + generated SVG charts |
@@ -191,10 +191,12 @@ Seven implementations of one interface. The pilot proves the interface on PyPI b
 
 ```
 src/
-  cli.ts                    # bun run src/cli.ts <stage> --ecosystem <id> --n <N>
-  http/{client,cache,ratelimit}.ts
-  db/{schema.sql,open.ts,queries.ts}
-  adapters/{pypi,npm,crates,rubygems,go,maven,packagist}.ts
+  cli.ts                    # citty commands: rank | fetch | extract | aggregate | report | status
+  http/{client,cache,ratelimit,transport}.ts
+  db/{schema.ts,validation.ts,open.ts}   # drizzle schema + drizzle-zod insert guards
+  stages/{rank,fetch}.ts
+  adapters/{index,types,pypi}.ts         # npm, crates, rubygems, go, maven, packagist land M4-M6
+drizzle/                    # generated migrations, applied on open
   extract/signals.ts        # shared three-state logic + quarter-anchor selection
   aggregate/{matrix,timeseries}.ts
   report/{summary,charts}.ts

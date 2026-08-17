@@ -11,9 +11,11 @@ const { PypiAdapter, normalizeName, simpleUrl, jsonUrl, SIMPLE_ACCEPT } = await 
 );
 const { HttpClient } = await import("../src/http/client.ts");
 const { ResponseCache } = await import("../src/http/cache.ts");
-const { openDb } = await import("../src/db/open.ts");
+const { openDb, closeDb } = await import("../src/db/open.ts");
+const { packages } = await import("../src/db/schema.ts");
 const { runRank, loadCandidates } = await import("../src/stages/rank.ts");
 const { runFetch } = await import("../src/stages/fetch.ts");
+import { eq, isNotNull } from "drizzle-orm";
 import type { Transport, TransportRequest, TransportResponse } from "../src/http/transport.ts";
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
@@ -167,7 +169,7 @@ describe("rank + fetch stages", () => {
     expect(loaded.map((c) => c.name)).toEqual(["boto3", "requests"]);
     expect(loaded[0]!.rank).toBe(1);
     expect(loaded[0]!.downloadCount).toBe(900);
-    db.close();
+    closeDb(db);
   });
 
   test("re-ranking the same snapshot updates rather than duplicating rows", async () => {
@@ -177,7 +179,7 @@ describe("rank + fetch stages", () => {
     await runRank(["pypi"], 2, "snap-1", db, http);
 
     expect(loadCandidates(db, "snap-1", "pypi")).toHaveLength(2);
-    db.close();
+    closeDb(db);
   });
 
   test("fetch records a timestamp per package and clears no-longer-current errors", async () => {
@@ -188,14 +190,16 @@ describe("rank + fetch stages", () => {
 
     expect(summary).toMatchObject({ attempted: 2, succeeded: 2, failed: 0 });
     const rows = db
-      .query(`SELECT fetch_timestamp, fetch_error FROM packages WHERE snapshot_id = 'snap-1'`)
-      .all() as Array<{ fetch_timestamp: string | null; fetch_error: string | null }>;
+      .select({ ts: packages.fetchTimestamp, err: packages.fetchError })
+      .from(packages)
+      .where(eq(packages.snapshotId, "snap-1"))
+      .all();
     expect(rows).toHaveLength(2);
     for (const r of rows) {
-      expect(r.fetch_timestamp).toBeTruthy();
-      expect(r.fetch_error).toBeNull();
+      expect(r.ts).toBeTruthy();
+      expect(r.err).toBeNull();
     }
-    db.close();
+    closeDb(db);
   });
 
   test("one failing package is recorded, not fatal to the run", async () => {
@@ -223,18 +227,20 @@ describe("rank + fetch stages", () => {
     expect(summary).toMatchObject({ attempted: 2, succeeded: 1, failed: 1 });
 
     const failed = db
-      .query(`SELECT package_name, fetch_error FROM packages WHERE fetch_error IS NOT NULL`)
-      .all() as Array<{ package_name: string; fetch_error: string }>;
+      .select({ name: packages.packageName, err: packages.fetchError })
+      .from(packages)
+      .where(isNotNull(packages.fetchError))
+      .all();
     expect(failed).toHaveLength(1);
-    expect(failed[0]!.package_name).toBe("requests");
-    expect(failed[0]!.fetch_error).toContain("connection reset");
-    db.close();
+    expect(failed[0]!.name).toBe("requests");
+    expect(failed[0]!.err).toContain("connection reset");
+    closeDb(db);
   });
 
   test("fetch without a prior rank does nothing rather than inventing a sample", async () => {
     const { transport, db } = setup();
     const http = new HttpClient({ transport, cache: new ResponseCache() });
     expect(await runFetch(["pypi"], "no-such-snapshot", db, http)).toHaveLength(0);
-    db.close();
+    closeDb(db);
   });
 });

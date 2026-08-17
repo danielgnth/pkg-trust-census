@@ -6,14 +6,16 @@
  * rest of each row.
  */
 
-import type { Database } from "bun:sqlite";
+import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import type { Candidate, EcosystemId } from "../types.ts";
 import type { HttpClient } from "../http/client.ts";
 import { getAdapter } from "../adapters/index.ts";
 import { dataDir } from "../http/cache.ts";
-import { ensureSnapshot } from "../db/open.ts";
+import { ensureSnapshot, type Db } from "../db/open.ts";
+import { packages } from "../db/schema.ts";
+import { packageInsert, validateAll } from "../db/validation.ts";
 
 export interface RankResult {
   ecosystem: EcosystemId;
@@ -25,8 +27,9 @@ export async function runRank(
   ecosystems: EcosystemId[],
   n: number,
   snapshotId: string,
-  db: Database,
+  db: Db,
   http: HttpClient,
+  onProgress?: (message: string) => void,
 ): Promise<RankResult[]> {
   const results: RankResult[] = [];
   const dir = join(dataDir(), "rankings");
@@ -39,7 +42,7 @@ export async function runRank(
   for (const eco of ecosystems) {
     const adapter = getAdapter(eco);
     if (!adapter) {
-      console.log(`  [${eco}] no adapter yet — skipping`);
+      onProgress?.(`[${eco}] no adapter yet — skipping`);
       continue;
     }
 
@@ -64,67 +67,73 @@ export async function runRank(
 
     persistCandidates(db, snapshotId, candidates);
     results.push({ ecosystem: eco, count: candidates.length, path });
-    console.log(`  [${eco}] ranked ${candidates.length} by ${adapter.rankFrame} -> ${path}`);
+    onProgress?.(`[${eco}] ranked ${candidates.length} by ${adapter.rankFrame} -> ${path}`);
   }
 
   return results;
 }
 
-function persistCandidates(db: Database, snapshotId: string, candidates: Candidate[]): void {
-  const stmt = db.query(
-    `INSERT INTO packages
-       (snapshot_id, ecosystem, package_name, rank_frame, rank, download_count, dependent_count)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT (snapshot_id, ecosystem, package_name) DO UPDATE SET
-       rank_frame = excluded.rank_frame,
-       rank = excluded.rank,
-       download_count = excluded.download_count,
-       dependent_count = excluded.dependent_count`,
+function persistCandidates(db: Db, snapshotId: string, candidates: Candidate[]): void {
+  // Validated before the transaction opens: a bad row is an adapter bug, and it should
+  // abort with a message naming the package rather than a bare CHECK violation mid-write.
+  const rows = validateAll(
+    packageInsert,
+    candidates.map((c) => ({
+      snapshotId,
+      ecosystem: c.ecosystem,
+      packageName: c.name,
+      rankFrame: c.rankFrame,
+      rank: c.rank,
+      downloadCount: c.downloadCount,
+      dependentCount: c.dependentCount,
+    })),
+    "packages",
   );
 
   // One transaction: a partially-written ranking would misrepresent the sample.
-  db.transaction(() => {
-    for (const c of candidates) {
-      stmt.run(
-        snapshotId,
-        c.ecosystem,
-        c.name,
-        c.rankFrame,
-        c.rank,
-        c.downloadCount,
-        c.dependentCount,
-      );
+  db.transaction((tx) => {
+    for (const row of rows) {
+      tx.insert(packages)
+        .values(row)
+        .onConflictDoUpdate({
+          target: [packages.snapshotId, packages.ecosystem, packages.packageName],
+          set: {
+            rankFrame: row.rankFrame,
+            rank: row.rank,
+            downloadCount: row.downloadCount ?? null,
+            dependentCount: row.dependentCount ?? null,
+          },
+        })
+        .run();
     }
-  })();
+  });
 }
 
 /** Reads back the sample for a snapshot, so `fetch` can run as a separate invocation. */
 export function loadCandidates(
-  db: Database,
+  db: Db,
   snapshotId: string,
   ecosystem: EcosystemId,
 ): Candidate[] {
   const rows = db
-    .query(
-      `SELECT package_name, rank_frame, rank, download_count, dependent_count
-         FROM packages
-        WHERE snapshot_id = ? AND ecosystem = ?
-        ORDER BY rank`,
-    )
-    .all(snapshotId, ecosystem) as Array<{
-    package_name: string;
-    rank_frame: "downloads" | "dependents";
-    rank: number;
-    download_count: number | null;
-    dependent_count: number | null;
-  }>;
+    .select({
+      name: packages.packageName,
+      rankFrame: packages.rankFrame,
+      rank: packages.rank,
+      downloadCount: packages.downloadCount,
+      dependentCount: packages.dependentCount,
+    })
+    .from(packages)
+    .where(and(eq(packages.snapshotId, snapshotId), eq(packages.ecosystem, ecosystem)))
+    .orderBy(asc(packages.rank))
+    .all();
 
   return rows.map((r) => ({
     ecosystem,
-    name: r.package_name,
+    name: r.name,
     rank: r.rank,
-    rankFrame: r.rank_frame,
-    downloadCount: r.download_count,
-    dependentCount: r.dependent_count,
+    rankFrame: r.rankFrame as Candidate["rankFrame"],
+    downloadCount: r.downloadCount,
+    dependentCount: r.dependentCount,
   }));
 }
