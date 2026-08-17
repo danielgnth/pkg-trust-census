@@ -1,0 +1,6 @@
+node_modules/
+data/cache/**/*.json.gz
+data/trust.sqlite-journal
+data/trust.sqlite-wal
+data/trust.sqlite-shm
+.DS_Store
