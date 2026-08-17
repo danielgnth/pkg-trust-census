@@ -11,9 +11,21 @@ import { appendFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { CacheEntry, EcosystemId } from "../types.ts";
 
-export const DATA_DIR = process.env.PKG_TRUST_DATA_DIR ?? "data";
-const CACHE_DIR = join(DATA_DIR, "cache");
-const MANIFEST = join(CACHE_DIR, "manifest.jsonl");
+/**
+ * Resolved per call rather than at module load: capturing the environment once means the
+ * first importer wins, which silently pointed separate test files at a shared directory.
+ */
+export function dataDir(): string {
+  return process.env.PKG_TRUST_DATA_DIR ?? "data";
+}
+
+export function cacheDir(): string {
+  return join(dataDir(), "cache");
+}
+
+export function manifestPath(): string {
+  return join(cacheDir(), "manifest.jsonl");
+}
 
 export function sha256(s: string): string {
   return createHash("sha256").update(s, "utf8").digest("hex");
@@ -35,7 +47,7 @@ export function slug(name: string): string {
 }
 
 export function cachePath(ecosystem: EcosystemId, pkg: string, url: string): string {
-  return join(CACHE_DIR, ecosystem, slug(pkg), `${sha256(url).slice(0, 32)}.json.gz`);
+  return join(cacheDir(), ecosystem, slug(pkg), `${sha256(url).slice(0, 32)}.json.gz`);
 }
 
 /**
@@ -47,8 +59,9 @@ class ManifestWriter {
 
   append(entry: CacheEntry): Promise<void> {
     this.#tail = this.#tail.then(async () => {
-      await mkdir(dirname(MANIFEST), { recursive: true });
-      await appendFile(MANIFEST, JSON.stringify(entry) + "\n", "utf8");
+      const path = manifestPath();
+      await mkdir(dirname(path), { recursive: true });
+      await appendFile(path, JSON.stringify(entry) + "\n", "utf8");
     });
     return this.#tail;
   }
@@ -67,7 +80,7 @@ export class ResponseCache {
   async load(): Promise<void> {
     if (this.#loaded) return;
     this.#loaded = true;
-    const f = Bun.file(MANIFEST);
+    const f = Bun.file(manifestPath());
     if (!(await f.exists())) return;
     for (const line of (await f.text()).split("\n")) {
       if (!line.trim()) continue;

@@ -150,7 +150,20 @@ Two incidental notes from the same investigation:
 - **`Bun.spawn` rejects arguments containing literal newlines**, so curl's `-w` format string passes `\n`
   escapes for curl itself to expand.
 
-## 6. Deferred to M7
+## 6. Note for the extractor (M3)
+
+The M2 fetch produced a preliminary read: **11 of the top 20 PyPI packages** carry a PEP 740 provenance URL
+on their newest file (`packaging`, `typing-extensions`, `certifi`, `urllib3`, `idna`, `requests`,
+`charset-normalizer`, `cryptography`, `pluggy`, `aiobotocore`, `numpy` — but not `boto3`, `setuptools`,
+`botocore`, `cffi`, `pygments`, `pyyaml`, `python-dateutil`, `six`, `pycparser`).
+
+That figure is indicative only, and the extractor must be more careful than the probe was. `files[]` is a flat
+list across *all* versions and mixes sdists with wheels, so "the last file" is neither necessarily the latest
+version nor representative of it. M3 must group files by version and define explicitly whether a version counts
+as attested when *any* or *all* of its files carry provenance — a package can ship an attested sdist alongside
+unattested wheels. Record the choice in the methodology section; `signal_source` should name the rule applied.
+
+## 7. Deferred to M7
 
 Registry-wide 2FA/MFA policy text, effective dates and thresholds for all seven ecosystems, each cited to a
 primary source, land with the `ecosystem_facts` and `signal_availability` curation milestone. Several

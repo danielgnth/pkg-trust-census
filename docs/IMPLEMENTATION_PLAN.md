@@ -224,7 +224,7 @@ Cache paths use a filesystem-safe slug plus a URL hash — this sidesteps npm sc
 |---|---|---|
 | ~~**M0**~~ | `docs/preflight.md` + 13 real fixtures across all 7 registries | **Done.** Signal shapes verified and locked by regression tests; 2FA policy text deferred to M7 (some doc hosts egress-blocked) |
 | ~~**M1**~~ | Bun skeleton: schema, HTTP client, cache, manifest, CLI | **Done.** 47 tests green under both transports; zero-refetch resume demonstrated |
-| **M2** | PyPI rank + fetch, N=20 | Interrupt mid-run, resume, zero re-fetches |
+| ~~**M2**~~ | PyPI rank + fetch, N=20 | **Done.** Interrupted at 17/20; resume was 30 cache hits + 10 fetches; third run 0 fetches / 40 hits |
 | **M3** | PyPI extract + aggregate + charts | Matrix + adoption curve render; format judged paper-ready |
 | **M4** | crates.io + npm | The two richest signals (`trustpub_data`, `dist.attestations`) land end-to-end |
 | **M5** | RubyGems + Packagist | The two negative-finding ecosystems; `not_exposed` vs `no_mechanism` renders correctly |

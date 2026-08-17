@@ -10,9 +10,12 @@
  *   bun run src/cli.ts status
  */
 
+import type { Database } from "bun:sqlite";
 import { ECOSYSTEMS, type EcosystemId } from "./types.ts";
-import { DB_PATH, newSnapshotId, openDb } from "./db/open.ts";
+import { dbPath, ensureSnapshot, newSnapshotId, openDb } from "./db/open.ts";
 import { HttpClient, TOOL_VERSION, USER_AGENT } from "./http/client.ts";
+import { runRank } from "./stages/rank.ts";
+import { runFetch } from "./stages/fetch.ts";
 
 const STAGES = ["rank", "fetch", "extract", "aggregate", "report", "status"] as const;
 type Stage = (typeof STAGES)[number];
@@ -73,22 +76,32 @@ async function main(): Promise<void> {
     return;
   }
 
-  const snapshotId = args.snapshot ?? newSnapshotId();
   const db = openDb();
-  db.query(
-    `INSERT OR IGNORE INTO snapshots (snapshot_id, started_at, tool_version, config_json)
-     VALUES (?, ?, ?, ?)`,
-  ).run(snapshotId, new Date().toISOString(), TOOL_VERSION, JSON.stringify({ n: args.n, ecosystems: args.ecosystems }));
+  // Only `rank` starts a new snapshot. Later stages default to continuing the most recent
+  // one, so `rank` then `fetch` works without having to copy an id between invocations.
+  const snapshotId = args.snapshot ?? (args.stage === "rank" ? newSnapshotId() : latestSnapshot(db));
+  if (!snapshotId) throw new Error(`no snapshot found — run \`rank\` first, or pass --snapshot`);
+  ensureSnapshot(db, snapshotId, { n: args.n, ecosystems: args.ecosystems }, TOOL_VERSION);
 
   console.log(`snapshot ${snapshotId} | stage ${args.stage} | ${args.ecosystems.join(", ")} | n=${args.n}`);
   console.log(`UA: ${USER_AGENT}`);
 
   const http = new HttpClient();
   await http.cache.load();
+  console.log(`transport: ${http.transport.name}`);
 
-  // Adapters land in M2 (PyPI) and M4-M6 (the rest); the skeleton verifies wiring only.
-  for (const eco of args.ecosystems) {
-    console.log(`  [${eco}] no adapter registered yet — skipping`);
+  switch (args.stage) {
+    case "rank":
+      await runRank(args.ecosystems, args.n, snapshotId, db, http);
+      break;
+    case "fetch":
+      await runFetch(args.ecosystems, snapshotId, db, http);
+      break;
+    case "extract":
+    case "aggregate":
+    case "report":
+      console.log(`  stage "${args.stage}" lands in M3`);
+      break;
   }
 
   await http.flush();
@@ -103,6 +116,13 @@ async function main(): Promise<void> {
   db.close();
 }
 
+function latestSnapshot(db: Database): string | null {
+  const row = db
+    .query(`SELECT snapshot_id FROM snapshots ORDER BY started_at DESC LIMIT 1`)
+    .get() as { snapshot_id: string } | null;
+  return row?.snapshot_id ?? null;
+}
+
 async function status(): Promise<void> {
   const db = openDb();
   const snaps = db.query(`SELECT snapshot_id, started_at, finished_at FROM snapshots ORDER BY snapshot_id`).all();
@@ -110,7 +130,7 @@ async function status(): Promise<void> {
   const http = new HttpClient();
   await http.cache.load();
 
-  console.log(`db: ${DB_PATH}`);
+  console.log(`db: ${dbPath()}`);
   console.log(`snapshots: ${snaps.length}`);
   for (const s of snaps as Array<Record<string, string>>) {
     console.log(`  ${s.snapshot_id}  started=${s.started_at}  finished=${s.finished_at ?? "(incomplete)"}`);
