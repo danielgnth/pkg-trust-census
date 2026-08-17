@@ -4,3 +4,6 @@ data/trust.sqlite-journal
 data/trust.sqlite-wal
 data/trust.sqlite-shm
 .DS_Store
+data/trust.sqlite
+data/rankings/
+data/out/

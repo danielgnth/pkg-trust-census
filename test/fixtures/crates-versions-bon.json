@@ -1,0 +1,355 @@
+{
+  "versions": [
+    {
+      "id": 2577918,
+      "crate": "bon",
+      "num": "3.9.3",
+      "dl_path": "/api/v1/crates/bon/3.9.3/download",
+      "readme_path": "/api/v1/crates/bon/3.9.3/readme",
+      "updated_at": "2026-06-15T10:06:29.221470Z",
+      "created_at": "2026-06-15T10:06:29.221470Z",
+      "downloads": 3999179,
+      "features": {
+        "alloc": [
+          "bon-macros/alloc"
+        ],
+        "default": [
+          "std"
+        ],
+        "experimental-generics-setters": [
+          "bon-macros/experimental-generics-setters"
+        ],
+        "experimental-getter": [],
+        "experimental-overwritable": [
+          "bon-macros/experimental-overwritable"
+        ],
+        "implied-bounds": [
+          "bon-macros/implied-bounds"
+        ],
+        "std": [
+          "bon-macros/std",
+          "alloc"
+        ]
+      },
+      "yanked": false,
+      "yank_message": null,
+      "lib_links": null,
+      "license": "MIT OR Apache-2.0",
+      "links": {
+        "dependencies": "/api/v1/crates/bon/3.9.3/dependencies",
+        "version_downloads": "/api/v1/crates/bon/3.9.3/downloads",
+        "authors": "/api/v1/crates/bon/3.9.3/authors"
+      },
+      "crate_size": 66773,
+      "published_by": null,
+      "audit_actions": [],
+      "checksum": "a602c73c7b0148ec6d12af6fd5cc7a46e2eacc8878271a999abac56eed12f561",
+      "rust_version": "1.59.0",
+      "has_lib": true,
+      "bin_names": [],
+      "edition": "2021",
+      "description": "Next-gen compile-time-checked builder generator, named function's arguments, and more!",
+      "homepage": "https://bon-rs.com",
+      "documentation": null,
+      "repository": "https://github.com/elastio/bon",
+      "trustpub_data": {
+        "provider": "github",
+        "repository": "elastio/bon",
+        "run_id": "27538920713",
+        "sha": "0d443827ea1682fb8163f41c84f84ec4fea7c7f0"
+      },
+      "linecounts": {
+        "languages": {
+          "Rust": {
+            "code_lines": 265,
+            "comment_lines": 34,
+            "files": 7
+          }
+        },
+        "total_code_lines": 265,
+        "total_comment_lines": 34
+      }
+    },
+    {
+      "id": 2545752,
+      "crate": "bon",
+      "num": "3.9.2",
+      "dl_path": "/api/v1/crates/bon/3.9.2/download",
+      "readme_path": "/api/v1/crates/bon/3.9.2/readme",
+      "updated_at": "2026-06-10T14:03:49.984566Z",
+      "created_at": "2026-06-10T14:03:49.984566Z",
+      "downloads": 361892,
+      "features": {
+        "alloc": [
+          "bon-macros/alloc"
+        ],
+        "default": [
+          "std"
+        ],
+        "experimental-generics-setters": [
+          "bon-macros/experimental-generics-setters"
+        ],
+        "experimental-getter": [],
+        "experimental-overwritable": [
+          "bon-macros/experimental-overwritable"
+        ],
+        "implied-bounds": [
+          "bon-macros/implied-bounds"
+        ],
+        "std": [
+          "bon-macros/std",
+          "alloc"
+        ]
+      },
+      "yanked": false,
+      "yank_message": null,
+      "lib_links": null,
+      "license": "MIT OR Apache-2.0",
+      "links": {
+        "dependencies": "/api/v1/crates/bon/3.9.2/dependencies",
+        "version_downloads": "/api/v1/crates/bon/3.9.2/downloads",
+        "authors": "/api/v1/crates/bon/3.9.2/authors"
+      },
+      "crate_size": 66782,
+      "published_by": null,
+      "audit_actions": [],
+      "checksum": "b2f04f6fef12d70d42a77b1433c9e0f065238479a6cefc4f5bab105e9873a3c3",
+      "rust_version": "1.59.0",
+      "has_lib": true,
+      "bin_names": [],
+      "edition": "2021",
+      "description": "Next-gen compile-time-checked builder generator, named function's arguments, and more!",
+      "homepage": "https://bon-rs.com",
+      "documentation": null,
+      "repository": "https://github.com/elastio/bon",
+      "trustpub_data": {
+        "provider": "github",
+        "repository": "elastio/bon",
+        "run_id": "27281820213",
+        "sha": "0f845dcf4ea3f388e2130ce8f4a9a80da4a8888c"
+      },
+      "linecounts": {
+        "languages": {
+          "Rust": {
+            "code_lines": 265,
+            "comment_lines": 34,
+            "files": 7
+          }
+        },
+        "total_code_lines": 265,
+        "total_comment_lines": 34
+      }
+    },
+    {
+      "id": 2120483,
+      "crate": "bon",
+      "num": "3.9.1",
+      "dl_path": "/api/v1/crates/bon/3.9.1/download",
+      "readme_path": "/api/v1/crates/bon/3.9.1/readme",
+      "updated_at": "2026-03-13T23:53:03.756159Z",
+      "created_at": "2026-03-13T23:53:03.756159Z",
+      "downloads": 9592336,
+      "features": {
+        "alloc": [
+          "bon-macros/alloc"
+        ],
+        "default": [
+          "std"
+        ],
+        "experimental-generics-setters": [
+          "bon-macros/experimental-generics-setters"
+        ],
+        "experimental-getter": [],
+        "experimental-overwritable": [
+          "bon-macros/experimental-overwritable"
+        ],
+        "implied-bounds": [
+          "bon-macros/implied-bounds"
+        ],
+        "std": [
+          "bon-macros/std",
+          "alloc"
+        ]
+      },
+      "yanked": false,
+      "yank_message": null,
+      "lib_links": null,
+      "license": "MIT OR Apache-2.0",
+      "links": {
+        "dependencies": "/api/v1/crates/bon/3.9.1/dependencies",
+        "version_downloads": "/api/v1/crates/bon/3.9.1/downloads",
+        "authors": "/api/v1/crates/bon/3.9.1/authors"
+      },
+      "crate_size": 66853,
+      "published_by": null,
+      "audit_actions": [],
+      "checksum": "f47dbe92550676ee653353c310dfb9cf6ba17ee70396e1f7cf0a2020ad49b2fe",
+      "rust_version": "1.59.0",
+      "has_lib": true,
+      "bin_names": [],
+      "edition": "2021",
+      "description": "Next-gen compile-time-checked builder generator, named function's arguments, and more!",
+      "homepage": "https://bon-rs.com",
+      "documentation": null,
+      "repository": "https://github.com/elastio/bon",
+      "trustpub_data": {
+        "provider": "github",
+        "repository": "elastio/bon",
+        "run_id": "23075235528",
+        "sha": "1f427d01048ae86c6d929ed1e7c18ec994b43227"
+      },
+      "linecounts": {
+        "languages": {
+          "Rust": {
+            "code_lines": 265,
+            "comment_lines": 34,
+            "files": 7
+          }
+        },
+        "total_code_lines": 265,
+        "total_comment_lines": 34
+      }
+    },
+    {
+      "id": 2024168,
+      "crate": "bon",
+      "num": "3.9.0",
+      "dl_path": "/api/v1/crates/bon/3.9.0/download",
+      "readme_path": "/api/v1/crates/bon/3.9.0/readme",
+      "updated_at": "2026-02-13T01:23:15.845938Z",
+      "created_at": "2026-02-13T01:23:15.845938Z",
+      "downloads": 2779082,
+      "features": {
+        "alloc": [
+          "bon-macros/alloc"
+        ],
+        "default": [
+          "std"
+        ],
+        "experimental-generics-setters": [
+          "bon-macros/experimental-generics-setters"
+        ],
+        "experimental-getter": [],
+        "experimental-overwritable": [
+          "bon-macros/experimental-overwritable"
+        ],
+        "implied-bounds": [
+          "bon-macros/implied-bounds"
+        ],
+        "std": [
+          "bon-macros/std",
+          "alloc"
+        ]
+      },
+      "yanked": false,
+      "yank_message": null,
+      "lib_links": null,
+      "license": "MIT OR Apache-2.0",
+      "links": {
+        "dependencies": "/api/v1/crates/bon/3.9.0/dependencies",
+        "version_downloads": "/api/v1/crates/bon/3.9.0/downloads",
+        "authors": "/api/v1/crates/bon/3.9.0/authors"
+      },
+      "crate_size": 64401,
+      "published_by": null,
+      "audit_actions": [],
+      "checksum": "2d13a61f2963b88eef9c1be03df65d42f6996dfeac1054870d950fcf66686f83",
+      "rust_version": "1.59.0",
+      "has_lib": true,
+      "bin_names": [],
+      "edition": "2021",
+      "description": "Next-gen compile-time-checked builder generator, named function's arguments, and more!",
+      "homepage": "https://bon-rs.com",
+      "documentation": null,
+      "repository": "https://github.com/elastio/bon",
+      "trustpub_data": {
+        "provider": "github",
+        "repository": "elastio/bon",
+        "run_id": "21970964054",
+        "sha": "d87637ce33329841aaf5353ba529d9626f771623"
+      },
+      "linecounts": {
+        "languages": {
+          "Rust": {
+            "code_lines": 265,
+            "comment_lines": 34,
+            "files": 7
+          }
+        },
+        "total_code_lines": 265,
+        "total_comment_lines": 34
+      }
+    },
+    {
+      "id": 1929543,
+      "crate": "bon",
+      "num": "3.8.2",
+      "dl_path": "/api/v1/crates/bon/3.8.2/download",
+      "readme_path": "/api/v1/crates/bon/3.8.2/readme",
+      "updated_at": "2026-01-08T13:24:09.804064Z",
+      "created_at": "2026-01-08T13:24:09.804064Z",
+      "downloads": 2766295,
+      "features": {
+        "alloc": [
+          "bon-macros/alloc"
+        ],
+        "default": [
+          "std"
+        ],
+        "experimental-getter": [],
+        "experimental-overwritable": [
+          "bon-macros/experimental-overwritable"
+        ],
+        "implied-bounds": [
+          "bon-macros/implied-bounds"
+        ],
+        "std": [
+          "bon-macros/std",
+          "alloc"
+        ]
+      },
+      "yanked": false,
+      "yank_message": null,
+      "lib_links": null,
+      "license": "MIT OR Apache-2.0",
+      "links": {
+        "dependencies": "/api/v1/crates/bon/3.8.2/dependencies",
+        "version_downloads": "/api/v1/crates/bon/3.8.2/downloads",
+        "authors": "/api/v1/crates/bon/3.8.2/authors"
+      },
+      "crate_size": 61985,
+      "published_by": null,
+      "audit_actions": [],
+      "checksum": "234655ec178edd82b891e262ea7cf71f6584bcd09eff94db786be23f1821825c",
+      "rust_version": "1.59.0",
+      "has_lib": true,
+      "bin_names": [],
+      "edition": "2021",
+      "description": "Next-gen compile-time-checked builder generator, named function's arguments, and more!",
+      "homepage": "https://bon-rs.com",
+      "documentation": null,
+      "repository": "https://github.com/elastio/bon",
+      "trustpub_data": {
+        "provider": "github",
+        "repository": "elastio/bon",
+        "run_id": "20818285638",
+        "sha": "9f43a1feec45b1843996943edb23db2f8fecef70"
+      },
+      "linecounts": {
+        "languages": {
+          "Rust": {
+            "code_lines": 265,
+            "comment_lines": 34,
+            "files": 7
+          }
+        },
+        "total_code_lines": 265,
+        "total_comment_lines": 34
+      }
+    }
+  ],
+  "meta": {
+    "total": 48,
+    "next_page": "?per_page=5&seek=WyIzLjguMiIsMTkyOTU0M10"
+  }
+}

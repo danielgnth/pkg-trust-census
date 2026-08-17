@@ -1,0 +1,113 @@
+{
+  "responseHeader": {
+    "status": 0,
+    "QTime": 1,
+    "params": {
+      "q": "g:com.google.guava AND a:guava",
+      "core": "gav",
+      "indent": "off",
+      "fl": "id,g,a,v,p,ec,timestamp,tags",
+      "start": "",
+      "sort": "score desc,timestamp desc,g asc,a asc,v desc",
+      "rows": "3",
+      "wt": "json",
+      "version": "2.2"
+    }
+  },
+  "response": {
+    "numFound": 150,
+    "start": 0,
+    "docs": [
+      {
+        "id": "com.google.guava:guava:33.4.8-jre",
+        "g": "com.google.guava",
+        "a": "guava",
+        "v": "33.4.8-jre",
+        "p": "bundle",
+        "timestamp": 1744651522422,
+        "ec": [
+          ".module",
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ],
+        "tags": [
+          "include",
+          "more",
+          "classes",
+          "libraries",
+          "utility",
+          "google",
+          "core",
+          "that",
+          "expanded",
+          "suite",
+          "collections",
+          "guava",
+          "much"
+        ]
+      },
+      {
+        "id": "com.google.guava:guava:33.4.8-android",
+        "g": "com.google.guava",
+        "a": "guava",
+        "v": "33.4.8-android",
+        "p": "bundle",
+        "timestamp": 1744650919688,
+        "ec": [
+          ".module",
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ],
+        "tags": [
+          "include",
+          "more",
+          "classes",
+          "libraries",
+          "utility",
+          "google",
+          "core",
+          "that",
+          "expanded",
+          "suite",
+          "collections",
+          "guava",
+          "much"
+        ]
+      },
+      {
+        "id": "com.google.guava:guava:33.4.7-jre",
+        "g": "com.google.guava",
+        "a": "guava",
+        "v": "33.4.7-jre",
+        "p": "bundle",
+        "timestamp": 1744117063405,
+        "ec": [
+          ".module",
+          "-sources.jar",
+          ".pom",
+          "-javadoc.jar",
+          ".jar"
+        ],
+        "tags": [
+          "include",
+          "more",
+          "classes",
+          "libraries",
+          "utility",
+          "google",
+          "core",
+          "that",
+          "expanded",
+          "suite",
+          "collections",
+          "guava",
+          "much"
+        ]
+      }
+    ]
+  }
+}

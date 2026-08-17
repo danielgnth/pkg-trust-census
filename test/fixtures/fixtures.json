@@ -1,0 +1,164 @@
+[
+  {
+    "fixture": "test/fixtures/pypi-simple-sigstore.json",
+    "ecosystem": "pypi",
+    "package": "sigstore",
+    "source_url": "https://pypi.org/simple/sigstore/",
+    "request_headers": {
+      "Accept": "application/vnd.pypi.simple.v1+json"
+    },
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:53.770Z",
+    "full_response_sha256": "9c793ffd34887033c9e0276fdce58262b6297d94e04079dbe34a08704b7f87a7",
+    "full_response_bytes": 72076,
+    "trimmed": "files 132 -> 6 (kept newest)",
+    "why": "files[].provenance is non-null — PEP 740 attestation present"
+  },
+  {
+    "fixture": "test/fixtures/pypi-simple-ruff.json",
+    "ecosystem": "pypi",
+    "package": "ruff",
+    "source_url": "https://pypi.org/simple/ruff/",
+    "request_headers": {
+      "Accept": "application/vnd.pypi.simple.v1+json"
+    },
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:54.042Z",
+    "full_response_sha256": "fb779190f26d89d180d1be0ccb8fabd1644d939a764d6a48dd9d168297711eda",
+    "full_response_bytes": 4449402,
+    "trimmed": "files 7044 -> 4 (kept newest)",
+    "why": "files[].provenance is null — the negative case, so `false` is a real negative"
+  },
+  {
+    "fixture": "test/fixtures/npm-packument-sigstore.json",
+    "ecosystem": "npm",
+    "package": "sigstore",
+    "source_url": "https://registry.npmjs.org/sigstore",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:54.143Z",
+    "full_response_sha256": "c370a3769c3a2bfae7dcc3e34eb5980955849e9d829cae17abcf6132f78eb414",
+    "full_response_bytes": 121433,
+    "trimmed": "versions 40 -> 4; readme dropped",
+    "why": "dist.attestations present; also exercises the `time` map the backfill needs"
+  },
+  {
+    "fixture": "test/fixtures/npm-packument-chalk.json",
+    "ecosystem": "npm",
+    "package": "chalk",
+    "source_url": "https://registry.npmjs.org/chalk",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:54.342Z",
+    "full_response_sha256": "dbbff88bcfafef2eed657dbe3c318d7b6056c4515116176e553ff188c6263c01",
+    "full_response_bytes": 134775,
+    "trimmed": "versions 44 -> 3; readme dropped",
+    "why": "dist.signatures present but no dist.attestations — proves signatures are not the differentiator"
+  },
+  {
+    "fixture": "test/fixtures/crates-versions-bon.json",
+    "ecosystem": "crates",
+    "package": "bon",
+    "source_url": "https://crates.io/api/v1/crates/bon/versions?per_page=5",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:54.946Z",
+    "full_response_sha256": "bbdf321d54d97ee7d9f2eb25c429b8f47b47509d72d2da65605c27001e4d632e",
+    "full_response_bytes": 7416,
+    "trimmed": null,
+    "why": "trustpub_data populated — the only direct trusted-publishing observation of the seven"
+  },
+  {
+    "fixture": "test/fixtures/crates-versions-serde.json",
+    "ecosystem": "crates",
+    "package": "serde",
+    "source_url": "https://crates.io/api/v1/crates/serde/versions?per_page=3",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:55.628Z",
+    "full_response_sha256": "aef853117cd091c05561e9e23a32a2619dcfd2af365d91d634ac22d8c6037d68",
+    "full_response_bytes": 5094,
+    "trimmed": null,
+    "why": "trustpub_data null — token-published negative case"
+  },
+  {
+    "fixture": "test/fixtures/rubygems-versions-trusted-publishing-test.json",
+    "ecosystem": "rubygems",
+    "package": "trusted_publishing_test",
+    "source_url": "https://rubygems.org/api/v1/versions/trusted_publishing_test.json",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:56.281Z",
+    "full_response_sha256": "03902cdb403dd1db3eecd61f4ee4729aa3e2fd445041dbb0aec41f01a7dd499d",
+    "full_response_bytes": 16099,
+    "trimmed": "versions 19 -> 4 (newest-first API, kept head)",
+    "why": "Ruby Central's own trusted-publishing gem exposes NO trusted-publishing field — pins the negative finding"
+  },
+  {
+    "fixture": "test/fixtures/rubygems-versions-rails.json",
+    "ecosystem": "rubygems",
+    "package": "rails",
+    "source_url": "https://rubygems.org/api/v1/versions/rails.json",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:56.614Z",
+    "full_response_sha256": "ab23d8cfbf2eca8b92cc9a858215c979bf7c6deb97fe3530f22cd548b2abbdcc",
+    "full_response_bytes": 463850,
+    "trimmed": "versions 519 -> 4 (newest-first API, kept head)",
+    "why": "metadata.rubygems_mfa_required present per version — the backfillable MFA signal"
+  },
+  {
+    "fixture": "test/fixtures/go-latest-gorilla-mux.json",
+    "ecosystem": "go",
+    "package": "github.com/gorilla/mux",
+    "source_url": "https://proxy.golang.org/github.com/gorilla/mux/@latest",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:56.691Z",
+    "full_response_sha256": "104c0fb5c977a68b196744aa397c4c486c12ac2d66497a5bedbe0344782ce545",
+    "full_response_bytes": 187,
+    "trimmed": null,
+    "why": "Origin {VCS, URL, Ref, Hash} — source provenance built into the module proxy"
+  },
+  {
+    "fixture": "test/fixtures/go-sumdb-gorilla-mux.txt",
+    "ecosystem": "go",
+    "package": "github.com/gorilla/mux",
+    "source_url": "https://sum.golang.org/lookup/github.com/gorilla/mux@v1.8.1",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:57.012Z",
+    "full_response_sha256": "1868d3dd98a2881bc8f3faadf26b634c76c42803eebf28271ce4d5665f519988",
+    "full_response_bytes": 361,
+    "trimmed": null,
+    "why": "transparency-log inclusion proof; HTTP 200 is itself the signal"
+  },
+  {
+    "fixture": "test/fixtures/maven-gav-sigstore.json",
+    "ecosystem": "maven",
+    "package": "dev.sigstore:protobuf-specs",
+    "source_url": "https://search.maven.org/solrsearch/select?q=g:dev.sigstore+AND+a:protobuf-specs&core=gav&rows=3&wt=json",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:57.683Z",
+    "full_response_sha256": "d87974fb9ee0c9baa5d1a66c5f777719d48d4b991997d039b52798a8779c1ae2",
+    "full_response_bytes": 3590,
+    "trimmed": null,
+    "why": "ec[] lists .jar.sigstore.json — the Sigstore positive case. Note it lists .jar.asc.sha256 but never a bare .jar.asc"
+  },
+  {
+    "fixture": "test/fixtures/maven-gav-guava.json",
+    "ecosystem": "maven",
+    "package": "com.google.guava:guava",
+    "source_url": "https://search.maven.org/solrsearch/select?q=g:com.google.guava+AND+a:guava&core=gav&rows=3&wt=json",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:58.072Z",
+    "full_response_sha256": "572342dd6e43c9684dc737e82df4496629d4fb530fe3557811a697db723ba63e",
+    "full_response_bytes": 1284,
+    "trimmed": null,
+    "why": "ec[] omits .asc even though the .asc file exists — pins the trap that ec is unreliable for GPG"
+  },
+  {
+    "fixture": "test/fixtures/packagist-monolog.json",
+    "ecosystem": "packagist",
+    "package": "monolog/monolog",
+    "source_url": "https://packagist.org/packages/monolog/monolog.json",
+    "http_status": 200,
+    "captured_at": "2026-08-17T15:20:58.343Z",
+    "full_response_sha256": "d43b49f807355f5184c819dc2fe9175bf6c1f3ecc8e83840dafd15fe8fca2ba2",
+    "full_response_bytes": 235864,
+    "trimmed": "versions 93 -> 3",
+    "why": "no signing field of any kind exists on version objects — the no_mechanism case"
+  }
+]

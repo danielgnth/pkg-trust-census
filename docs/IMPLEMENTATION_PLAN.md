@@ -222,8 +222,8 @@ Cache paths use a filesystem-safe slug plus a URL hash — this sidesteps npm sc
 
 | # | Deliverable | Exit criterion |
 |---|---|---|
-| **M0** | `docs/preflight.md` + test fixtures | Remaining §2 items confirmed; 2FA policy text cited for all seven |
-| **M1** | Bun skeleton: schema, HTTP client, cache, manifest, CLI | `bun test` green on the client; cache hit/miss and resumability demonstrated |
+| ~~**M0**~~ | `docs/preflight.md` + 13 real fixtures across all 7 registries | **Done.** Signal shapes verified and locked by regression tests; 2FA policy text deferred to M7 (some doc hosts egress-blocked) |
+| ~~**M1**~~ | Bun skeleton: schema, HTTP client, cache, manifest, CLI | **Done.** 47 tests green under both transports; zero-refetch resume demonstrated |
 | **M2** | PyPI rank + fetch, N=20 | Interrupt mid-run, resume, zero re-fetches |
 | **M3** | PyPI extract + aggregate + charts | Matrix + adoption curve render; format judged paper-ready |
 | **M4** | crates.io + npm | The two richest signals (`trustpub_data`, `dist.attestations`) land end-to-end |
@@ -247,6 +247,7 @@ M2 uses PyPI first deliberately: one call per package returns the entire version
 | Go/Maven sampled by dependents, others by downloads | Record `rank_frame` per package row; state the caveat explicitly in the paper. Both frames are reported in the output so the difference is visible, not hidden |
 | PyPI/npm trusted publishing is inferred, not observed | Encoded as `availability = 'inferred'` rather than asserted as fact — the inference is visible in the data model itself |
 | Registry APIs change shape mid-project | Raw cache + fixture tests mean a shape change is caught by a failing test, and old snapshots stay re-extractable |
+| Bun `fetch` cannot traverse an HTTPS CONNECT proxy (sandbox/CI egress) | Resolved in M1: HTTP sits behind a `Transport` interface, curl-backed when `HTTPS_PROXY` is set. See preflight §5 |
 | Quarter anchors sparse for slow-moving packages | Anchor = last version published **at or before** each quarter boundary; record `null` where the package did not yet exist |
 
 ---

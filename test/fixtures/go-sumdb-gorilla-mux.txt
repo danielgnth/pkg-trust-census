@@ -1,0 +1,9 @@
+20489207
+github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
+github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
+
+go.sum database tree
+60053726
+OQUOf3fXGyyA5BY/nXH4cXZ4dDTobtafrnPRbCBOoV8=
+
+— sum.golang.org Az3grhxhgexrEnI8rhQxcXPWYpRqpC+b+1MgUdMhkxD5uil6ol5RUSlvw2D6swyLkdazyeDvTSWSkFWrcYf2DHz21AI=

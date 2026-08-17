@@ -1,0 +1,17 @@
+{
+  "name": "pkg-trust-scraper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cross-ecosystem package trust signal scraper — Seminar Software Supply Chain Security WiSe 26/27",
+  "module": "src/cli.ts",
+  "scripts": {
+    "cli": "bun run src/cli.ts",
+    "test": "bun test",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}

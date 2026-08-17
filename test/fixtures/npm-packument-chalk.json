@@ -1,0 +1,432 @@
+{
+  "_id": "chalk",
+  "_rev": "1239-b742c42277ad0a904287e75461ea13ec",
+  "name": "chalk",
+  "dist-tags": {
+    "next": "3.0.0-beta.2",
+    "latest": "6.0.0"
+  },
+  "versions": {
+    "5.6.0": {
+      "name": "chalk",
+      "version": "5.6.0",
+      "keywords": [
+        "color",
+        "colour",
+        "colors",
+        "terminal",
+        "console",
+        "cli",
+        "string",
+        "ansi",
+        "style",
+        "styles",
+        "tty",
+        "formatting",
+        "rgb",
+        "256",
+        "shell",
+        "xterm",
+        "log",
+        "logging",
+        "command-line",
+        "text"
+      ],
+      "license": "MIT",
+      "_id": "chalk@5.6.0",
+      "maintainers": [
+        {
+          "name": "sindresorhus",
+          "email": "redacted@example.invalid"
+        },
+        {
+          "name": "qix",
+          "email": "redacted@example.invalid"
+        }
+      ],
+      "homepage": "https://github.com/chalk/chalk#readme",
+      "bugs": {
+        "url": "https://github.com/chalk/chalk/issues"
+      },
+      "c8": {
+        "exclude": [
+          "source/vendor"
+        ],
+        "reporter": [
+          "text",
+          "lcov"
+        ]
+      },
+      "xo": {
+        "rules": {
+          "unicorn/prefer-string-slice": "off",
+          "unicorn/expiring-todo-comments": "off",
+          "@typescript-eslint/consistent-type-exports": "off",
+          "@typescript-eslint/consistent-type-imports": "off",
+          "@typescript-eslint/consistent-type-definitions": "off"
+        }
+      },
+      "dist": {
+        "shasum": "a1a8d294ea3526dbb77660f12649a08490e33ab8",
+        "tarball": "https://registry.npmjs.org/chalk/-/chalk-5.6.0.tgz",
+        "fileCount": 12,
+        "integrity": "sha512-46QrSQFyVSEyYAgQ22hQ+zDa60YHA4fBstHmtSApj1Y5vKtG27fWowW03jCk5KcbXEWPZUIR894aARCA/G1kfQ==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDltNNES9F6J7ZCIOUmCIhmzarhpwV/RreL30sKz1JmrAIhALm8Tqs3WI9NV4zlCvcssrH4iNus8SHGfj5uM87gYKNd",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 44342
+      },
+      "main": "./source/index.js",
+      "type": "module",
+      "types": "./source/index.d.ts",
+      "engines": {
+        "node": "^12.17.0 || ^14.13 || >=16.0.0"
+      },
+      "exports": "./source/index.js",
+      "funding": "https://github.com/chalk/chalk?sponsor=1",
+      "gitHead": "5c91505e184aff4609c0a7fb235770c2f71db4a3",
+      "imports": {
+        "#ansi-styles": "./source/vendor/ansi-styles/index.js",
+        "#supports-color": {
+          "node": "./source/vendor/supports-color/index.js",
+          "default": "./source/vendor/supports-color/browser.js"
+        }
+      },
+      "scripts": {
+        "test": "xo && c8 ava && tsd",
+        "bench": "matcha benchmark.js"
+      },
+      "_npmUser": {
+        "name": "sindresorhus",
+        "email": "redacted@example.invalid"
+      },
+      "repository": {
+        "url": "git+https://github.com/chalk/chalk.git",
+        "type": "git"
+      },
+      "_npmVersion": "10.9.2",
+      "description": "Terminal string styling done right",
+      "directories": {},
+      "sideEffects": false,
+      "_nodeVersion": "20.19.1",
+      "_hasShrinkwrap": false,
+      "devDependencies": {
+        "c8": "^7.10.0",
+        "xo": "^0.57.0",
+        "ava": "^3.15.0",
+        "tsd": "^0.19.0",
+        "execa": "^6.0.0",
+        "matcha": "^0.7.0",
+        "log-update": "^5.0.0",
+        "yoctodelay": "^2.0.0",
+        "@types/node": "^16.11.10",
+        "color-convert": "^2.0.1"
+      },
+      "_npmOperationalInternal": {
+        "tmp": "tmp/chalk_5.6.0_1755415667378_0.8747575983878675",
+        "host": "s3://npm-registry-packages-npm-production"
+      }
+    },
+    "5.6.2": {
+      "name": "chalk",
+      "version": "5.6.2",
+      "keywords": [
+        "color",
+        "colour",
+        "colors",
+        "terminal",
+        "console",
+        "cli",
+        "string",
+        "ansi",
+        "style",
+        "styles",
+        "tty",
+        "formatting",
+        "rgb",
+        "256",
+        "shell",
+        "xterm",
+        "log",
+        "logging",
+        "command-line",
+        "text"
+      ],
+      "license": "MIT",
+      "_id": "chalk@5.6.2",
+      "maintainers": [
+        {
+          "name": "sindresorhus",
+          "email": "redacted@example.invalid"
+        }
+      ],
+      "homepage": "https://github.com/chalk/chalk#readme",
+      "bugs": {
+        "url": "https://github.com/chalk/chalk/issues"
+      },
+      "c8": {
+        "exclude": [
+          "source/vendor"
+        ],
+        "reporter": [
+          "text",
+          "lcov"
+        ]
+      },
+      "xo": {
+        "rules": {
+          "unicorn/prefer-string-slice": "off",
+          "unicorn/expiring-todo-comments": "off",
+          "@typescript-eslint/consistent-type-exports": "off",
+          "@typescript-eslint/consistent-type-imports": "off",
+          "@typescript-eslint/consistent-type-definitions": "off"
+        }
+      },
+      "dist": {
+        "shasum": "b1238b6e23ea337af71c7f8a295db5af0c158aea",
+        "tarball": "https://registry.npmjs.org/chalk/-/chalk-5.6.2.tgz",
+        "fileCount": 12,
+        "integrity": "sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==",
+        "signatures": [
+          {
+            "sig": "MEUCIAK8R5sdT/x7G+um1BI7SoV0pjX9rmfetVilv4nFhgVMAiEA0zkx6dRcCky2Exe5uLha3/Hnv9JISu7kVVBBFUeZ/RQ=",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          }
+        ],
+        "unpackedSize": 44342
+      },
+      "main": "./source/index.js",
+      "type": "module",
+      "types": "./source/index.d.ts",
+      "engines": {
+        "node": "^12.17.0 || ^14.13 || >=16.0.0"
+      },
+      "exports": "./source/index.js",
+      "funding": "https://github.com/chalk/chalk?sponsor=1",
+      "gitHead": "51557784b829c87ff8d138206598764f2eb957b1",
+      "imports": {
+        "#ansi-styles": "./source/vendor/ansi-styles/index.js",
+        "#supports-color": {
+          "node": "./source/vendor/supports-color/index.js",
+          "default": "./source/vendor/supports-color/browser.js"
+        }
+      },
+      "scripts": {
+        "test": "xo && c8 ava && tsd",
+        "bench": "matcha benchmark.js"
+      },
+      "_npmUser": {
+        "name": "sindresorhus",
+        "email": "redacted@example.invalid"
+      },
+      "repository": {
+        "url": "git+https://github.com/chalk/chalk.git",
+        "type": "git"
+      },
+      "_npmVersion": "10.9.2",
+      "description": "Terminal string styling done right",
+      "directories": {},
+      "sideEffects": false,
+      "_nodeVersion": "22.12.0",
+      "_hasShrinkwrap": false,
+      "devDependencies": {
+        "c8": "^7.10.0",
+        "xo": "^0.57.0",
+        "ava": "^3.15.0",
+        "tsd": "^0.19.0",
+        "execa": "^6.0.0",
+        "matcha": "^0.7.0",
+        "log-update": "^5.0.0",
+        "yoctodelay": "^2.0.0",
+        "@types/node": "^16.11.10",
+        "color-convert": "^2.0.1"
+      },
+      "_npmOperationalInternal": {
+        "tmp": "tmp/chalk_5.6.2_1757342874299_0.9496636300891743",
+        "host": "s3://npm-registry-packages-npm-production"
+      }
+    },
+    "6.0.0": {
+      "c8": {
+        "exclude": [
+          "source/vendor"
+        ],
+        "reporter": [
+          "text",
+          "lcov"
+        ]
+      },
+      "xo": [
+        {
+          "ignores": [
+            "source/vendor"
+          ]
+        },
+        {
+          "rules": {
+            "no-warning-comments": "off",
+            "unicorn/prefer-string-slice": "off",
+            "unicorn/expiring-todo-comments": "off",
+            "@typescript-eslint/consistent-type-exports": "off",
+            "@typescript-eslint/consistent-type-imports": "off",
+            "@typescript-eslint/consistent-type-definitions": "off"
+          }
+        }
+      ],
+      "_id": "chalk@6.0.0",
+      "bugs": {
+        "url": "https://github.com/chalk/chalk/issues"
+      },
+      "dist": {
+        "shasum": "a3bae843bc8454f41ef66ef3fd584dcf34dd805d",
+        "tarball": "https://registry.npmjs.org/chalk/-/chalk-6.0.0.tgz",
+        "fileCount": 12,
+        "integrity": "sha512-2uNTXIuTTxk7ciZgAU1BQcgnchcG0xXnrs6jzkQfj9SsRa9M2s5zE8WT96hS6KmG4MzWHSrvH43DF1m4XRkrFg==",
+        "signatures": [
+          {
+            "sig": "MEYCIQDkRybaXiWbWA2HNC5DeMLw9jJZD4MXs56nLrqen4Y1kAIhALHJlK4u37pCSgdxBJGY6O4edIq8ihjLF8Syt6UkcXlo",
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+          },
+          {
+            "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+            "sig": "MEUCICO3Obg06YF3rR7AWElxEX/VCksltxq9xZiaac2uUMuhAiEAhANwq2jUyqF/BlXwL2vwnx72HVIxIB16E/Voq7HvzA0="
+          }
+        ],
+        "unpackedSize": 56029
+      },
+      "name": "chalk",
+      "type": "module",
+      "engines": {
+        "node": ">=22"
+      },
+      "exports": {
+        "types": "./source/index.d.ts",
+        "default": "./source/index.js"
+      },
+      "funding": "https://github.com/chalk/chalk?sponsor=1",
+      "gitHead": "661317e6f91fe7c90306c2c48ea9354562ee9146",
+      "imports": {
+        "#ansi-styles": "./source/vendor/ansi-styles/index.js",
+        "#supports-color": {
+          "node": "./source/vendor/supports-color/index.js",
+          "default": "./source/vendor/supports-color/browser.js"
+        }
+      },
+      "license": "MIT",
+      "scripts": {
+        "test": "xo && c8 ava && tsc --noEmit --types node source/index.d.ts",
+        "bench": "matcha benchmark.js"
+      },
+      "version": "6.0.0",
+      "_npmUser": {
+        "name": "sindresorhus",
+        "email": "redacted@example.invalid"
+      },
+      "homepage": "https://github.com/chalk/chalk#readme",
+      "keywords": [
+        "color",
+        "colour",
+        "colors",
+        "terminal",
+        "console",
+        "cli",
+        "string",
+        "ansi",
+        "style",
+        "styles",
+        "tty",
+        "formatting",
+        "rgb",
+        "256",
+        "shell",
+        "xterm",
+        "log",
+        "logging",
+        "command-line",
+        "text"
+      ],
+      "repository": {
+        "url": "git+https://github.com/chalk/chalk.git",
+        "type": "git"
+      },
+      "_npmVersion": "12.0.1",
+      "description": "Terminal string styling done right",
+      "directories": {},
+      "maintainers": [
+        {
+          "name": "sindresorhus",
+          "email": "redacted@example.invalid"
+        }
+      ],
+      "sideEffects": false,
+      "_nodeVersion": "22.23.1",
+      "_hasShrinkwrap": false,
+      "devDependencies": {
+        "c8": "^12.0.0",
+        "xo": "^4.0.0",
+        "ava": "^8.0.1",
+        "execa": "^10.0.0",
+        "matcha": "^0.7.0",
+        "log-update": "^8.0.0",
+        "typescript": "^6.0.3",
+        "yoctodelay": "^2.0.0",
+        "@types/node": "^26.1.1",
+        "ansi-styles": "^6.2.3",
+        "color-convert": "^3.1.3"
+      },
+      "_npmOperationalInternal": {
+        "host": "s3://npm-registry-packages-npm-production",
+        "tmp": "tmp/chalk_6.0.0_1785077467188_0.7480010571173716"
+      }
+    }
+  },
+  "time": {
+    "created": "2013-08-03T00:21:56.318Z",
+    "modified": "2026-07-26T14:51:07.471Z",
+    "5.6.0": "2025-08-17T07:27:47.572Z",
+    "5.6.2": "2025-09-08T14:47:54.486Z",
+    "6.0.0": "2026-07-26T14:51:07.269Z"
+  },
+  "bugs": {
+    "url": "https://github.com/chalk/chalk/issues"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/chalk/chalk#readme",
+  "keywords": [
+    "color",
+    "colour",
+    "colors",
+    "terminal",
+    "console",
+    "cli",
+    "string",
+    "ansi",
+    "style",
+    "styles",
+    "tty",
+    "formatting",
+    "rgb",
+    "256",
+    "shell",
+    "xterm",
+    "log",
+    "logging",
+    "command-line",
+    "text"
+  ],
+  "repository": {
+    "url": "git+https://github.com/chalk/chalk.git",
+    "type": "git"
+  },
+  "description": "Terminal string styling done right",
+  "maintainers": [
+    {
+      "name": "sindresorhus",
+      "email": "redacted@example.invalid"
+    }
+  ],
+  "readmeFilename": "readme.md"
+}
