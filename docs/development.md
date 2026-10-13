@@ -62,9 +62,11 @@ Results land in `data/out/<snapshot>/`:
 | `baseline.md` / `baseline.csv` | Registry baseline (ecosystem-level properties) |
 | `sigstore.md` / `sigstore.csv` | Which registries accept Sigstore bundles, who verifies them, nearest equivalents |
 | `pqc.md` / `pqc.csv` | Post-quantum exposure of each mechanism, per ecosystem |
+| `policies.md` / `policies.csv` | Governance (namespaces, confusable names, upload scanning) and containment (yank, deletion, advisories) |
+| `withdrawals.csv` | Per package: versions yanked, unpublished, deprecated or retracted, with the version numbers |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
-| `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, Sigstore, post-quantum exposure, adoption per signal |
+| `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, governance and containment, withdrawals, Sigstore, post-quantum exposure, adoption per signal |
 
 ## Configuration
 

@@ -44,6 +44,10 @@ interface Raw {
   kept: KeptVersion<Kept>[];
   sumdb: Map<string, FetchResult>;
   latest: Info | null;
+  /** Every tag the proxy lists, for expanding retraction ranges. */
+  tags: string[];
+  /** The latest version's go.mod, whose retract directives apply to the whole module. */
+  latestMod: string | null;
 }
 
 export class GoAdapter extends GatheringAdapter<Raw> {
@@ -111,7 +115,9 @@ export class GoAdapter extends GatheringAdapter<Raw> {
       // 404 and 410 both mean "not in the log"; the client caches 404 as a fact already.
       sumdb.set(record.version, await src.get(`${SUMDB}/lookup/${mod}@${escapeModulePath(record.version)}`, opts));
     }
-    return { kept, sumdb, latest };
+    // Retractions live in the latest go.mod and apply to earlier versions (go.dev/ref/mod).
+    const modRes = latest ? await src.get(`${PROXY}/${mod}/@v/${escapeModulePath(latest.Version)}.mod`, opts) : null;
+    return { kept, sumdb, latest, tags, latestMod: modRes?.status === 200 ? modRes.body : null };
   }
 
   protected build(candidate: Candidate, raw: Raw): ExtractedPackage {
@@ -164,8 +170,51 @@ export class GoAdapter extends GatheringAdapter<Raw> {
           raw: { path: lookup.entry.path, sha256: lookup.entry.sha256 },
         };
       }),
+      // Retracted versions are undated without one .info request each, so they are
+      // counted over the module's whole history and the denominator is left unknown.
+      withdrawals: raw.latestMod == null ? [] : [{ kind: "retracted", versionsInWindow: null, withdrawn: retractedVersions(raw.latestMod, raw.tags) }],
     };
   }
+}
+
+/** One `retract` entry: a single version, or an inclusive [low, high] range. */
+export interface Retraction {
+  low: string;
+  high: string;
+}
+
+/**
+ * Parses the retract directives of a go.mod: `retract v1.0.0`, `retract [v1.0.0, v1.0.5]`,
+ * and the block form `retract ( ... )`, ignoring `//` comments (the rationale).
+ */
+export function parseRetractions(gomod: string): Retraction[] {
+  const out: Retraction[] = [];
+  const entry = (text: string) => {
+    const t = text.replace(/\/\/.*$/, "").trim();
+    if (!t) return;
+    const range = /^\[\s*(\S+?)\s*,\s*(\S+?)\s*\]$/.exec(t);
+    if (range) out.push({ low: range[1]!, high: range[2]! });
+    else if (/^v\S+$/.test(t)) out.push({ low: t, high: t });
+  };
+  let inBlock = false;
+  for (const line of gomod.split("\n")) {
+    const l = line.trim();
+    if (inBlock) {
+      if (l.startsWith(")")) inBlock = false;
+      else entry(l);
+    } else if (/^retract\s*\(/.test(l)) {
+      inBlock = true;
+    } else if (l.startsWith("retract ")) {
+      entry(l.slice("retract ".length));
+    }
+  }
+  return out;
+}
+
+/** The listed tags that fall inside any retraction, by semver precedence. */
+export function retractedVersions(gomod: string, tags: string[]): string[] {
+  const rs = parseRetractions(gomod);
+  return tags.filter((t) => rs.some((r) => compareSemver(t, r.low) >= 0 && compareSemver(t, r.high) <= 0));
 }
 
 /** Best-effort repository for forge-hosted module paths, when the proxy recorded no Origin. */

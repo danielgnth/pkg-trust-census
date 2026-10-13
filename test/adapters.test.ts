@@ -15,12 +15,13 @@ import { availabilityOf, AVAILABILITY } from "../src/facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, baselineOf } from "../src/facts/baseline.ts";
 import { SIGSTORE, sigstoreOf } from "../src/facts/sigstore.ts";
 import { PQC, PQC_LAYERS, pqcOf } from "../src/facts/pqc.ts";
+import { POLICIES, POLICY_PROPERTIES, policyOf } from "../src/facts/policies.ts";
 import { ECOSYSTEMS, SIGNALS } from "../src/types.ts";
 import { PypiAdapter, jsonUrl, simpleUrl } from "../src/adapters/pypi.ts";
 import { NpmAdapter, highImpactWindow, packumentUrl, windowDownloadsUrl } from "../src/adapters/npm.ts";
 import { CratesAdapter } from "../src/adapters/crates.ts";
 import { RubygemsAdapter } from "../src/adapters/rubygems.ts";
-import { GoAdapter } from "../src/adapters/go.ts";
+import { GoAdapter, parseRetractions, retractedVersions } from "../src/adapters/go.ts";
 import { MavenAdapter, pomUrl } from "../src/adapters/maven.ts";
 import { PackagistAdapter } from "../src/adapters/packagist.ts";
 
@@ -121,6 +122,17 @@ describe("facts", () => {
     }
   });
 
+  test("the governance/containment table covers every ecosystem × property once, each cited", () => {
+    expect(POLICIES).toHaveLength(ECOSYSTEMS.length * POLICY_PROPERTIES.length);
+    for (const e of ECOSYSTEMS) for (const p of POLICY_PROPERTIES) expect(() => policyOf(e, p.id)).not.toThrow();
+    for (const b of POLICIES) {
+      expect(b.sources.length).toBeGreaterThan(0);
+      for (const u of b.sources) expect(u).toStartWith("https://");
+      expect(b.note.length).toBeGreaterThan(10);
+      if (b.since) expect(b.since).toMatch(/^\d{4}-\d{2}$/);
+    }
+  });
+
   test("post-quantum cells agree with the Sigstore table", () => {
     // A registry that accepts Sigstore bundles has a (classical) publisher signature and a log.
     for (const s of SIGSTORE.filter((x) => x.status === "yes")) {
@@ -188,6 +200,7 @@ describe("PyPI extract", () => {
 
     expect(sig(pkg, "0.16.3", "build_provenance")!.value).toBe("false");
     expect(sig(pkg, "0.16.3", "identity_publish")!.value).toBe("unknown");
+    expect(pkg.withdrawals).toEqual([{ kind: "yanked", versionsInWindow: expect.any(Number), withdrawn: expect.any(Array) }]);
     expect(pkg.versions.find((v) => v.isLatest)?.raw?.sha256).toMatch(/^[0-9a-f]{64}$/);
     assertConsistentWithFacts(pkg);
   });
@@ -246,6 +259,32 @@ describe("npm extract", () => {
     expect(sig(pkg, "6.0.0", "build_provenance")!.value).toBe("false");
     expect(sig(pkg, "6.0.0", "identity_publish")!.value).toBe("false");
     assertConsistentWithFacts(pkg);
+  });
+
+  test("unpublished versions are read from the time map, deprecated ones from the manifest", async () => {
+    const doc = {
+      "dist-tags": { latest: "2.0.0" },
+      time: {
+        created: "2023-01-01T00:00:00Z",
+        modified: "2026-09-01T00:00:00Z",
+        "1.0.0": "2023-06-01T00:00:00Z",
+        "1.1.0": "2025-01-01T00:00:00Z",
+        "1.1.1": "2025-09-08T13:00:00Z",
+        "2.0.0": "2026-02-01T00:00:00Z",
+      },
+      versions: { "1.0.0": { deprecated: "old" }, "1.1.0": { deprecated: "use 2.x" }, "2.0.0": {} },
+    };
+    const routes: Record<string, Route> = { [packumentUrl("w")]: JSON.stringify(doc) };
+    for (const at of Object.values(doc.time)) {
+      const window = highImpactWindow(at);
+      if (window) routes[windowDownloadsUrl("w", window)] = JSON.stringify({ downloads: 0 });
+    }
+    const pkg = await new NpmAdapter().extract(candidate("npm", "w"), new FakeSource(routes), CTX);
+    // 1.0.0 predates the window; 1.1.1 was unpublished and survives only in `time`.
+    expect(pkg.withdrawals).toEqual([
+      { kind: "unpublished", versionsInWindow: 3, withdrawn: ["1.1.1"] },
+      { kind: "deprecated", versionsInWindow: 3, withdrawn: ["1.1.0"] },
+    ]);
   });
 
   test("the high-impact window is the week ending 15 days before the publication day", () => {
@@ -375,8 +414,10 @@ describe("Go extract", () => {
       "https://proxy.golang.org/github.com/gorilla/mux/@v/v1.8.0.info": JSON.stringify({ Version: "v1.8.0", Time: "2020-08-17T07:28:15Z" }),
       "https://proxy.golang.org/github.com/gorilla/mux/@v/v1.8.1.info": latest,
       "https://sum.golang.org/lookup/github.com/gorilla/mux@v1.8.1": await fixture("go-sumdb-gorilla-mux.txt"),
+      "https://proxy.golang.org/github.com/gorilla/mux/@v/v1.8.1.mod": "module github.com/gorilla/mux\n\ngo 1.20\n",
     });
     const pkg = await new GoAdapter().extract(candidate("go", "github.com/gorilla/mux"), src, CTX);
+    expect(pkg.withdrawals).toEqual([{ kind: "retracted", versionsInWindow: null, withdrawn: [] }]);
 
     expect(pkg.latestVersion).toBe("v1.8.1");
     expect(pkg.repositoryUrl).toBe("https://github.com/gorilla/mux");
@@ -386,6 +427,27 @@ describe("Go extract", () => {
     expect(sig(pkg, "v1.8.1", "source_link")!.evidence).toContain("b4617d0b9670ad14039b2739167fd35a60f557c5");
     expect(sig(pkg, "v1.8.1", "registry_integrity")!.value).toBe("true");
     assertConsistentWithFacts(pkg);
+  });
+
+  test("retract directives: single versions, ranges, blocks and comments", () => {
+    const gomod = [
+      "module example.com/m",
+      "",
+      "retract v1.0.1 // published by mistake",
+      "retract [v1.2.0, v1.2.3]",
+      "retract (",
+      "\tv1.5.0 // broken build",
+      "\t[v2.0.0, v2.0.1]",
+      ")",
+    ].join("\n");
+    expect(parseRetractions(gomod)).toEqual([
+      { low: "v1.0.1", high: "v1.0.1" },
+      { low: "v1.2.0", high: "v1.2.3" },
+      { low: "v1.5.0", high: "v1.5.0" },
+      { low: "v2.0.0", high: "v2.0.1" },
+    ]);
+    const tags = ["v1.0.0", "v1.0.1", "v1.2.0", "v1.2.2", "v1.2.4", "v1.5.0", "v2.0.1", "v2.1.0"];
+    expect(retractedVersions(gomod, tags)).toEqual(["v1.0.1", "v1.2.0", "v1.2.2", "v1.5.0", "v2.0.1"]);
   });
 
   test("a module the proxy cannot serve is an error", async () => {

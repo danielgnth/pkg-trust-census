@@ -19,8 +19,9 @@ import {
   observed,
   selectKeptVersions,
   type VersionRecord,
+  withdrawalIn,
 } from "../extract/signals.ts";
-import { quarterBoundaries } from "../extract/quarters.ts";
+import { quarterBoundaries, withdrawalWindowStart } from "../extract/quarters.ts";
 import { isSemverPrerelease } from "../extract/versions.ts";
 
 const API = "https://crates.io/api/v1";
@@ -172,6 +173,14 @@ export class CratesAdapter extends GatheringAdapter<Raw> {
           raw: { path: record.res.entry.path, sha256: record.res.entry.sha256 },
         };
       }),
+      withdrawals: [
+        withdrawalIn(
+          "yanked",
+          records.map((r) => ({ version: r.version, publishedAt: r.publishedAt, withdrawn: Boolean(r.yanked) })),
+          withdrawalWindowStart(ctx.asOf),
+          ctx.asOf,
+        ),
+      ],
     };
   }
 }

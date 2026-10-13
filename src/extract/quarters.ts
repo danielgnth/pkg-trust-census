@@ -9,6 +9,15 @@
 
 export const BACKFILL_START = "2024-01-01T00:00:00Z";
 
+/**
+ * Start of the window in which withdrawn versions are counted: the first quarter boundary.
+ * Not BACKFILL_START, because crates.io's version walk is only guaranteed complete after
+ * that boundary (it stops at the first older stable release).
+ */
+export function withdrawalWindowStart(asOf: Date): Date {
+  return quarterBoundaries(asOf)[0]?.at ?? asOf;
+}
+
 export interface VersionLike {
   version: string;
   publishedAt: string | null;

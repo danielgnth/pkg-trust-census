@@ -203,6 +203,23 @@ registry-level facts and, for the other three, the nearest equivalent: Go's own 
 nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
 `charts/sigstore.svg` draws the table alongside the share of sampled latest releases carrying a bundle.
 
+### Governance, containment and withdrawals
+
+A fourth curated table (`src/facts/policies.ts`; `policies.md` and `charts/policies.svg`) covers what
+keeps malicious packages out and what happens after a bad release. Governance: owned namespaces,
+blocking of confusable names, malware analysis of uploads. Containment: yanking that keeps lockfiles
+working, restrictions on author deletion, and whether the default client acts on advisories. Name rules
+are read from the registries' code (PyPI `ultranormalize_name`, RubyGems `GemTypo`, crates.io
+`canon_crate_name` and its typosquat job, Packagist `TypoSquattersValidator`).
+
+How often the containment tools are used is measured: per package, the versions yanked (PyPI, crates.io),
+unpublished or deprecated (npm; unpublished versions keep their entry in the packument's `time` map), or
+retracted (Go, from the latest `go.mod`), among versions published since the first quarter boundary
+(2024-04-01; crates.io's version walk is complete only from there). Go's retractions are undated and
+counted over all time. RubyGems hides yanked versions from every API, Maven allows no withdrawal, and
+Packagist's soft-deleted versions are not public, so those three have no counts. Stored in
+`package_withdrawals`; reported in the summary, `withdrawals.csv` and `charts/withdrawals.svg`.
+
 ### Publish authentication
 
 The identity signal also answers the reverse question, how releases *not* published through trusted

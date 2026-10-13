@@ -11,11 +11,11 @@
 import { and, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ECOSYSTEMS, SIGNALS, type Availability, type EcosystemId, type SignalId } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type Availability, type EcosystemId, type SignalId, type WithdrawalKind } from "../types.ts";
 import { snapshotAsOf, type Db } from "../db/open.ts";
-import { packageVersions, packages, signalAvailability, versionSignals } from "../db/schema.ts";
+import { packageVersions, packageWithdrawals, packages, signalAvailability, versionSignals } from "../db/schema.ts";
 import { dataDir } from "../http/cache.ts";
-import { quarterBoundaries } from "../extract/quarters.ts";
+import { quarterBoundaries, withdrawalWindowStart } from "../extract/quarters.ts";
 
 export interface Counts {
   n: number;
@@ -90,6 +90,24 @@ export interface Aggregate {
   weights: Record<SignalId, number>;
   scores: Score[];
   scoreSeries: ScorePoint[];
+  /** Start of the window withdrawn versions are counted in (`withdrawalWindowStart`). */
+  withdrawalWindowStart: string;
+  withdrawals: WithdrawalCell[];
+}
+
+/**
+ * How often one withdrawal mechanism was used, per ecosystem: packages that withdrew at
+ * least one version in the window, and the version share where the registry dates them.
+ */
+export interface WithdrawalCell {
+  ecosystem: EcosystemId;
+  kind: WithdrawalKind;
+  /** Packages with a row for this kind: the denominator. */
+  packages: number;
+  packagesWithdrawing: number;
+  withdrawnVersions: number;
+  /** Null where the registry dates too few versions to count the window (Go). */
+  versionsInWindow: number | null;
 }
 
 /**
@@ -252,7 +270,32 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
     weights: WEIGHTS,
     scores,
     scoreSeries,
+    withdrawalWindowStart: withdrawalWindowStart(asOf).toISOString(),
+    withdrawals: withdrawals(db, snapshotId),
   };
+}
+
+function withdrawals(db: Db, snapshotId: string): WithdrawalCell[] {
+  const rows = db.select().from(packageWithdrawals).where(eq(packageWithdrawals.snapshotId, snapshotId)).all();
+  const cells = new Map<string, WithdrawalCell>();
+  for (const r of rows) {
+    const key = `${r.ecosystem}/${r.kind}`;
+    const c = cells.get(key) ?? {
+      ecosystem: r.ecosystem as EcosystemId,
+      kind: r.kind as WithdrawalKind,
+      packages: 0,
+      packagesWithdrawing: 0,
+      withdrawnVersions: 0,
+      versionsInWindow: 0 as number | null,
+    };
+    c.packages++;
+    if (r.withdrawnCount > 0) c.packagesWithdrawing++;
+    c.withdrawnVersions += r.withdrawnCount;
+    c.versionsInWindow = r.versionsInWindow == null || c.versionsInWindow == null ? null : c.versionsInWindow + r.versionsInWindow;
+    cells.set(key, c);
+  }
+  const order = (c: WithdrawalCell) => ECOSYSTEMS.indexOf(c.ecosystem) * 10 + WITHDRAWAL_KINDS.indexOf(c.kind);
+  return [...cells.values()].sort((a, b) => order(a) - order(b));
 }
 
 export async function runAggregate(db: Db, snapshotId: string): Promise<{ aggregate: Aggregate; path: string }> {

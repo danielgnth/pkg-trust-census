@@ -372,3 +372,33 @@ The identity signal showed who used trusted publishing, not how everyone else pu
 Result on the top-50 snapshot: RubyGems' latest releases are 32% trusted publishing and 68% API key, with
 no unknowns, against ≥ 26% from attestations alone: three trusted-publishing releases carried no attestation.
 
+## 15. Governance, containment and withdrawals (2026-10-13)
+
+Sources for `src/facts/policies.ts` beyond documentation, read from registry code:
+
+- **PyPI** rejects a new project name whose `ultranormalize_name` (drop `. _ -`, fold `l i`→`1`, `o`→`0`,
+  lowercase) equals any existing project's (`warehouse/packaging/services.py`).
+- **RubyGems** rejects a push whose name equals an established gem's (≥ 10,000 downloads or a release in the
+  last five years) ignoring case, `_` and `-`, unless the pusher owns it (`app/models/gem_typo.rb`).
+- **crates.io** treats `-` and `_` as one (`canon_crate_name`); its typosquat job runs after publication and
+  only emails the team (`src/worker/jobs/typosquat.rs`).
+- **Packagist** rejects a package whose vendor is one edit from an existing vendor with the same package name
+  when that package has ≥ 1M downloads, and otherwise emails the admins (`TypoSquattersValidator.php`).
+
+Withdrawals visible per registry:
+
+| Registry | Where | Visible? |
+|---|---|---|
+| PyPI | Simple API `files[].yanked` | yes |
+| crates.io | `versions[].yanked` | yes |
+| npm | packument `time` keeps unpublished versions that `versions` drops; `versions[v].deprecated` | yes |
+| Go | `retract` directives in the latest `@v/{v}.mod` | yes, but undated |
+| RubyGems | yanked versions are absent from `/api/v1/versions` and 404 at `/api/v2/rubygems/{g}/versions/{v}.json` (`rest-client` 1.6.13) | no |
+| Maven | nothing can be withdrawn | n/a |
+| Packagist | soft-deleted versions are not in the public JSON | no |
+
+In the top-50 snapshot, every unpublished npm version since 2024-04 is one of the nine published in the
+2025-09-08 compromise of `chalk`, `debug`, `ansi-styles`, `ansi-regex`, `strip-ansi`, `supports-color`,
+`wrap-ansi`, `color-convert` and `color-name` (e.g. `chalk` 5.6.1, `time` 2025-09-08T13:13:05Z, no longer in
+`versions`).
+

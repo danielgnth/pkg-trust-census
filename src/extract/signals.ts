@@ -5,7 +5,7 @@
  * so "latest plus one anchor per quarter" means the same thing in all seven ecosystems.
  */
 
-import type { ExtractedSignal, SignalId, SignalValue } from "../types.ts";
+import type { ExtractedSignal, SignalId, SignalValue, Withdrawal, WithdrawalKind } from "../types.ts";
 import { anchorLabelsByVersion, selectQuarterAnchors } from "./quarters.ts";
 
 export interface VersionRecord {
@@ -157,3 +157,21 @@ export function earliest(timestamps: Array<string | null | undefined>): string |
   }
   return best;
 }
+
+/**
+ * Counts withdrawn versions among those published in [since, until]. Undated versions are
+ * left out of both numerator and denominator rather than guessed into the window.
+ */
+export function withdrawalIn(
+  kind: WithdrawalKind,
+  versions: Array<{ version: string; publishedAt: string | null; withdrawn: boolean }>,
+  since: Date,
+  until: Date,
+): Withdrawal {
+  const inWindow = versions.filter((v) => {
+    const t = v.publishedAt ? Date.parse(v.publishedAt) : NaN;
+    return Number.isFinite(t) && t >= since.getTime() && t <= until.getTime();
+  });
+  return { kind, versionsInWindow: inWindow.length, withdrawn: inWindow.filter((v) => v.withdrawn).map((v) => v.version) };
+}
+

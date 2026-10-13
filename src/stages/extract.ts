@@ -12,8 +12,8 @@ import { CacheSource } from "../http/client.ts";
 import type { ResponseCache } from "../http/cache.ts";
 import { getAdapter } from "../adapters/index.ts";
 import { snapshotAsOf, type Db } from "../db/open.ts";
-import { packageVersions, packages, versionSignals } from "../db/schema.ts";
-import { packageVersionInsert, validateAll, versionSignalInsert } from "../db/validation.ts";
+import { packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
+import { packageVersionInsert, packageWithdrawalInsert, validateAll, versionSignalInsert } from "../db/validation.ts";
 import { seedFacts } from "../facts/index.ts";
 import { loadCandidates } from "./rank.ts";
 
@@ -109,6 +109,18 @@ function persist(db: Db, snapshotId: string, pkg: ExtractedPackage): { versions:
     "version_signals",
   );
 
+  const withdrawalRows = validateAll(
+    packageWithdrawalInsert,
+    (pkg.withdrawals ?? []).map((w) => ({
+      ...key,
+      kind: w.kind,
+      versionsInWindow: w.versionsInWindow,
+      withdrawnCount: w.withdrawn.length,
+      withdrawnVersions: w.withdrawn.join(","),
+    })),
+    "package_withdrawals",
+  );
+
   db.transaction((tx) => {
     deleteRows(tx as unknown as Db, snapshotId, pkg.ecosystem, pkg.name);
     tx.update(packages)
@@ -124,6 +136,7 @@ function persist(db: Db, snapshotId: string, pkg: ExtractedPackage): { versions:
       .run();
     for (const row of versionRows) tx.insert(packageVersions).values(row).run();
     for (const row of signalRows) tx.insert(versionSignals).values(row).run();
+    for (const row of withdrawalRows) tx.insert(packageWithdrawals).values(row).run();
   });
   return { versions: versionRows.length, signals: signalRows.length };
 }
@@ -137,6 +150,9 @@ function clearPackage(db: Db, snapshotId: string, ecosystem: EcosystemId, name: 
 
 /** Signals first: they reference versions through a foreign key. */
 function deleteRows(db: Db, snapshotId: string, ecosystem: EcosystemId, name: string): void {
+  db.delete(packageWithdrawals)
+    .where(and(eq(packageWithdrawals.snapshotId, snapshotId), eq(packageWithdrawals.ecosystem, ecosystem), eq(packageWithdrawals.packageName, name)))
+    .run();
   db.delete(versionSignals)
     .where(and(eq(versionSignals.snapshotId, snapshotId), eq(versionSignals.ecosystem, ecosystem), eq(versionSignals.packageName, name)))
     .run();

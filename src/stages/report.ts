@@ -10,14 +10,15 @@ import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
-import { packageVersions, packages, versionSignals } from "../db/schema.ts";
+import { packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
 import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
-import { adoptionSvg, baselineSvg, matrixSvg, measurable, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg } from "../report/charts.ts";
-import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
+import { adoptionSvg, baselineSvg, matrixSvg, measurable, policiesSvg, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg, withdrawalsSvg } from "../report/charts.ts";
+import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 import { PQC, PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
+import { POLICIES, POLICIES_VERIFIED, POLICY_PROPERTIES, policyOf } from "../facts/policies.ts";
 
 export interface ReportResult {
   dir: string;
@@ -39,6 +40,11 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["baseline.md", baselineMarkdown(agg, true)],
     ["baseline.csv", baselineCsv()],
     ["charts/baseline.svg", baselineSvg(agg)],
+    ["policies.md", policiesMarkdown(agg, true)],
+    ["policies.csv", policiesCsv()],
+    ["charts/policies.svg", policiesSvg(agg)],
+    ["withdrawals.csv", withdrawalsCsv(db, snapshotId)],
+    ["charts/withdrawals.svg", withdrawalsSvg(agg)],
     ["sigstore.md", sigstoreMarkdown(agg, true)],
     ["sigstore.csv", sigstoreCsv()],
     ["charts/sigstore.svg", sigstoreSvg(agg)],
@@ -136,6 +142,8 @@ export function summaryMarkdown(agg: Aggregate): string {
     scoresMarkdown(agg),
     publishAuthMarkdown(agg),
     baselineMarkdown(agg, false),
+    policiesMarkdown(agg, false),
+    withdrawalsMarkdown(agg),
     sigstoreMarkdown(agg, false),
     pqcMarkdown(agg, false),
     "## Headline numbers",
@@ -347,6 +355,87 @@ function sigstoreCsv(): string {
       const clients = s.clients.map((c) => `${c.client}: ${c.verifies}`).join("; ");
       return [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, best.client, best.verifies, clients, s.signs, s.similar, s.sources.join(" ")];
     }),
+  );
+}
+
+/**
+ * Governance (keeping malicious packages out) and containment (what happens after a bad
+ * release), as registry rules. Ecosystem-level and curated, like the baseline.
+ */
+export function policiesMarkdown(agg: Aggregate, withNotes: boolean): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const cell = (b: { value: BaselineFact["value"]; since?: string }) => `${BASELINE_SYMBOL[b.value]}${b.since ? ` (since ${b.since})` : ""}`;
+  const lines = [
+    `### Registry governance and containment (verified ${POLICIES_VERIFIED})`,
+    "",
+    `| | ${POLICY_PROPERTIES.map((p) => p.label).join(" | ")} |`,
+    `|---|${POLICY_PROPERTIES.map(() => "---").join("|")}|`,
+    ...ecosystems.map((e) => `| **${ECOSYSTEM_LABEL[e]}** | ${POLICY_PROPERTIES.map((p) => cell(policyOf(e, p.id))).join(" | ")} |`),
+    "",
+    "What each column asks:",
+    "",
+    ...POLICY_PROPERTIES.map((p) => `- **${p.label}** (${p.group}): ${p.question}`),
+    "",
+  ];
+  if (!withNotes) return lines.join("\n");
+
+  lines.push("#### Notes and sources", "");
+  for (const p of POLICY_PROPERTIES) {
+    lines.push(`**${p.label}**`, "");
+    for (const e of ecosystems) {
+      const b = policyOf(e, p.id);
+      const links = b.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}${b.since ? ` (since ${b.since})` : ""}. ${b.note} ${links}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+/** How often each withdrawal mechanism was used in the sample. */
+export function withdrawalsMarkdown(agg: Aggregate): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const cells = agg.withdrawals ?? [];
+  const rows = ecosystems.flatMap((e) => {
+    const mine = cells.filter((c) => c.ecosystem === e);
+    if (!mine.length) return [`| **${ECOSYSTEM_LABEL[e]}** | – | – | – | ${WITHDRAWAL_BLIND[e] ?? "no withdrawal data"} |`];
+    return mine.map((c) => {
+      const share = c.packages ? `${pctText(c.packagesWithdrawing / c.packages)} (${c.packagesWithdrawing}/${c.packages})` : "–";
+      const versions = c.versionsInWindow ? `${pctSmall(c.withdrawnVersions / c.versionsInWindow)} (${c.withdrawnVersions}/${c.versionsInWindow})` : `${c.withdrawnVersions}`;
+      return `| **${ECOSYSTEM_LABEL[e]}** | ${WITHDRAWAL_LABEL[c.kind]} | ${share} | ${versions} | |`;
+    });
+  });
+  const since = (agg.withdrawalWindowStart ?? agg.asOf).slice(0, 10);
+  return [
+    `### Withdrawn versions since ${since} (snapshot ${agg.snapshotId})`,
+    "",
+    "| Platform | Mechanism | Packages withdrawing ≥ 1 version | Withdrawn versions | Why no data |",
+    "|---|---|---:|---:|---|",
+    ...rows,
+    "",
+    "Counted over versions published in the window; Go's retractions are undated and counted over each module's",
+    "history. Per-package rows, with the version numbers, are in `withdrawals.csv`.",
+    "",
+  ].join("\n");
+}
+
+function withdrawalsCsv(db: Db, snapshotId: string): string {
+  const rows = db
+    .select()
+    .from(packageWithdrawals)
+    .where(eq(packageWithdrawals.snapshotId, snapshotId))
+    .orderBy(asc(packageWithdrawals.ecosystem), asc(packageWithdrawals.packageName), asc(packageWithdrawals.kind))
+    .all();
+  return csv(
+    ["ecosystem", "package", "kind", "versions_in_window", "withdrawn_count", "withdrawn_versions"],
+    rows.map((r) => [r.ecosystem, r.packageName, r.kind, r.versionsInWindow, r.withdrawnCount, r.withdrawnVersions]),
+  );
+}
+
+function policiesCsv(): string {
+  return csv(
+    ["ecosystem", "property", "group", "value", "since", "note", "sources"],
+    POLICIES.map((b) => [b.ecosystem, b.property, POLICY_PROPERTIES.find((p) => p.id === b.property)!.group, b.value, b.since ?? null, b.note, b.sources.join(" ")]),
   );
 }
 

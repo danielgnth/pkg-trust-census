@@ -19,13 +19,14 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { ECOSYSTEMS, SIGNALS } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
 
 /** Renders a string[] as a SQL `IN (...)` list for CHECK constraints. */
 const inList = (values: readonly string[]) => values.map((v) => `'${v}'`).join(", ");
 
 const ECOSYSTEM_LIST = inList(ECOSYSTEMS);
 const SIGNAL_LIST = inList(SIGNALS);
+const WITHDRAWAL_LIST = inList(WITHDRAWAL_KINDS);
 
 export const snapshots = sqliteTable("snapshots", {
   snapshotId: text("snapshot_id").primaryKey(),
@@ -193,3 +194,40 @@ export type SnapshotRow = typeof snapshots.$inferSelect;
 export type PackageRow = typeof packages.$inferSelect;
 export type PackageVersionRow = typeof packageVersions.$inferSelect;
 export type VersionSignalRow = typeof versionSignals.$inferSelect;
+
+/**
+ * How many versions a package withdrew, per mechanism the registry exposes (yank,
+ * unpublish, deprecate, retract), counted over the window in `withdrawalWindowStart`.
+ * One row per package and kind; registries that expose none have no rows.
+ */
+export const packageWithdrawals = sqliteTable(
+  "package_withdrawals",
+  {
+    snapshotId: text("snapshot_id").notNull(),
+    ecosystem: text("ecosystem").notNull(),
+    packageName: text("package_name").notNull(),
+    kind: text("kind").notNull(),
+    /** Versions published in the window; null where the registry dates too few (Go). */
+    versionsInWindow: integer("versions_in_window"),
+    withdrawnCount: integer("withdrawn_count").notNull(),
+    /** Comma-joined version numbers, so a count can be checked by hand. */
+    withdrawnVersions: text("withdrawn_versions").notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName, t.kind] }),
+    foreignKey({
+      columns: [t.snapshotId, t.ecosystem, t.packageName],
+      foreignColumns: [packages.snapshotId, packages.ecosystem, packages.packageName],
+      name: "package_withdrawals_package_fk",
+    }),
+    check("package_withdrawals_ecosystem", sql.raw(`${t.ecosystem.name} IN (${ECOSYSTEM_LIST})`)),
+    check("package_withdrawals_kind", sql.raw(`${t.kind.name} IN (${WITHDRAWAL_LIST})`)),
+    check(
+      "package_withdrawals_counts",
+      sql.raw(
+        `${t.withdrawnCount.name} >= 0 AND (${t.versionsInWindow.name} IS NULL OR ${t.versionsInWindow.name} >= ${t.withdrawnCount.name})`,
+      ),
+    ),
+  ],
+);
+

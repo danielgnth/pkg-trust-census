@@ -20,7 +20,9 @@ import {
   signal,
   type KeptVersion,
   type VersionRecord,
+  withdrawalIn,
 } from "../extract/signals.ts";
+import { withdrawalWindowStart } from "../extract/quarters.ts";
 import { fulcioSourceRef } from "../extract/fulcio.ts";
 import { isPep440Prerelease } from "../extract/versions.ts";
 
@@ -197,7 +199,7 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
     return { simple, simpleRes, json, kept, provenance };
   }
 
-  protected build(candidate: Candidate, raw: Raw): ExtractedPackage {
+  protected build(candidate: Candidate, raw: Raw, ctx: RunContext): ExtractedPackage {
     const latest = raw.json?.info?.version ?? null;
     const kept = raw.kept;
     const rawRef = { path: raw.simpleRes.entry.path, sha256: raw.simpleRes.entry.sha256 };
@@ -222,6 +224,14 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
         signals: signalsFor(record, raw.provenance.get(record.version)?.data ?? null),
         raw: rawRef,
       })),
+      withdrawals: [
+        withdrawalIn(
+          "yanked",
+          groupByVersion(candidate.name, raw.simple).map((r) => ({ version: r.version, publishedAt: r.publishedAt, withdrawn: Boolean(r.yanked) })),
+          withdrawalWindowStart(ctx.asOf),
+          ctx.asOf,
+        ),
+      ],
     };
   }
 }

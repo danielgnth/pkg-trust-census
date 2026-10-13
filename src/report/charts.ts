@@ -9,8 +9,9 @@
 
 import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
 import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
-import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
-import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineValue } from "../facts/baseline.ts";
+import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, humanDate, humanMonth, pctSmall, pctText } from "./labels.ts";
+import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineProperty, type BaselineValue } from "../facts/baseline.ts";
+import { POLICIES_VERIFIED, POLICY_PROPERTIES, policyOf, type PolicyProperty } from "../facts/policies.ts";
 import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 import { PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
 
@@ -146,44 +147,87 @@ function twoLines(text: string): string[] {
   return [text.slice(0, cut), text.slice(cut + 1)];
 }
 
+interface GridColumn {
+  id: string;
+  label: string;
+  question: string;
+  /** Columns sharing a group get one header spanning them. */
+  group?: string;
+}
+
+interface GridCell {
+  value: BaselineValue;
+  since?: string;
+  note: string;
+}
+
 /**
- * The registry baseline as a grid: ecosystem × property, one categorical value per cell.
- * Ecosystem-level and curated, so the subtitle says so, and the hover title carries the note.
+ * An ecosystem × property grid of yes/partial/no/n/a values, each cell printing its value
+ * (and "since" month) so the reading never depends on colour. Shared by the baseline and
+ * the governance/containment tables.
  */
-export function baselineSvg(agg: Aggregate): string {
+function factGridSvg(opts: {
+  agg: Aggregate;
+  title: string;
+  subtitle: string;
+  columns: readonly GridColumn[];
+  cell: (e: EcosystemId, column: string) => GridCell;
+  footnote: string;
+}): string {
+  const { agg, columns } = opts;
   const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const grouped = columns.some((c) => c.group);
   const cellW = 128;
   const cellH = 44;
   const gap = 2;
   const left = 120;
-  const top = 94;
+  const top = grouped ? 116 : 94;
   const legendH = 66;
-  const width = left + BASELINE_PROPERTIES.length * (cellW + gap) + 32;
+  const width = left + columns.length * (cellW + gap) + 32;
   const height = top + ecosystems.length * (cellH + gap) + legendH;
   const parts: string[] = [
-    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Registry baseline: what the default toolchain protects</text>`,
-    `<text x="16" y="42" font-size="11" fill="${INK_2}">Ecosystem defaults from primary sources, verified ${esc(humanDate(BASELINE_VERIFIED, true))} · not part of the trust score · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">${esc(opts.title)}</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">${esc(opts.subtitle)}</text>`,
   ];
 
-  BASELINE_PROPERTIES.forEach((p, j) => {
+  if (grouped) {
+    // One rule and label per run of columns sharing a group.
+    let j = 0;
+    while (j < columns.length) {
+      const group = columns[j]!.group;
+      let k = j;
+      while (k + 1 < columns.length && columns[k + 1]!.group === group) k++;
+      if (group) {
+        const x1 = left + j * (cellW + gap);
+        const x2 = left + k * (cellW + gap) + cellW;
+        parts.push(
+          `<text x="${(x1 + x2) / 2}" y="${top - 46}" font-size="11" font-weight="600" fill="${INK}" text-anchor="middle">${esc(group)}</text>`,
+          `<line x1="${x1}" y1="${top - 40}" x2="${x2}" y2="${top - 40}" stroke="${GRID}" stroke-width="1.5"/>`,
+        );
+      }
+      j = k + 1;
+    }
+  }
+
+  columns.forEach((c, j) => {
     const x = left + j * (cellW + gap) + cellW / 2;
-    const lines = twoLines(p.label);
+    const lines = twoLines(c.label);
     lines.forEach((line, k) => {
       const y = top - 10 - (lines.length - 1 - k) * 13;
-      parts.push(`<text x="${x}" y="${y}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle"><title>${esc(p.question)}</title>${esc(line)}</text>`);
+      parts.push(`<text x="${x}" y="${y}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle"><title>${esc(c.question)}</title>${esc(line)}</text>`);
     });
   });
 
   ecosystems.forEach((e, i) => {
     const y = top + i * (cellH + gap);
     parts.push(`<text x="${left - 10}" y="${y + cellH / 2 + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(ECOSYSTEM_LABEL[e])}</text>`);
-    BASELINE_PROPERTIES.forEach((p, j) => {
-      const b = baselineOf(e, p.id);
+    columns.forEach((c, j) => {
+      const b = opts.cell(e, c.id);
       const st = BASELINE_STYLE[b.value];
       const x = left + j * (cellW + gap);
       const cx = x + cellW / 2;
       const since = b.since ? `since ${humanMonth(b.since)}` : null;
-      const title = `${ECOSYSTEM_LABEL[e]} · ${p.label}: ${b.value}${since ? ` (${since})` : ""}. ${b.note}`;
+      const title = `${ECOSYSTEM_LABEL[e]} · ${c.label}: ${b.value}${since ? ` (${since})` : ""}. ${b.note}`;
       parts.push(
         `<g><title>${esc(title)}</title>`,
         `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" rx="4" fill="${st.fill}"/>`,
@@ -206,11 +250,36 @@ export function baselineSvg(agg: Aggregate): string {
     );
     lx += 34 + st.label.length * 6;
   }
-  parts.push(
-    `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">"since" marks a value that changed recently, so the backfill quarters predate it. Hover a cell for the note; sources in baseline.md.</text>`,
-  );
+  parts.push(`<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">${esc(opts.footnote)}</text>`);
 
   return svg(width, height, parts.join("\n"), HATCH);
+}
+
+/**
+ * The registry baseline as a grid: ecosystem × property, one categorical value per cell.
+ * Ecosystem-level and curated, so the subtitle says so, and the hover title carries the note.
+ */
+export function baselineSvg(agg: Aggregate): string {
+  return factGridSvg({
+    agg,
+    title: "Registry baseline: what the default toolchain protects",
+    subtitle: `Ecosystem defaults from primary sources, verified ${humanDate(BASELINE_VERIFIED, true)} · not part of the trust score · snapshot ${humanDate(agg.asOf)}`,
+    columns: BASELINE_PROPERTIES,
+    cell: (e, id) => baselineOf(e, id as BaselineProperty),
+    footnote: '"since" marks a value that changed recently, so the backfill quarters predate it. Hover a cell for the note; sources in baseline.md.',
+  });
+}
+
+/** Governance (what keeps malicious names out) and containment (what happens after). */
+export function policiesSvg(agg: Aggregate): string {
+  return factGridSvg({
+    agg,
+    title: "Registry governance and incident containment",
+    subtitle: `Registry rules from primary sources and registry code, verified ${humanDate(POLICIES_VERIFIED, true)} · not part of the trust score · snapshot ${humanDate(agg.asOf)}`,
+    columns: POLICY_PROPERTIES.map((p) => ({ ...p, group: p.group === "governance" ? "Governance: keeping malicious packages out" : "Containment: after a bad release" })),
+    cell: (e, id) => policyOf(e, id as PolicyProperty),
+    footnote: '"since" marks a recent change. Hover a cell for the rule and its source; full notes and links in policies.md.',
+  });
 }
 
 /**
@@ -447,6 +516,69 @@ export function publishAuthSvg(agg: Aggregate): string {
     `<text x="16" y="${height - 14}" font-size="10" fill="${MUTED}">Maven has no OIDC path, so every upload uses a token. PyPI shows trusted publishing only through attestations, so credential uploads stay unknown.</text>`,
   );
   return svg(width, height, parts.join("\n"), HATCH);
+}
+
+/**
+ * How often the containment tools were used: per ecosystem and mechanism, the share of
+ * sampled packages that withdrew at least one version in the window. One bar per row on a
+ * single 0–100% axis; registries that expose no withdrawals get a text row saying why.
+ */
+export function withdrawalsSvg(agg: Aggregate): string {
+  const cells = agg.withdrawals ?? [];
+  type Row = { e: EcosystemId; label: string; cell?: (typeof cells)[number]; blind?: string };
+  const rows: Row[] = [];
+  for (const e of ECOSYSTEMS) {
+    if (!agg.scores.some((s) => s.ecosystem === e)) continue;
+    const mine = cells.filter((c) => c.ecosystem === e);
+    if (mine.length) for (const c of mine) rows.push({ e, label: `${ECOSYSTEM_LABEL[e]} · ${WITHDRAWAL_LABEL[c.kind]}`, cell: c });
+    else rows.push({ e, label: ECOSYSTEM_LABEL[e], blind: WITHDRAWAL_BLIND[e] ?? "no withdrawal data" });
+  }
+  const left = 236;
+  const barW = 320;
+  const rowH = 34;
+  const top = 88;
+  const width = left + barW + 300;
+  const height = top + rows.length * rowH + 52;
+  const x = (p: number) => left + p * barW;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Withdrawn versions: how often containment is used</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages that withdrew at least one version published since ${esc(humanDate(agg.withdrawalWindowStart ?? agg.asOf, true))} · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+  ];
+  for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+    parts.push(`<text x="${x(p)}" y="${top - 14}" font-size="10" fill="${MUTED}" text-anchor="middle">${p * 100}%</text>`);
+  }
+  rows.forEach((r, i) => {
+    // Gridlines only behind bar rows, so they never cross a text row.
+    if (r.cell) {
+      const cy = top + i * rowH + 10;
+      for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+        parts.push(`<line x1="${x(p)}" y1="${cy - 17}" x2="${x(p)}" y2="${cy + 17}" stroke="${GRID}" stroke-width="1"/>`);
+      }
+    }
+  });
+  rows.forEach((r, i) => {
+    const cy = top + i * rowH + 10;
+    parts.push(`<text x="${left - 12}" y="${cy + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(r.label)}</text>`);
+    if (!r.cell) {
+      parts.push(`<text x="${left}" y="${cy + 4}" font-size="11" fill="${INK_2}">${esc(r.blind!)}</text>`);
+      return;
+    }
+    const c = r.cell;
+    const share = c.packages ? c.packagesWithdrawing / c.packages : 0;
+    const versions = c.versionsInWindow ? ` · ${pctSmall(c.withdrawnVersions / c.versionsInWindow)} of ${c.versionsInWindow} versions` : "";
+    const tip = `${r.label}: ${c.packagesWithdrawing} of ${c.packages} packages, ${c.withdrawnVersions} versions${versions}`;
+    parts.push(
+      `<g><title>${esc(tip)}</title>`,
+      `<rect x="${x(0)}" y="${cy - 9}" width="${barW}" height="18" rx="4" fill="${NEUTRAL}"/>`,
+      share > 0 ? `<path d="${barPath(x(0), Math.max(x(0) + 2, x(share)), cy - 5, 10, true)}" fill="${RAMP[9]}"/>` : "",
+      `<text x="${left + barW + 12}" y="${cy + 4}" font-size="11" fill="${INK}">${pctText(share)} <tspan fill="${INK_2}">${esc(`(${c.packagesWithdrawing}/${c.packages}) · ${c.withdrawnVersions} versions${versions}`)}</tspan></text>`,
+      `</g>`,
+    );
+  });
+  parts.push(
+    `<text x="16" y="${height - 14}" font-size="10" fill="${MUTED}">Go retractions are undated, so they are counted over each module's whole history. Deprecation only warns; the version still installs.</text>`,
+  );
+  return svg(width, height, parts.join("\n"));
 }
 
 /** Ecosystems whose availability for this signal yields a measurable series. */

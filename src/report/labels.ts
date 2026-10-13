@@ -1,4 +1,4 @@
-import type { EcosystemId, SignalId } from "../types.ts";
+import type { EcosystemId, SignalId, WithdrawalKind } from "../types.ts";
 import type { MatrixCell } from "../stages/aggregate.ts";
 
 export const SIGNAL_LABEL: Record<SignalId, string> = {
@@ -56,8 +56,27 @@ export const PUBLISH_CREDENTIAL: Record<EcosystemId, string> = {
   packagist: "none: releases are VCS tags",
 };
 
+/** Why a registry has no withdrawal counts, for registries that expose none. */
+export const WITHDRAWAL_BLIND: Partial<Record<EcosystemId, string>> = {
+  rubygems: "yanked versions vanish from every API, so yanks cannot be counted",
+  maven: "nothing can be withdrawn",
+  packagist: "soft-deleted versions are not in the public API",
+};
+
+export const WITHDRAWAL_LABEL: Record<WithdrawalKind, string> = {
+  yanked: "yanked",
+  unpublished: "unpublished",
+  deprecated: "deprecated (still installs)",
+  retracted: "retracted (all time)",
+};
+
 export function pctText(p: number | null): string {
   return p == null ? "–" : `${Math.round(p * 100)}%`;
+}
+
+/** Like `pctText`, but a small non-zero share reads "<1%" instead of rounding to 0%. */
+export function pctSmall(p: number): string {
+  return p > 0 && p < 0.005 ? "<1%" : pctText(p);
 }
 
 /**

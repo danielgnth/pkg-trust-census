@@ -24,7 +24,9 @@ import {
   observed,
   selectKeptVersions,
   signal,
+  withdrawalIn,
 } from "../extract/signals.ts";
+import { withdrawalWindowStart } from "../extract/quarters.ts";
 import { isSemverPrerelease } from "../extract/versions.ts";
 
 const DOWNLOADS = "https://api.npmjs.org/downloads/point/last-month";
@@ -70,6 +72,8 @@ export function packumentUrl(name: string): string {
 }
 
 interface Manifest {
+  /** Set by `npm deprecate`: the version still installs, with a warning. */
+  deprecated?: string;
   _npmUser?: { name?: string; trustedPublisher?: { id?: string; oidcConfigId?: string } };
   dist?: {
     signatures?: Array<{ keyid?: string; sig?: string }>;
@@ -181,7 +185,7 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
     return { doc: data, res, kept };
   }
 
-  protected build(candidate: Candidate, raw: Raw): ExtractedPackage {
+  protected build(candidate: Candidate, raw: Raw, ctx: RunContext): ExtractedPackage {
     const { doc, kept } = raw;
     const versions = doc.versions ?? {};
     const latest = kept.find((k) => k.isLatest)?.record;
@@ -204,6 +208,7 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
         signals: [...signalsFor(versions[record.version] ?? {}), mfaFor(record)],
         raw: rawRef,
       })),
+      withdrawals: withdrawalsOf(doc, ctx.asOf),
     };
   }
 }
@@ -237,6 +242,22 @@ function signalsFor(m: Manifest) {
     // npm provenance is only accepted from public repositories, and its statements are
     // logged in the public Rekor instance.
     observed("transparency_log", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, Rekor-logged)`),
+  ];
+}
+
+/**
+ * The packument's `time` map keeps an entry for every version ever published, including
+ * unpublished ones that `versions` no longer lists; `deprecated` marks the rest.
+ */
+function withdrawalsOf(doc: Packument, asOf: Date) {
+  const since = withdrawalWindowStart(asOf);
+  const all = Object.entries(doc.time ?? {})
+    .filter(([k]) => k !== "created" && k !== "modified")
+    .map(([version, publishedAt]) => ({ version, publishedAt }));
+  const versions = doc.versions ?? {};
+  return [
+    withdrawalIn("unpublished", all.map((v) => ({ ...v, withdrawn: !(v.version in versions) })), since, asOf),
+    withdrawalIn("deprecated", all.map((v) => ({ ...v, withdrawn: Boolean(versions[v.version]?.deprecated) })), since, asOf),
   ];
 }
 

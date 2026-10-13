@@ -13,10 +13,11 @@
 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { ECOSYSTEMS, SIGNALS } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
 import {
   ecosystemFacts,
   packageVersions,
+  packageWithdrawals,
   packages,
   signalAvailability,
   snapshots,
@@ -111,6 +112,17 @@ export const versionSignalInsert = createInsertSchema(versionSignals, {
 }).refine((s) => s.value === "unknown" || s.evidence != null || s.value === "false", {
   error: "a 'true' signal must carry evidence",
   path: ["evidence"],
+});
+
+export const packageWithdrawalInsert = createInsertSchema(packageWithdrawals, {
+  ecosystem: ecosystemEnum,
+  packageName: z.string().min(1),
+  kind: z.enum(WITHDRAWAL_KINDS),
+  versionsInWindow: z.int().min(0).nullish(),
+  withdrawnCount: z.int().min(0),
+}).refine((w) => w.versionsInWindow == null || w.versionsInWindow >= w.withdrawnCount, {
+  error: "more withdrawn versions than versions in the window",
+  path: ["withdrawnCount"],
 });
 
 export type PackageInsert = z.infer<typeof packageInsert>;

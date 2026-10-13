@@ -147,6 +147,18 @@ describe("pipeline", () => {
     expect(sigstoreChart).toContain("Sigstore across registries");
     expect(sigstoreChart).toContain("since Nov 2024");
     expect(summary).toContain("How the latest releases were published");
+    expect(summary).toContain("Registry governance and containment");
+    expect(summary).toContain("Withdrawn versions since");
+    // Every chart must be well-formed XML: a bare "<" in a label breaks the whole file.
+    for (const f of files.filter((n) => n.endsWith(".svg"))) {
+      const body = await Bun.file(join(dir, f)).text();
+      expect([f, /<(?![a-zA-Z/!?])/.test(body)]).toEqual([f, false]);
+    }
+    expect(await Bun.file(join(dir, "charts/withdrawals.svg")).text()).toContain("how often containment is used");
+    expect((await Bun.file(join(dir, "withdrawals.csv")).text()).split("\n")[0]).toBe("ecosystem,package,kind,versions_in_window,withdrawn_count,withdrawn_versions");
+    const policiesChart = await Bun.file(join(dir, "charts/policies.svg")).text();
+    expect(policiesChart).toContain("Governance: keeping malicious packages out");
+    expect(await Bun.file(join(dir, "policies.md")).text()).toContain("#### Notes and sources");
     expect(await Bun.file(join(dir, "charts/publish-auth.svg")).text()).toContain("account credential");
     const pqcChart = await Bun.file(join(dir, "charts/pqc.svg")).text();
     expect(pqcChart).toContain("Post-quantum exposure");

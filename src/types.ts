@@ -116,6 +116,21 @@ export interface ExtractedVersion {
   raw: { path: string; sha256: string } | null;
 }
 
+/**
+ * How a registry lets a version be taken back: PyPI and crates.io yank, npm unpublishes or
+ * deprecates (deprecation only warns), Go retracts in a later go.mod.
+ */
+export const WITHDRAWAL_KINDS = ["yanked", "unpublished", "deprecated", "retracted"] as const;
+export type WithdrawalKind = (typeof WITHDRAWAL_KINDS)[number];
+
+export interface Withdrawal {
+  kind: WithdrawalKind;
+  /** Versions published in the window: the denominator. Null when the registry dates too few. */
+  versionsInWindow: number | null;
+  /** Withdrawn versions published in the window; all-time where versions are undated (Go). */
+  withdrawn: string[];
+}
+
 export interface ExtractedPackage {
   ecosystem: EcosystemId;
   name: string;
@@ -126,4 +141,6 @@ export interface ExtractedPackage {
   repositoryUrl: string | null;
   fetchError: string | null;
   versions: ExtractedVersion[];
+  /** One entry per withdrawal kind the registry exposes; empty where none is visible. */
+  withdrawals?: Withdrawal[];
 }
