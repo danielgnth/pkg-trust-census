@@ -322,6 +322,8 @@ describe("RubyGems extract", () => {
     expect(pkg.repositoryUrl).toBe("https://github.com/rails/rails");
     expect(pkg.maintainerCount).toBe(3);
     expect(sig(pkg, "8.1.3.1", "mfa_enforced")!.value).toBe("true");
+    // Attestations are accepted only from trusted-publishing pushes.
+    expect(sig(pkg, "8.1.3.1", "identity_publish")!.value).toBe("true");
     expect(sig(pkg, "8.1.3.1", "transparency_log")!.evidence).toMatch(/Rekor logIndex \d+/);
     expect(sig(pkg, "8.1.3.1", "source_link")!.evidence).toMatch(/^https:\/\/github.com\/rails\/rails@[0-9a-f]{40}$/);
     // A bare message signature carries no SLSA statement.
@@ -330,6 +332,8 @@ describe("RubyGems extract", () => {
     // An empty attestation list: no Sigstore signature, but a gem-cert one is invisible.
     expect(older.signals.find((s) => s.signal === "artifact_signature")!.value).toBe("unknown");
     expect(older.signals.find((s) => s.signal === "source_link")!.value).toBe("false");
+    // Trusted publishing without attestations is possible, so no attestation is not "no".
+    expect(older.signals.find((s) => s.signal === "identity_publish")!.value).toBe("unknown");
     assertConsistentWithFacts(pkg);
   });
 });

@@ -299,3 +299,13 @@ when npm has no count, `unknown`. Releases before 2022-11-01 cost no request and
 dependents half of the rule and the earlier top-100 (2022-02-01) and top-500 (2022-05) cohorts are not
 reconstructable, which is why the cell is a lower bound.
 
+## 11. RubyGems trusted publishing is inferable (2026-10-13)
+
+rubygems.org rejects an attestation unless the push authenticated with a trusted-publisher token:
+`Pusher#verify_sigstore` returns *"Pushing with an attestation requires trusted publishing"* (HTTP 400)
+otherwise. The check shipped in the same change that first accepted attestations (rubygems.org#4987,
+2024-11-14), and the push path is the only code that creates them (admin actions only repair existing
+ones). So a non-empty `/api/v1/attestations/{g}-{v}.json` proves trusted publishing, the same inference as
+PyPI's. `rubygems · identity_publish` moves from **not_exposed** to **inferred**; absence stays `unknown`,
+since trusted publishing need not emit attestations. §3.2's finding that no *direct* marker exists stands.
+

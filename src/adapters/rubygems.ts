@@ -4,8 +4,11 @@
  * RubyGems has trusted publishing, but its public API exposes no per-version marker for it,
  * not even on Ruby Central's own test gem (preflight §3.2). What it *does* expose:
  *
+ *  - Sigstore attestations, which rubygems.org accepts only from a trusted-publishing push
+ *    (`Pusher#verify_sigstore`, since attestations were first accepted on 2024-11-14), so
+ *    an attestation implies trusted publishing — the same inference as PyPI's;
  *  - `metadata.rubygems_mfa_required` per version, which makes MFA enforcement backfillable;
- *  - Sigstore attestations per version at `/api/v1/attestations/{gem}-{version}.json`
+ *  - the attestations themselves, per version at `/api/v1/attestations/{gem}-{version}.json`
  *    (`[]` when there are none). Found 2026-10-13; the M0 probe missed it because the
  *    versions and gem endpoints carry no hint that it exists (preflight §8).
  */
@@ -20,7 +23,6 @@ import {
   earliest,
   impliedBy,
   noMechanism,
-  notExposed,
   observed,
   selectKeptVersions,
   type KeptVersion,
@@ -153,8 +155,10 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
           isLatest,
           quarterAnchor,
           signals: [
-            // An attestation proves CI signing, not how the push was authenticated.
-            notExposed("identity_publish", "RubyGems trusted publishing leaves no marker in the public API"),
+            // rubygems.org rejects an attestation unless the push used a trusted-publisher
+            // token, so one present proves trusted publishing. Trusted publishing does not
+            // require attestations, so their absence proves nothing.
+            impliedBy("identity_publish", evidence, `${ATT_SRC} (accepted only from trusted-publishing pushes)`),
             // Sigstore signatures are observable; legacy `gem cert` X.509 signatures are
             // not, so an empty attestation list does not prove the gem is unsigned.
             impliedBy("artifact_signature", evidence, `${ATT_SRC} (Sigstore; gem cert signatures not exposed)`),

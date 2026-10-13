@@ -117,6 +117,7 @@ was re-checked against primary sources on 2026-10-13 (docs/preflight.md §9).
 | npm | MFA | release on/after 2022-11-01 with more than 1M downloads in the week ending 15 days before it ⇒ `true`, else `unknown` | inferred |
 | crates.io | identity | `trustpub_data` non-null | observable |
 | crates.io | source link | `trustpub_data.sha` present | observable |
+| RubyGems | identity | same endpoint non-empty ⇒ `true` (attestations are accepted only from trusted-publishing pushes), else `unknown` | inferred |
 | RubyGems | signature | `/api/v1/attestations/{g}-{v}.json` non-empty ⇒ `true`, else `unknown` | inferred |
 | RubyGems | SLSA | a bundle carries an in-toto statement with an SLSA predicate | observable |
 | RubyGems | source link | a bundle's Fulcio certificate carries a source repository digest | observable |
@@ -208,7 +209,7 @@ rebuilt offline from the cached payloads.
 
 ## Limitations
 
-1. **Inferred lower bounds.** PyPI identity and RubyGems signatures can only be confirmed, never refuted.
+1. **Inferred lower bounds.** PyPI and RubyGems identity, and RubyGems signatures, can only be confirmed, never refuted.
    Their shares are lower bounds.
 2. **Registry-applied npm signatures.** npm signs every tarball on serve, including 2016-era tarballs. The 100%
    reflects registry behaviour, not publisher choice.

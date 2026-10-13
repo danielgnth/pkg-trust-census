@@ -82,8 +82,8 @@ export const AVAILABILITY: AvailabilityFact[] = [
   }),
 
   // RubyGems
-  a("rubygems", "identity_publish", "not_exposed", "none", {
-    notes: "Trusted publishing GA 2023-12-14, but no per-version marker in any public API (preflight §3.2).",
+  a("rubygems", "identity_publish", "inferred", "/api/v1/attestations/{g}-{v}.json non-empty ⇒ trusted publishing", {
+    notes: "rubygems.org accepts an attestation only from a trusted-publishing push (Pusher#verify_sigstore, since 2024-11-14), but trusted publishing need not emit one, so absence is unknown. No direct per-version marker exists (preflight §3.2).",
   }),
   a("rubygems", "artifact_signature", "inferred", "/api/v1/attestations/{g}-{v}.json non-empty ⇒ Sigstore signature", {
     notes: "Legacy `gem cert` X.509 signatures are not exposed, so an empty attestation list is unknown, not false.",
