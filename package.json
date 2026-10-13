@@ -13,7 +13,8 @@
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "fixtures": "bun run scripts/capture-fixtures.ts"
+    "fixtures": "bun run scripts/capture-fixtures.ts",
+    "probe:tls": "bun run scripts/probe-pq-tls.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
