@@ -309,3 +309,18 @@ ones). So a non-empty `/api/v1/attestations/{g}-{v}.json` proves trusted publish
 PyPI's. `rubygems · identity_publish` moves from **not_exposed** to **inferred**; absence stays `unknown`,
 since trusted publishing need not emit attestations. §3.2's finding that no *direct* marker exists stands.
 
+## 12. Is maintainer 2FA *enabled* visible anywhere? (2026-10-13)
+
+Where 2FA is optional or only partly enforced, the weaker question is whether a maintainer has it switched
+on. No registry answers it publicly:
+
+| Registry | Checked | Result |
+|---|---|---|
+| Packagist | `/users/{u}/` page, `packages/{p}.json` `maintainers[]` (`name`, `avatar_url` only), `/transparency-log` (302 → login) | **Not yet.** MFA events in the public log were announced for about six months after 2026-05-27, and profile MFA status after that. Re-check from 2026-11 |
+| npm | packument `maintainers[]` / `_npmUser` (name, email), `/-/package/{p}/collaborators` (name → permission), `/-/package/{p}/access` (GET 405) | No 2FA field; the per-package "require 2FA" setting is write-only |
+| RubyGems | `/api/v1/gems/{g}/owners.json` (`id`, `handle`, `role`), `/api/v1/profiles/{u}.json` (`id`, `handle`), gem and profile pages | No 2FA field. The gem page's "Version published with MFA" is rendered from `rubygems_mfa_required` (`_aside.html.erb`), the policy flag already measured, not whether MFA was used |
+| crates.io | `/api/v1/users/{u}`, `/api/v1/crates/{c}/owners` | No 2FA field; GitHub exposes another user's 2FA only to that user's org owners |
+| Maven Central | namespace pages | No 2FA field |
+| PyPI | user page | Moot: 2FA is mandatory for every account |
+| Go | — | No accounts |
+
