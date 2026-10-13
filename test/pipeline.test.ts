@@ -131,6 +131,14 @@ describe("pipeline", () => {
     expect(baseline).toContain("https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/");
     expect(summary).toMatch(/\| \*\*PyPI\*\* \| 6\/7 \| 6\/7 \| 29%–43% \|/);
     expect(await Bun.file(join(dir, "charts/scores.svg")).text()).toContain("Trust summary per platform");
+    // Charts name the snapshot by a readable instant, never by its id.
+    const scoresChart = await Bun.file(join(dir, "charts/scores.svg")).text();
+    expect(scoresChart).toMatch(/snapshot \d{1,2} [A-Z][a-z]{2} \d{4}, \d{2}:\d{2} UTC/);
+    expect(scoresChart).not.toContain("snap-e2e");
+    const baselineChart = await Bun.file(join(dir, "charts/baseline.svg")).text();
+    expect(baselineChart).toContain("Registry baseline");
+    expect(baselineChart).toContain("since Jul 2026");
+    expect(baselineChart).toContain(">PyPI</text>");
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");

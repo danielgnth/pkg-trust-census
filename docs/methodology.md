@@ -187,6 +187,7 @@ the sampled packages, and several cells depend on which client a user runs. Seve
 2025–26: npm 12 stopped running install scripts (2026-07), PyPI stopped accepting new files on old
 releases (2026-07), Packagist made stable versions immutable (2026-07), and npm limited write tokens to 90
 days (2025-11). The backfill quarters predate these changes, so the table describes the snapshot date only.
+The table is also drawn as `charts/baseline.svg`.
 
 ## Reproducibility
 

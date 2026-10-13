@@ -168,3 +168,14 @@ describe("signal helpers", () => {
     expect(earliest([])).toBeNull();
   });
 });
+
+describe("human-readable dates", () => {
+  test("format instants and months in UTC", async () => {
+    const { humanDate, humanMonth } = await import("../src/report/labels.ts");
+    expect(humanDate("2026-10-13T09:14:26.098Z")).toBe("13 Oct 2026, 09:14 UTC");
+    expect(humanDate("2026-10-13", true)).toBe("13 Oct 2026");
+    expect(humanDate("not a date")).toBe("not a date");
+    expect(humanMonth("2026-07")).toBe("Jul 2026");
+  });
+});
+

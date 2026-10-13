@@ -61,7 +61,7 @@ Results land in `data/out/<snapshot>/`:
 | `baseline.md` / `baseline.csv` | Registry baseline (ecosystem-level properties) |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
-| `charts/*.svg` | Charts |
+| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, adoption per signal |
 
 ## Configuration
 

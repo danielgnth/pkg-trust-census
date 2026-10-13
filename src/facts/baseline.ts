@@ -46,6 +46,9 @@ export const BASELINE_PROPERTIES = [
   },
 ] as const;
 
+/** When every baseline value was last checked against its sources. */
+export const BASELINE_VERIFIED = "2026-10-13";
+
 export type BaselineProperty = (typeof BASELINE_PROPERTIES)[number]["id"];
 export type BaselineValue = "yes" | "partial" | "no" | "n/a";
 

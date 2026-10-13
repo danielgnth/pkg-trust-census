@@ -9,7 +9,8 @@
 
 import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
 import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
-import { ECOSYSTEM_LABEL, SIGNAL_LABEL, pctText } from "./labels.ts";
+import { ECOSYSTEM_LABEL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
+import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineValue } from "../facts/baseline.ts";
 
 const FONT = "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 const SURFACE = "#fcfcfb";
@@ -49,6 +50,8 @@ function inkOn(p: number): string {
   return Math.round(p * (RAMP.length - 1)) >= 6 ? "#ffffff" : INK;
 }
 
+const HATCH = `<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${NEUTRAL}"/><line x1="0" y1="0" x2="0" y2="6" stroke="#c9c8c2" stroke-width="2"/></pattern>`;
+
 export function matrixSvg(agg: Aggregate): string {
   const ecosystems = ECOSYSTEMS.filter((e) => agg.matrix.some((c) => c.ecosystem === e));
   const cellW = 128;
@@ -63,7 +66,7 @@ export function matrixSvg(agg: Aggregate): string {
 
   parts.push(
     `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Trust-signal adoption, latest version</text>`,
-    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages whose latest release carries the signal · snapshot ${esc(agg.snapshotId)}</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages whose latest release carries the signal · snapshot ${esc(humanDate(agg.asOf))}</text>`,
   );
 
   SIGNALS.forEach((s, j) => {
@@ -96,7 +99,7 @@ export function matrixSvg(agg: Aggregate): string {
     `<text x="${left}" y="${ly + 44}" font-size="10" fill="${MUTED}">≥ marks an inferred signal: unknowns count as not adopted, so the figure is a lower bound.</text>`,
   );
 
-  return svg(width, height, parts.join("\n"), `<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${NEUTRAL}"/><line x1="0" y1="0" x2="0" y2="6" stroke="#c9c8c2" stroke-width="2"/></pattern>`);
+  return svg(width, height, parts.join("\n"), HATCH);
 }
 
 function matrixCell(c: MatrixCell, x: number, y: number, w: number, h: number): string {
@@ -117,6 +120,95 @@ function matrixCell(c: MatrixCell, x: number, y: number, w: number, h: number): 
     `<text x="${cx}" y="${y + 38}" font-size="10" fill="${ink}" text-anchor="middle" opacity="0.85">${esc(sub)}</text>`,
     `</g>`,
   ].join("");
+}
+
+/**
+ * Baseline values are ordinal, so they take steps of the same sequential blue as the
+ * matrix: "yes" darkest, "partial" mid. "No" and "n/a" stay off the ramp, as the matrix's
+ * no-mechanism and not-exposed cells do. Every cell also prints its value, so the reading
+ * never depends on colour.
+ */
+const BASELINE_STYLE: Record<BaselineValue, { fill: string; ink: string; label: string }> = {
+  yes: { fill: RAMP[9]!, ink: "#ffffff", label: "yes" },
+  partial: { fill: RAMP[4]!, ink: INK, label: "partial" },
+  no: { fill: NEUTRAL, ink: INK_2, label: "no" },
+  "n/a": { fill: "url(#hatch)", ink: INK_2, label: "n/a" },
+};
+
+/** Splits a header into at most two lines at the space nearest the middle. */
+function twoLines(text: string): string[] {
+  if (text.length <= 16) return [text];
+  const spaces = [...text.matchAll(/ /g)].map((m) => m.index!);
+  if (spaces.length === 0) return [text];
+  const cut = spaces.reduce((best, i) => (Math.abs(i - text.length / 2) < Math.abs(best - text.length / 2) ? i : best));
+  return [text.slice(0, cut), text.slice(cut + 1)];
+}
+
+/**
+ * The registry baseline as a grid: ecosystem × property, one categorical value per cell.
+ * Ecosystem-level and curated, so the subtitle says so, and the hover title carries the note.
+ */
+export function baselineSvg(agg: Aggregate): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const cellW = 128;
+  const cellH = 44;
+  const gap = 2;
+  const left = 120;
+  const top = 94;
+  const legendH = 66;
+  const width = left + BASELINE_PROPERTIES.length * (cellW + gap) + 32;
+  const height = top + ecosystems.length * (cellH + gap) + legendH;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Registry baseline: what the default toolchain protects</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Ecosystem defaults from primary sources, verified ${esc(humanDate(BASELINE_VERIFIED, true))} · not part of the trust score · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+  ];
+
+  BASELINE_PROPERTIES.forEach((p, j) => {
+    const x = left + j * (cellW + gap) + cellW / 2;
+    const lines = twoLines(p.label);
+    lines.forEach((line, k) => {
+      const y = top - 10 - (lines.length - 1 - k) * 13;
+      parts.push(`<text x="${x}" y="${y}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle"><title>${esc(p.question)}</title>${esc(line)}</text>`);
+    });
+  });
+
+  ecosystems.forEach((e, i) => {
+    const y = top + i * (cellH + gap);
+    parts.push(`<text x="${left - 10}" y="${y + cellH / 2 + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(ECOSYSTEM_LABEL[e])}</text>`);
+    BASELINE_PROPERTIES.forEach((p, j) => {
+      const b = baselineOf(e, p.id);
+      const st = BASELINE_STYLE[b.value];
+      const x = left + j * (cellW + gap);
+      const cx = x + cellW / 2;
+      const since = b.since ? `since ${humanMonth(b.since)}` : null;
+      const title = `${ECOSYSTEM_LABEL[e]} · ${p.label}: ${b.value}${since ? ` (${since})` : ""}. ${b.note}`;
+      parts.push(
+        `<g><title>${esc(title)}</title>`,
+        `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" rx="4" fill="${st.fill}"/>`,
+        `<text x="${cx}" y="${y + (since ? 20 : 26)}" font-size="13" font-weight="600" fill="${st.ink}" text-anchor="middle">${st.label}</text>`,
+        since ? `<text x="${cx}" y="${y + 34}" font-size="10" fill="${st.ink}" text-anchor="middle" opacity="0.85">${esc(since)}</text>` : "",
+        `</g>`,
+      );
+    });
+  });
+
+  // Legend: one swatch per value, in reading order.
+  const ly = top + ecosystems.length * (cellH + gap) + 22;
+  let lx = left;
+  for (const v of ["yes", "partial", "no", "n/a"] as const) {
+    const st = BASELINE_STYLE[v];
+    parts.push(
+      // The off-ramp swatches are close to the surface, so they get an outline.
+      `<rect x="${lx}" y="${ly}" width="14" height="10" rx="2" fill="${st.fill}"${v === "no" || v === "n/a" ? ` stroke="#c9c8c2" stroke-width="1"` : ""}/>`,
+      `<text x="${lx + 20}" y="${ly + 9}" font-size="10" fill="${INK_2}">${st.label}</text>`,
+    );
+    lx += 34 + st.label.length * 6;
+  }
+  parts.push(
+    `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">"since" marks a value that changed recently, so the backfill quarters predate it. Hover a cell for the note; sources in baseline.md.</text>`,
+  );
+
+  return svg(width, height, parts.join("\n"), HATCH);
 }
 
 /** Ecosystems whose availability for this signal yields a measurable series. */
@@ -227,7 +319,7 @@ export function scoresSvg(agg: Aggregate): string {
   const x = (p: number) => left + p * plotW;
   const parts: string[] = [
     `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Trust summary per platform</text>`,
-    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of the ${agg.scores[0]?.total ?? 7} trust properties · latest release of each sampled package · snapshot ${esc(agg.snapshotId)}</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of the ${agg.scores[0]?.total ?? 7} trust properties · latest release of each sampled package · snapshot ${esc(humanDate(agg.asOf))}</text>`,
     // Legend
     `<rect x="16" y="58" width="22" height="10" rx="3" fill="${RAMP[1]}"/>`,
     `<text x="44" y="67" font-size="11" fill="${INK_2}">capability (offered by the platform)</text>`,

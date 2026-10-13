@@ -21,6 +21,24 @@ export const ECOSYSTEM_LABEL: Record<EcosystemId, string> = {
   packagist: "Packagist",
 };
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "13 Oct 2026, 09:14 UTC" for an ISO instant; "13 Oct 2026" with `dateOnly`. Always UTC. */
+export function humanDate(iso: string, dateOnly = false): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const day = `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  if (dateOnly) return day;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${day}, ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`;
+}
+
+/** "Jul 2026" for a `YYYY-MM` month. */
+export function humanMonth(ym: string): string {
+  const m = /^(\d{4})-(\d{2})$/.exec(ym);
+  return m ? `${MONTHS[Number(m[2]) - 1]} ${m[1]}` : ym;
+}
+
 export function pctText(p: number | null): string {
   return p == null ? "–" : `${Math.round(p * 100)}%`;
 }

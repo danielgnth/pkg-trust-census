@@ -12,10 +12,10 @@ import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
 import { packageVersions, packages, versionSignals } from "../db/schema.ts";
 import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
-import { adoptionSvg, matrixSvg, measurable, scoresSvg } from "../report/charts.ts";
+import { adoptionSvg, baselineSvg, matrixSvg, measurable, scoresSvg } from "../report/charts.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
-import { BASELINE, BASELINE_PROPERTIES, baselineOf, type BaselineFact } from "../facts/baseline.ts";
+import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 
 export interface ReportResult {
   dir: string;
@@ -36,6 +36,7 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["scores.csv", scoresCsv(agg)],
     ["baseline.md", baselineMarkdown(agg, true)],
     ["baseline.csv", baselineCsv()],
+    ["charts/baseline.svg", baselineSvg(agg)],
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
@@ -170,7 +171,7 @@ export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
   const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
   const cell = (b: BaselineFact) => `${BASELINE_SYMBOL[b.value]}${b.since ? ` (since ${b.since})` : ""}`;
   const lines = [
-    "### Registry baseline (default toolchain, verified 2026-10-13)",
+    `### Registry baseline (default toolchain, verified ${BASELINE_VERIFIED})`,
     "",
     `| | ${BASELINE_PROPERTIES.map((p) => p.label).join(" | ")} |`,
     `|---|${BASELINE_PROPERTIES.map(() => "---").join("|")}|`,
