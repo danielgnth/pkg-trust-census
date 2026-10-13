@@ -78,7 +78,7 @@ export const AVAILABILITY: AvailabilityFact[] = [
   }),
   a("crates", "transparency_log", "no_mechanism", "none"),
   a("crates", "mfa_enforced", "no_mechanism", "none", {
-    notes: "crates.io has no MFA of its own and GitHub OAuth does not reveal whether 2FA was used; publishing authenticates with API tokens.",
+    notes: "crates.io has no MFA of its own and does not check whether the GitHub account behind a login has 2FA (GitHub requires it of code contributors since 2023, but crates.io cannot rely on it); publishing authenticates with API tokens. A per-crate `trustpub_only` flag (crate endpoint, current value only) can forbid token publishing altogether.",
   }),
 
   // RubyGems
@@ -138,13 +138,13 @@ export const AVAILABILITY: AvailabilityFact[] = [
   a("packagist", "registry_integrity", "no_mechanism", "none", { notes: "Packagist signs neither metadata nor archives." }),
   a("packagist", "build_provenance", "no_mechanism", "none", { notes: "Hosted artifacts with SLSA provenance are a stated long-term direction (2026-05)." }),
   a("packagist", "source_link", "observable", "versions[v].source.reference", {
-    notes: "Releases are VCS tags; Packagist resolves each to a commit itself, as Go's proxy does. Stable versions immutable since 2026-05.",
+    notes: "Releases are VCS tags; Packagist resolves each to a commit itself, as Go's proxy does. Stable versions keep their original commit since 2026-07.",
   }),
   a("packagist", "transparency_log", "no_mechanism", "none", {
-    notes: "A security-event log (ownership, maintainer and version-reference changes) went live 2026-05, behind login; it is not a tamper-evident log of artifacts.",
+    notes: "A security-event log (ownership, maintainer and version-reference changes; soft-deletions and blocked retags since 2026-07) requires login and is not a tamper-evident log of artifacts. Publishing artifact verification data to it is planned.",
   }),
   a("packagist", "mfa_enforced", "no_mechanism", "none", {
-    notes: "MFA is optional; mandatory MFA was announced 2026-05-27 but is not live.",
+    notes: "MFA is optional. Planned (2026-05-27, no dates): MFA events in the transparency log (about six months out), MFA status on profiles, MFA for maintainers of larger packages, then for all accounts. Not live as of 2026-10-13: no MFA shown on profiles or in the package JSON.",
   }),
 ];
 
@@ -183,13 +183,16 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     registryUrl: "https://www.npmjs.com",
     mandates2fa: null,
     mfaPolicyNote:
-      "Tiered: 2FA required for maintainers of high-impact packages since 2022. In 2025-12 GitHub announced 2FA-required local publishing and short-lived granular tokens, rolled out gradually without fixed dates.",
+      "Tiered: 2FA required for maintainers of the top 100 packages by dependents from 2022-02-01, the top 500 from 2022-05, and every high-impact package (>1M weekly downloads or >500 dependents) from 2022-11-01. Since 2026-07-31 tokens that bypass 2FA can no longer manage tokens, maintainers, access or trusted publishing; they can still publish until a planned 2027-01 cutoff. The 2025-09-22 plan to remove bypass-2FA local publishing has no date.",
     trustedPublishingGaDate: "2025-07-31",
     trustedPublishingMechanism: "OIDC trusted publishing (GitHub Actions, GitLab CI/CD; CircleCI from 2026-04)",
     notes: "Trusted publishing emits provenance attestations by default.",
     sources: [
       "https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/",
-      "https://github.blog/2025-12-15-our-plan-for-a-more-secure-npm-supply-chain/",
+      "https://github.blog/2022-02-01-top-100-npm-package-maintainers-require-2fa-additional-security",
+      "https://github.blog/changelog/2022-11-01-high-impact-package-maintainers-now-require-2fa/",
+      "https://github.blog/security/supply-chain-security/our-plan-for-a-more-secure-npm-supply-chain/",
+      "https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/",
       "https://docs.npmjs.com/generating-provenance-statements",
     ],
   },
@@ -198,13 +201,14 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     displayName: "crates.io",
     registryUrl: "https://crates.io",
     mandates2fa: false,
-    mfaPolicyNote: "No registry MFA; login is via GitHub OAuth, which does not reveal whether 2FA was used. Publishing uses API tokens.",
+    mfaPolicyNote: "No registry MFA; login is via GitHub OAuth, which does not reveal whether 2FA was used. GitHub requires 2FA of code contributors (rolled out 2023), but crates.io does not enforce it. Publishing uses API tokens.",
     trustedPublishingGaDate: "2025-07-11",
     trustedPublishingMechanism: "OIDC trusted publishing (RFC 3691), GitHub Actions",
     notes: "No artifact signing or attestation scheme.",
     sources: [
       "https://blog.rust-lang.org/2025/07/11/crates-io-development-update-2025-07",
       "https://rust-lang.github.io/rfcs/3691-trusted-publishing-cratesio.html",
+      "https://blog.rust-lang.org/2026/01/21/crates-io-development-update",
     ],
   },
   {
@@ -255,14 +259,16 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     displayName: "Packagist",
     registryUrl: "https://packagist.org",
     mandates2fa: false,
-    mfaPolicyNote: "MFA optional; mandatory MFA and public MFA status announced 2026-05-27, not yet live.",
+    mfaPolicyNote: "MFA optional on Packagist.org. Public MFA events and profile status, then MFA for larger packages and all accounts, planned since 2026-05-27 without dates. Private Packagist's org-level MFA enforcement (extended to Composer tokens 2026-08) does not apply to public packages.",
     trustedPublishingGaDate: null,
     trustedPublishingMechanism: null,
-    notes: "Packagist indexes VCS repositories; Composer downloads archives from the forge. Immutable stable versions and a login-gated security-event log since 2026-05; hosted artifacts with SLSA provenance and trusted publishing are a stated long-term direction.",
+    notes: "Packagist indexes VCS repositories; Composer downloads archives from the forge. Stable versions keep their original commit since 2026-07 (archives are still generated by the forge); a login-gated security-event log records ownership, maintainer and reference changes. Hosted artifacts with SLSA provenance and trusted publishing are a stated direction.",
     sources: [
       "https://packagist.org/about",
       "https://getcomposer.org/doc/05-repositories.md",
       "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
+      "https://blog.packagist.com/immutable-versions-on-packagist/",
+      "https://blog.packagist.com/whats-new-in-private-packagist-august-2026-update/",
     ],
   },
 ];
