@@ -117,7 +117,7 @@ was re-checked against primary sources on 2026-10-13 (docs/preflight.md §9).
 | npm | MFA | release on/after 2022-11-01 with more than 1M downloads in the week ending 15 days before it ⇒ `true`, else `unknown` | inferred |
 | crates.io | identity | `trustpub_data` non-null | observable |
 | crates.io | source link | `trustpub_data.sha` present | observable |
-| RubyGems | identity | same endpoint non-empty ⇒ `true` (attestations are accepted only from trusted-publishing pushes), else `unknown` | inferred |
+| RubyGems | identity | version page "Pushed by": trusted publisher ⇒ `true`, user (API key) ⇒ `false`, absent (pre-tracking) ⇒ `unknown`; an attestation also ⇒ `true` | inferred |
 | RubyGems | signature | `/api/v1/attestations/{g}-{v}.json` non-empty ⇒ `true`, else `unknown` | inferred |
 | RubyGems | SLSA | a bundle carries an in-toto statement with an SLSA predicate | observable |
 | RubyGems | source link | a bundle's Fulcio certificate carries a source repository digest | observable |
@@ -202,6 +202,17 @@ entry. A separate curated table (`src/facts/sigstore.ts`; `sigstore.md` in each 
 registry-level facts and, for the other three, the nearest equivalent: Go's own checksum transparency log,
 nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
 `charts/sigstore.svg` draws the table alongside the share of sampled latest releases carrying a bundle.
+
+### Publish authentication
+
+The identity signal also answers the reverse question, how releases *not* published through trusted
+publishing were authenticated: `false` means an account credential, `unknown` either. This is a real
+negative on npm (`_npmUser.trustedPublisher` absent), crates.io (`trustpub_data` null; publishing otherwise
+needs an API token) and RubyGems (the version page names a user, whose API key pushed it). Maven has no
+OIDC path, so every upload uses a Portal token. PyPI shows trusted publishing only through attestations;
+its per-file "Uploaded using Trusted Publishing?" field sits behind a bot challenge and is not read, so
+credential uploads stay `unknown`. No registry shows whether a credential was long-lived. Go and Packagist
+have no upload. Reported as `charts/publish-auth.svg` and in the summary.
 
 ### Post-quantum exposure
 

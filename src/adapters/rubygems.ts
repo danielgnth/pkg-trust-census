@@ -4,16 +4,19 @@
  * RubyGems has trusted publishing, but its public API exposes no per-version marker for it,
  * not even on Ruby Central's own test gem (preflight §3.2). What it *does* expose:
  *
+ *  - who pushed each version, on its web page ("Pushed by": a user, i.e. an API key, or a
+ *    trusted publisher). Not in any JSON endpoint, so the page is read; versions pushed
+ *    before rubygems.org recorded pushers have no such section and stay unknown;
  *  - Sigstore attestations, which rubygems.org accepts only from a trusted-publishing push
  *    (`Pusher#verify_sigstore`, since attestations were first accepted on 2024-11-14), so
- *    an attestation implies trusted publishing — the same inference as PyPI's;
+ *    an attestation also implies trusted publishing — the same inference as PyPI's;
  *  - `metadata.rubygems_mfa_required` per version, which makes MFA enforcement backfillable;
  *  - the attestations themselves, per version at `/api/v1/attestations/{gem}-{version}.json`
  *    (`[]` when there are none). Found 2026-10-13; the M0 probe missed it because the
  *    versions and gem endpoints carry no hint that it exists (preflight §8).
  */
 
-import type { Candidate, ExtractedPackage, FetchResult } from "../types.ts";
+import type { Candidate, ExtractedPackage, ExtractedSignal, FetchResult } from "../types.ts";
 import type { HttpClient, Source } from "../http/client.ts";
 import { GatheringAdapter, type RunContext } from "./types.ts";
 import { rankFromEcosystems } from "./ecosystems.ts";
@@ -25,6 +28,7 @@ import {
   noMechanism,
   observed,
   selectKeptVersions,
+  signal,
   type KeptVersion,
   type VersionRecord,
 } from "../extract/signals.ts";
@@ -64,6 +68,8 @@ interface GemRecord extends VersionRecord {
 interface Raw {
   kept: KeptVersion<GemRecord>[];
   attestations: Map<string, { bundles: Bundle[] | null; res: FetchResult }>;
+  /** The version's web page, for its "Pushed by" section; null when it did not answer 200. */
+  pages: Map<string, { html: string | null; url: string }>;
   versionsRes: FetchResult;
   gem: GemInfo | null;
   owners: unknown[] | null;
@@ -71,6 +77,27 @@ interface Raw {
 
 const MFA_SRC = "rubygems.org /api/v1/versions/{g}.json metadata.rubygems_mfa_required";
 const ATT_SRC = "rubygems.org /api/v1/attestations/{g}-{v}.json";
+const PUSHER_SRC = "rubygems.org /gems/{g}/versions/{v} \"Pushed by\"";
+
+export type Pusher = { kind: "trusted_publisher"; name: string } | { kind: "user" };
+
+/**
+ * Reads the "Pushed by" section of a version page (`rubygems/_release_info.html.erb`). A
+ * user push renders a profile link; a trusted-publisher push renders the publisher's icon
+ * titled with its name ("GitHub Actions rails/rails @ .github/workflows/release.yml").
+ * Returns null when the section is absent: the version predates pusher tracking.
+ */
+export function pusherOf(html: string | null): Pusher | null {
+  if (!html) return null;
+  const start = html.indexOf(">Pushed by</h3>");
+  if (start < 0) return null;
+  const next = html.indexOf("<h3", start + 1);
+  const section = html.slice(start, next < 0 ? undefined : next);
+  if (/href="\/profiles\//.test(section)) return { kind: "user" };
+  const title = /alt="GitHub"[^>]*title="([^"]+)"|title="([^"]+)"[^>]*alt="GitHub"/.exec(section);
+  if (title) return { kind: "trusted_publisher", name: (title[1] ?? title[2])!.replace(/&amp;/g, "&") };
+  return null;
+}
 
 export class RubygemsAdapter extends GatheringAdapter<Raw> {
   readonly id = "rubygems" as const;
@@ -126,7 +153,16 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
       );
       attestations.set(record.version, { bundles: Array.isArray(data) ? data : null, res });
     }
-    return { kept, attestations, versionsRes, gem, owners };
+
+    const pages: Raw["pages"] = new Map();
+    for (const { record } of kept) {
+      const build = primaryBuild(record);
+      const platform = build?.platform && build.platform !== "ruby" ? `-${build.platform}` : "";
+      const url = `https://rubygems.org/gems/${enc}/versions/${encodeURIComponent(record.version)}${platform}`;
+      const res = await src.get(url, { ...opts, headers: { Accept: "text/html" } });
+      pages.set(record.version, { html: res.status === 200 ? res.body : null, url });
+    }
+    return { kept, attestations, pages, versionsRes, gem, owners };
   }
 
   protected build(candidate: Candidate, raw: Raw): ExtractedPackage {
@@ -155,10 +191,7 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
           isLatest,
           quarterAnchor,
           signals: [
-            // rubygems.org rejects an attestation unless the push used a trusted-publisher
-            // token, so one present proves trusted publishing. Trusted publishing does not
-            // require attestations, so their absence proves nothing.
-            impliedBy("identity_publish", evidence, `${ATT_SRC} (accepted only from trusted-publishing pushes)`),
+            identityFor(pusherOf(raw.pages.get(record.version)?.html ?? null), evidence),
             // Sigstore signatures are observable; legacy `gem cert` X.509 signatures are
             // not, so an empty attestation list does not prove the gem is unsigned.
             impliedBy("artifact_signature", evidence, `${ATT_SRC} (Sigstore; gem cert signatures not exposed)`),
@@ -186,6 +219,18 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
       }),
     };
   }
+}
+
+/**
+ * The page's pusher decides; an attestation also proves trusted publishing, because
+ * rubygems.org rejects one from any other push. A user push used that user's API key.
+ * No pusher and no attestation: the version predates pusher tracking, so unknown.
+ */
+function identityFor(pusher: Pusher | null, attestation: string | null): ExtractedSignal {
+  if (pusher?.kind === "trusted_publisher") return signal("identity_publish", "true", `trusted publisher: ${pusher.name}`, PUSHER_SRC);
+  if (attestation) return signal("identity_publish", "true", attestation, `${ATT_SRC} (accepted only from trusted-publishing pushes)`);
+  if (pusher?.kind === "user") return signal("identity_publish", "false", "pushed with a user API key", PUSHER_SRC);
+  return signal("identity_publish", "unknown", null, `${PUSHER_SRC} (absent: pushed before rubygems.org recorded pushers)`);
 }
 
 function primaryBuild(r: GemRecord): GemVersion | undefined {

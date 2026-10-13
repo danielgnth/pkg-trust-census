@@ -82,8 +82,8 @@ export const AVAILABILITY: AvailabilityFact[] = [
   }),
 
   // RubyGems
-  a("rubygems", "identity_publish", "inferred", "/api/v1/attestations/{g}-{v}.json non-empty ⇒ trusted publishing", {
-    notes: "rubygems.org accepts an attestation only from a trusted-publishing push (Pusher#verify_sigstore, since 2024-11-14), but trusted publishing need not emit one, so absence is unknown. No direct per-version marker exists (preflight §3.2).",
+  a("rubygems", "identity_publish", "inferred", "version page \"Pushed by\": trusted publisher ⇒ true, user (API key) ⇒ false; or attestations present ⇒ true", {
+    notes: "The pusher is shown on /gems/{g}/versions/{v} but in no JSON endpoint (preflight §14). Versions pushed before rubygems.org recorded pushers show none and stay unknown, so the share is a lower bound. Attestations are accepted only from trusted-publishing pushes (Pusher#verify_sigstore).",
   }),
   a("rubygems", "artifact_signature", "inferred", "/api/v1/attestations/{g}-{v}.json non-empty ⇒ Sigstore signature", {
     notes: "Legacy `gem cert` X.509 signatures are not exposed, so an empty attestation list is unknown, not false.",

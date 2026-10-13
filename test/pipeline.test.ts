@@ -146,6 +146,8 @@ describe("pipeline", () => {
     const sigstoreChart = await Bun.file(join(dir, "charts/sigstore.svg")).text();
     expect(sigstoreChart).toContain("Sigstore across registries");
     expect(sigstoreChart).toContain("since Nov 2024");
+    expect(summary).toContain("How the latest releases were published");
+    expect(await Bun.file(join(dir, "charts/publish-auth.svg")).text()).toContain("account credential");
     const pqcChart = await Bun.file(join(dir, "charts/pqc.svg")).text();
     expect(pqcChart).toContain("Post-quantum exposure");
     expect(pqcChart).toContain("X25519MLKEM768");

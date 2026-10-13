@@ -16,7 +16,7 @@ const load = async <T = any>(name: string): Promise<T> => JSON.parse(await Bun.f
 describe("fixture manifest", () => {
   test("records provenance for every fixture", async () => {
     const manifest = await load<any[]>("fixtures.json");
-    expect(manifest.length).toBe(15);
+    expect(manifest.length).toBe(18);
     for (const m of manifest) {
       expect(m.source_url).toStartWith("https://");
       expect(m.http_status).toBe(200);
@@ -24,6 +24,25 @@ describe("fixture manifest", () => {
       expect(m.full_response_sha256).toMatch(/^[0-9a-f]{64}$/);
       expect(m.why).toBeTruthy();
     }
+  });
+});
+
+describe("RubyGems — version page \"Pushed by\"", () => {
+  const page = (v: string) => Bun.file(`${F}/rubygems-page-rails-${v}.html`).text();
+
+  test("a trusted-publishing push names the publisher; a user push links a profile", async () => {
+    const { pusherOf } = await import("../src/adapters/rubygems.ts");
+    expect(pusherOf(await page("8.1.3.1"))).toEqual({
+      kind: "trusted_publisher",
+      name: "GitHub Actions rails/rails @ .github/workflows/release.yml (release)",
+    });
+    expect(pusherOf(await page("7.0.0"))).toEqual({ kind: "user" });
+  });
+
+  test("versions from before pusher tracking have no section", async () => {
+    const { pusherOf } = await import("../src/adapters/rubygems.ts");
+    expect(pusherOf(await page("4.0.0"))).toBeNull();
+    expect(pusherOf(null)).toBeNull();
   });
 });
 

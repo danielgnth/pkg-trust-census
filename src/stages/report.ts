@@ -12,8 +12,8 @@ import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
 import { packageVersions, packages, versionSignals } from "../db/schema.ts";
 import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
-import { adoptionSvg, baselineSvg, matrixSvg, measurable, pqcSvg, scoresSvg, sigstoreSvg } from "../report/charts.ts";
-import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
+import { adoptionSvg, baselineSvg, matrixSvg, measurable, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg } from "../report/charts.ts";
+import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
@@ -51,6 +51,7 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["packages.csv", packagesCsv(db, snapshotId)],
     ["signals.csv", signalsCsv(db, snapshotId)],
     ["charts/matrix.svg", matrixSvg(agg)],
+    ["charts/publish-auth.svg", publishAuthSvg(agg)],
     ...SIGNALS.map((s): [string, string] => [`charts/adoption-${s}.svg`, adoptionSvg(agg, s)]),
   ];
 
@@ -133,6 +134,7 @@ export function summaryMarkdown(agg: Aggregate): string {
     ...coverageRows,
     "",
     scoresMarkdown(agg),
+    publishAuthMarkdown(agg),
     baselineMarkdown(agg, false),
     sigstoreMarkdown(agg, false),
     pqcMarkdown(agg, false),
@@ -145,6 +147,32 @@ export function summaryMarkdown(agg: Aggregate): string {
     ...headlines,
     "",
     matrixMarkdown(agg),
+  ].join("\n");
+}
+
+/**
+ * Trusted publishing against everything else: the identity signal's three values read as
+ * OIDC, account credential and unknown, with what "credential" means per registry.
+ */
+export function publishAuthMarkdown(agg: Aggregate): string {
+  const rows = ECOSYSTEMS.flatMap((e) => {
+    const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === "identity_publish");
+    if (!c) return [];
+    if (NO_UPLOAD.has(e)) return [`| **${ECOSYSTEM_LABEL[e]}** | – | – | – | ${PUBLISH_CREDENTIAL[e]} |`];
+    const share = (k: number) => (c.n ? `${pctText(k / c.n)} (${k})` : "–");
+    const bound = c.availability === "inferred" && c.u > 0 ? "≥ " : "";
+    return [`| **${ECOSYSTEM_LABEL[e]}** | ${bound}${share(c.t)} | ${share(c.f)} | ${share(c.u)} | ${PUBLISH_CREDENTIAL[e]} |`];
+  });
+  return [
+    `### How the latest releases were published (snapshot ${agg.snapshotId})`,
+    "",
+    "| Platform | Trusted publishing (OIDC) | Account credential | Unknown | Credential used otherwise |",
+    "|---|---:|---:|---:|---|",
+    ...rows,
+    "",
+    "No registry reveals whether a credential was long-lived, so \"account credential\" covers expiring tokens too",
+    "(npm write tokens expire after at most 90 days since 2025-11).",
+    "",
   ].join("\n");
 }
 

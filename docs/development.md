@@ -64,7 +64,7 @@ Results land in `data/out/<snapshot>/`:
 | `pqc.md` / `pqc.csv` | Post-quantum exposure of each mechanism, per ecosystem |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
-| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, Sigstore, post-quantum exposure, adoption per signal |
+| `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, Sigstore, post-quantum exposure, adoption per signal |
 
 ## Configuration
 

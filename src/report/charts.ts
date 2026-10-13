@@ -9,7 +9,7 @@
 
 import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
 import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
-import { ECOSYSTEM_LABEL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
+import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
 import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineValue } from "../facts/baseline.ts";
 import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 import { PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
@@ -385,6 +385,66 @@ export function pqcSvg(agg: Aggregate): string {
   parts.push(
     `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">Hashes and symmetric secrets keep half their strength against a quantum computer (Grover); RSA, ECDSA and EdDSA are broken (Shor).</text>`,
     `<text x="${left}" y="${ly + 44}" font-size="10" fill="${MUTED}">Hybrid TLS (X25519MLKEM768) protects recorded traffic, not server authentication: every certificate is still RSA or ECDSA. Hover a cell for details.</text>`,
+  );
+  return svg(width, height, parts.join("\n"), HATCH);
+}
+
+/**
+ * How the latest releases were published: trusted publishing (OIDC), an account credential,
+ * or unknown, as one 100% bar per ecosystem. Parts of a whole, so a stacked bar; the three
+ * parts take two ramp steps and the hatch, in reading order from strongest to unknown.
+ */
+export function publishAuthSvg(agg: Aggregate): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.matrix.some((c) => c.ecosystem === e && c.signal === "identity_publish"));
+  const left = 120;
+  const barW = 420;
+  const rowH = 38;
+  const top = 92;
+  const width = left + barW + 290;
+  const height = top + ecosystems.length * rowH + 56;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">How the latest releases were published</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages by upload authentication · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+  ];
+  const SEG = [
+    { key: "t", label: "trusted publishing (OIDC)", fill: RAMP[9]! },
+    { key: "f", label: "account credential", fill: RAMP[3]! },
+    { key: "u", label: "unknown", fill: "url(#hatch)" },
+  ] as const;
+  let lx = 16;
+  for (const s of SEG) {
+    parts.push(
+      `<rect x="${lx}" y="58" width="14" height="10" rx="2" fill="${s.fill}"${s.key === "u" ? ` stroke="#c9c8c2" stroke-width="1"` : ""}/>`,
+      `<text x="${lx + 20}" y="67" font-size="11" fill="${INK_2}">${s.label}</text>`,
+    );
+    lx += 40 + s.label.length * 6.2;
+  }
+
+  ecosystems.forEach((e, i) => {
+    const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === "identity_publish")!;
+    const cy = top + i * rowH + 12;
+    const name = ECOSYSTEM_LABEL[e];
+    parts.push(`<text x="${left - 12}" y="${cy + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(name)}</text>`);
+    if (NO_UPLOAD.has(e) || c.n === 0) {
+      parts.push(`<text x="${left}" y="${cy + 4}" font-size="11" fill="${INK_2}">no upload: a release is a VCS tag</text>`);
+      return;
+    }
+    let x = left;
+    const counts = { t: c.t, f: c.f, u: c.u };
+    const segs = SEG.filter((s) => counts[s.key] > 0);
+    segs.forEach((s, k) => {
+      const w = (counts[s.key] / c.n) * barW;
+      const g = k < segs.length - 1 ? 2 : 0;
+      const tip = `${name}: ${counts[s.key]} of ${c.n} ${s.label}${s.key === "f" ? ` (${PUBLISH_CREDENTIAL[e]})` : ""}`;
+      parts.push(`<rect x="${x.toFixed(2)}" y="${cy - 9}" width="${Math.max(0, w - g).toFixed(2)}" height="18" rx="3" fill="${s.fill}"><title>${esc(tip)}</title></rect>`);
+      x += w;
+    });
+    const share = (k: number) => `${Math.round((k / c.n) * 100)}%`;
+    const bound = c.availability === "inferred" && c.u > 0 ? "≥ " : "";
+    parts.push(`<text x="${left + barW + 12}" y="${cy + 4}" font-size="11" fill="${INK}">${bound}${share(c.t)} OIDC <tspan fill="${INK_2}">· ${share(c.f)} credential${c.u ? ` · ${share(c.u)} unknown` : ""}</tspan></text>`);
+  });
+  parts.push(
+    `<text x="16" y="${height - 14}" font-size="10" fill="${MUTED}">Maven has no OIDC path, so every upload uses a token. PyPI shows trusted publishing only through attestations, so credential uploads stay unknown.</text>`,
   );
   return svg(width, height, parts.join("\n"), HATCH);
 }

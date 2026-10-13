@@ -39,6 +39,23 @@ export function humanMonth(ym: string): string {
   return m ? `${MONTHS[Number(m[2]) - 1]} ${m[1]}` : ym;
 }
 
+/**
+ * How each ecosystem's uploads authenticate, as far as its identity signal tells: `true` is
+ * trusted publishing, `false` an account credential (API token or login session), and
+ * `unknown` either. Go and Packagist have no upload at all: a release is a VCS tag.
+ */
+export const NO_UPLOAD: ReadonlySet<EcosystemId> = new Set(["go", "packagist"]);
+
+export const PUBLISH_CREDENTIAL: Record<EcosystemId, string> = {
+  npm: "granular token or login session",
+  pypi: "API token (not distinguishable from trusted publishing without attestations)",
+  crates: "API token",
+  rubygems: "user API key",
+  maven: "Portal user token (no OIDC path exists)",
+  go: "none: releases are VCS tags",
+  packagist: "none: releases are VCS tags",
+};
+
 export function pctText(p: number | null): string {
   return p == null ? "–" : `${Math.round(p * 100)}%`;
 }

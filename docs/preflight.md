@@ -356,3 +356,19 @@ What each cell of `src/facts/pqc.ts` rests on.
 - Trusted publishing: the OIDC JWKS of GitHub Actions (`token.actions.githubusercontent.com`) and GitLab
   (`gitlab.com/oauth/discovery/keys`) contain only RSA keys, `RS256`.
 
+## 14. Who published a release: trusted publishing vs. credentials (2026-10-13)
+
+The identity signal showed who used trusted publishing, not how everyone else published.
+
+| Registry | Per-release evidence of the alternative | Status |
+|---|---|---|
+| npm | `_npmUser` without `trustedPublisher`: a token or login session | already a real negative |
+| crates.io | `trustpub_data: null` with `published_by` set; `cargo publish` needs an API token | already a real negative |
+| RubyGems | Version page `/gems/{g}/versions/{v}`, "Pushed by" (`rubygems/_release_info.html.erb`): `Version#pusher` (a user, i.e. that user's API key) or `pusher_api_key.owner` (a trusted publisher, rendered as the GitHub icon titled with its name). In no JSON endpoint (`/api/v1`, `/api/v2/rubygems/{g}/versions/{v}.json` checked). Absent for versions pushed before rubygems.org recorded pushers (`rails` 4.0.0: absent; 6.0.0: user) | **new: read from the page**; robots.txt allows it; fixtures `rubygems-page-rails-*.html` |
+| PyPI | The file details show "Uploaded using Trusted Publishing? Yes/No" and "Uploaded via", but not in the JSON API (`urls[]` has no such field). The HTML answers bots with a JavaScript "Client Challenge" | **not read**: getting past a bot challenge is not appropriate; stays `unknown` |
+| Maven Central | No OIDC path: every upload uses a Portal user token | by construction |
+| Go, Packagist | No upload: releases are VCS tags | n/a |
+
+Result on the top-50 snapshot: RubyGems' latest releases are 32% trusted publishing and 68% API key, with
+no unknowns, against ≥ 26% from attestations alone: three trusted-publishing releases carried no attestation.
+
