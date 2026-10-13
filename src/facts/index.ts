@@ -62,8 +62,8 @@ export const AVAILABILITY: AvailabilityFact[] = [
     notes: "`gitHead` is not counted: it is asserted by the uploader's own npm client.",
   }),
   a("npm", "transparency_log", "inferred", "dist.attestations present ⇒ Sigstore bundle logged in public Rekor"),
-  a("npm", "mfa_enforced", "not_exposed", "none", {
-    notes: "A per-package 'require 2FA' publishing setting exists but is not in the packument. Local-publish 2FA announced 2025-12 without dates.",
+  a("npm", "mfa_enforced", "inferred", "registry policy: >1M downloads in the week ending 15 days before publish, on/after 2022-11-01 (api.npmjs.org/downloads/point)", {
+    notes: "High-impact rule: 2FA required for maintainers of packages above 1M weekly downloads or 500 dependents. Dependents are not in a public API, the 2022 top-100/top-500 cohorts cannot be reconstructed, and the per-package 'require 2FA' setting is not in the packument, so anything below the download threshold is unknown.",
   }),
 
   // crates.io

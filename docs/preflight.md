@@ -223,8 +223,8 @@ Because `ec[]` is no longer read, §3.3's trap is avoided by construction.
   that is not by that number (`symfony/deprecation-contracts`, 969M, ranks above `psr/log`, 1.3B).
 - **RubyGems 2FA policy** (now cited in `ecosystem_facts`): MFA required for owners of gems above 180M
   downloads since 2022-08-15. **PyPI**: 2FA required for all accounts from 2024-01-01. **npm**: 2FA for local
-  publishing and 7-day granular tokens were announced 2025-12-15 without effective dates, so npm MFA stays
-  `not_exposed`.
+  publishing and 7-day granular tokens were announced without effective dates, so npm MFA stays
+  `not_exposed`. *(Superseded by §10: the plan is dated 2025-09-22, and npm MFA is now `inferred`.)*
 
 ## 9. Availability audit (2026-10-13)
 
@@ -276,3 +276,26 @@ lands in exactly one place:
 
 In the pilot, **no PyPI attestation in the top 50 is SLSA**. All are the publish predicate, so PyPI's
 SLSA share is 0%, while its source-link share equals its attestation share (64%).
+
+## 10. MFA re-audit (2026-10-13)
+
+Prompted by a third-party summary of registry 2FA policies. Each claim was checked against the primary
+source; three of ours were wrong or out of date.
+
+| Cell / fact | Was | Now | Evidence |
+|---|---|---|---|
+| npm · mfa_enforced | not_exposed | **inferred** | 2FA is required for maintainers of high-impact packages, ">1 million weekly downloads or … more than 500 dependents", from 2022-11-01, with 15 days' notice (GitHub changelog 2022-11-01). Same account-level kind of mandate as PyPI's, which was already counted. Weekly downloads for any past window are public (`api.npmjs.org/downloads/point/{start}:{end}/{pkg}`, scoped names unescaped; verified `@babel/core`, 404 for unknown packages) |
+| npm · policy note | "plan announced 2025-12-15" | **2025-09-22** | The cited URL redirects to *Our plan for a more secure npm supply chain*, dated 2025-09-22. Since 2026-07-31, bypass-2FA tokens can no longer manage tokens, maintainers, access or trusted publishing; they lose direct publish in a planned 2027-01 change (GitHub changelog 2026-07-31) |
+| packagist · immutable versions | since 2026-05 | **since 2026-07** | The 2026-05-27 post only scheduled it (composer/packagist#1742, merged 2026-06-05); *Immutable Versions on Packagist* (2026-07-07) announces it as live. It fixes version → commit, not archive bytes, which the forge still generates |
+| packagist · transparency log | "went live 2026-05" | **exists; date not stated** | The 2026-05-27 post lists it as already in place. Since 2026-07 it also records soft-deletions, recoveries and blocked retags. Still login-gated (`/transparency-log` → 302 `/login/`, checked 2026-10-13) |
+| packagist · mfa_enforced | no_mechanism | **confirmed** | MFA events in the log ("in about six months" from 2026-05-27), profile MFA status, MFA for larger packages and for all accounts are all planned, none dated. No MFA marker on `/users/Seldaek/` or in either package JSON. The 2026-08 org-level MFA enforcement is a Private Packagist feature, not Packagist.org |
+| crates · mfa_enforced | no_mechanism | **confirmed, note added** | GitHub requires 2FA of code contributors (2023), but crates.io neither checks it nor needs it for token publishing. A per-crate `trustpub_only` flag (forbids token publishing) is on `GET /api/v1/crates/{c}`, current value only |
+| rubygems · 180M rule | not applied | **still not applied** | Only all-time download totals exist, so when a gem crossed 180M cannot be dated (methodology, limitation 5) |
+| maven, go · mfa_enforced | no_mechanism | **confirmed** | No change |
+
+**npm rule as implemented.** For each kept release published on or after 2022-11-01, one request for the
+seven days ending 15 days before its publication day (UTC). More than 1,000,000 ⇒ `true`; otherwise, or
+when npm has no count, `unknown`. Releases before 2022-11-01 cost no request and stay `unknown`. The
+dependents half of the rule and the earlier top-100 (2022-02-01) and top-500 (2022-05) cohorts are not
+reconstructable, which is why the cell is a lower bound.
+

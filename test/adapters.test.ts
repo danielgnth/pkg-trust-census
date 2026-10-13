@@ -15,7 +15,7 @@ import { availabilityOf, AVAILABILITY } from "../src/facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, baselineOf } from "../src/facts/baseline.ts";
 import { ECOSYSTEMS, SIGNALS } from "../src/types.ts";
 import { PypiAdapter, jsonUrl, simpleUrl } from "../src/adapters/pypi.ts";
-import { NpmAdapter, packumentUrl } from "../src/adapters/npm.ts";
+import { NpmAdapter, highImpactWindow, packumentUrl, windowDownloadsUrl } from "../src/adapters/npm.ts";
 import { CratesAdapter } from "../src/adapters/crates.ts";
 import { RubygemsAdapter } from "../src/adapters/rubygems.ts";
 import { GoAdapter } from "../src/adapters/go.ts";
@@ -170,8 +170,19 @@ describe("PyPI extract", () => {
 });
 
 describe("npm extract", () => {
+  /** The packument plus one downloads answer per release date the adapter will ask about. */
+  async function npmRoutes(name: string, weekly: (version: string) => Route = () => JSON.stringify({ downloads: 0 })) {
+    const body = await fixture(`npm-packument-${name}.json`);
+    const routes: Record<string, Route> = { [packumentUrl(name)]: body };
+    for (const [version, at] of Object.entries(JSON.parse(body).time as Record<string, string>)) {
+      const window = highImpactWindow(at);
+      if (window) routes[windowDownloadsUrl(name, window)] = weekly(version);
+    }
+    return routes;
+  }
+
   test("trusted publishing and provenance are read per version", async () => {
-    const src = new FakeSource({ [packumentUrl("sigstore")]: await fixture("npm-packument-sigstore.json") });
+    const src = new FakeSource(await npmRoutes("sigstore"));
     const pkg = await new NpmAdapter().extract(candidate("npm", "sigstore"), src, CTX);
 
     expect(pkg.latestVersion).toBe("5.0.0");
@@ -185,7 +196,7 @@ describe("npm extract", () => {
   });
 
   test("a registry signature is not a publisher signature", async () => {
-    const src = new FakeSource({ [packumentUrl("chalk")]: await fixture("npm-packument-chalk.json") });
+    const src = new FakeSource(await npmRoutes("chalk"));
     const pkg = await new NpmAdapter().extract(candidate("npm", "chalk"), src, CTX);
 
     expect(sig(pkg, "6.0.0", "registry_integrity")!.value).toBe("true");
@@ -194,6 +205,55 @@ describe("npm extract", () => {
     expect(sig(pkg, "6.0.0", "build_provenance")!.value).toBe("false");
     expect(sig(pkg, "6.0.0", "identity_publish")!.value).toBe("false");
     assertConsistentWithFacts(pkg);
+  });
+
+  test("the high-impact window is the week ending 15 days before the publication day", () => {
+    expect(highImpactWindow("2026-06-01T21:02:52.319Z")).toBe("2026-05-11:2026-05-17");
+    expect(highImpactWindow("2022-11-01T00:00:00Z")).toBe("2022-10-11:2022-10-17");
+    expect(highImpactWindow("2022-10-31T23:59:59Z")).toBeNull();
+    expect(highImpactWindow(null)).toBeNull();
+    expect(windowDownloadsUrl("@babel/core", "2026-05-11:2026-05-17")).toBe(
+      "https://api.npmjs.org/downloads/point/2026-05-11:2026-05-17/@babel/core",
+    );
+  });
+
+  test("MFA is true above 1M weekly downloads, and unknown at or below it or without a count", async () => {
+    const counts: Record<string, Route> = {
+      "5.0.0": JSON.stringify({ downloads: 4_200_000 }),
+      "4.0.0": JSON.stringify({ downloads: 1_000_000 }),
+      "4.1.0": { status: 404, body: '{"error":"package sigstore not found"}' },
+    };
+    const src = new FakeSource(await npmRoutes("sigstore", (v) => counts[v] ?? JSON.stringify({ downloads: 0 })));
+    const pkg = await new NpmAdapter().extract(candidate("npm", "sigstore"), src, CTX);
+
+    expect(sig(pkg, "5.0.0", "mfa_enforced")).toMatchObject({ value: "true", evidence: "4200000 downloads in 2026-05-11:2026-05-17" });
+    expect(sig(pkg, "5.0.0", "mfa_enforced")!.signalSource).toContain("downloads/point/2026-05-11:2026-05-17/sigstore");
+    expect(sig(pkg, "4.0.0", "mfa_enforced")).toMatchObject({ value: "unknown", evidence: "1000000 downloads in 2025-07-08:2025-07-14" });
+    expect(sig(pkg, "4.1.0", "mfa_enforced")).toMatchObject({ value: "unknown", evidence: null });
+    assertConsistentWithFacts(pkg);
+  });
+
+  test("releases before the high-impact rule are unknown and cost no downloads request", async () => {
+    const doc = {
+      "dist-tags": { latest: "1.0.0" },
+      time: { "1.0.0": "2021-03-01T00:00:00Z" },
+      versions: { "1.0.0": {} },
+    };
+    const src = new FakeSource({ [packumentUrl("old")]: JSON.stringify(doc) });
+    const pkg = await new NpmAdapter().extract(candidate("npm", "old"), src, CTX);
+
+    expect(sig(pkg, "1.0.0", "mfa_enforced")!.value).toBe("unknown");
+    expect(src.calls).toEqual([packumentUrl("old")]);
+  });
+
+  test("extract makes exactly the requests fetch made", async () => {
+    const routes = await npmRoutes("sigstore");
+    const a = new FakeSource(routes);
+    const b = new FakeSource(routes);
+    await new NpmAdapter().fetch(candidate("npm", "sigstore"), a, CTX);
+    await new NpmAdapter().extract(candidate("npm", "sigstore"), b, CTX);
+    expect(b.calls).toEqual(a.calls);
+    expect(a.calls.filter((c) => c.includes("api.npmjs.org")).length).toBeGreaterThan(0);
   });
 });
 

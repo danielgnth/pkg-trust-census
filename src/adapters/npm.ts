@@ -7,19 +7,62 @@
  *
  * Trusted publishing is *observable* on npm: versions published through it carry
  * `_npmUser.trustedPublisher`. Verified live against `sigstore@5.0.0` on 2026-10-13.
+ *
+ * MFA is inferred from npm's high-impact rule: maintainers of a package with more than 1M
+ * weekly downloads or 500 dependents must have 2FA. Each kept release on or after the
+ * rule's start costs one downloads request for the week npm would have judged it by.
  */
 
-import type { Candidate, ExtractedPackage, FetchResult } from "../types.ts";
+import type { Candidate, ExtractedPackage, ExtractedSignal, FetchResult } from "../types.ts";
 import type { HttpClient, Source } from "../http/client.ts";
 import { GatheringAdapter, type RunContext } from "./types.ts";
 import { RANKING_CACHE_KEY, rankFromEcosystems } from "./ecosystems.ts";
-import { cleanRepoUrl, notExposed, observed, selectKeptVersions } from "../extract/signals.ts";
+import {
+  type KeptVersion,
+  type VersionRecord,
+  cleanRepoUrl,
+  observed,
+  selectKeptVersions,
+  signal,
+} from "../extract/signals.ts";
 import { isSemverPrerelease } from "../extract/versions.ts";
 
 const DOWNLOADS = "https://api.npmjs.org/downloads/point/last-month";
 
 /** The bulk downloads endpoint accepts at most 128 unscoped names per call. */
 const BULK_LIMIT = 128;
+
+/** 2FA enforced for maintainers of every high-impact package from this date; see src/facts. */
+export const NPM_HIGH_IMPACT_2FA = "2022-11-01T00:00:00Z";
+
+/** "More than 1 million weekly downloads". The 500-dependents half is not in any public API. */
+const HIGH_IMPACT_WEEKLY = 1_000_000;
+
+/**
+ * Maintainers are notified 15 days before 2FA is enforced, so a release counts only if its
+ * package was already high-impact that long before it was published.
+ */
+const NOTICE_DAYS = 15;
+
+const DAY_MS = 86_400_000;
+
+/**
+ * The week that decides a release's MFA signal, as `start:end` (inclusive days): the seven
+ * days ending `NOTICE_DAYS` before its publication day. Null before the rule's start, where
+ * no download count could make it `true`.
+ */
+export function highImpactWindow(publishedAt: string | null): string | null {
+  const t = publishedAt ? Date.parse(publishedAt) : NaN;
+  if (!Number.isFinite(t) || t < Date.parse(NPM_HIGH_IMPACT_2FA)) return null;
+  const end = Math.floor(t / DAY_MS) * DAY_MS - NOTICE_DAYS * DAY_MS;
+  const iso = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+  return `${iso(end - 6 * DAY_MS)}:${iso(end)}`;
+}
+
+/** Scoped names keep their `/` here: unlike the packument, this endpoint accepts it. */
+export function windowDownloadsUrl(name: string, window: string): string {
+  return `https://api.npmjs.org/downloads/point/${window}/${name}`;
+}
 
 /** Scoped names keep their `@` but must encode the `/`, or the registry reads a path. */
 export function packumentUrl(name: string): string {
@@ -42,9 +85,15 @@ interface Packument {
   repository?: string | { url?: string };
 }
 
+interface NpmRecord extends VersionRecord {
+  /** Downloads in the `highImpactWindow` week; null when npm has no count for it. */
+  weekly?: { downloads: number | null; window: string; url: string };
+}
+
 interface Raw {
   doc: Packument;
   res: FetchResult;
+  kept: KeptVersion<NpmRecord>[];
 }
 
 const SRC = "registry.npmjs.org/{p} versions[v]";
@@ -105,7 +154,7 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
     return out;
   }
 
-  protected async gather(candidate: Candidate, src: Source): Promise<Raw> {
+  protected async gather(candidate: Candidate, src: Source, ctx: RunContext): Promise<Raw> {
     const { data, res } = await src.getJson<Packument>(packumentUrl(candidate.name), {
       ecosystem: this.id,
       package: candidate.name,
@@ -113,18 +162,28 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
       headers: { Accept: "application/json" },
     });
     if (!data?.versions) throw new Error(`npm has no package "${candidate.name}" (HTTP ${res.status})`);
-    return { doc: data, res };
-  }
 
-  protected build(candidate: Candidate, raw: Raw, ctx: RunContext): ExtractedPackage {
-    const { doc } = raw;
-    const versions = doc.versions ?? {};
-    const records = Object.keys(versions).map((version) => ({
+    // Kept versions are chosen here rather than in `build`, because which downloads
+    // windows to request depends on them and `fetch` must request the same ones.
+    const records: NpmRecord[] = Object.keys(data.versions).map((version) => ({
       version,
-      publishedAt: doc.time?.[version] ?? null,
+      publishedAt: data.time?.[version] ?? null,
       prerelease: isSemverPrerelease(version),
     }));
-    const kept = selectKeptVersions(records, doc["dist-tags"]?.latest ?? null, ctx.asOf);
+    const kept = selectKeptVersions(records, data["dist-tags"]?.latest ?? null, ctx.asOf);
+    for (const { record } of kept) {
+      const window = highImpactWindow(record.publishedAt);
+      if (!window) continue;
+      const url = windowDownloadsUrl(candidate.name, window);
+      const { data: point } = await src.getJson<{ downloads?: number }>(url, { ecosystem: this.id, package: candidate.name });
+      record.weekly = { downloads: typeof point?.downloads === "number" ? point.downloads : null, window, url };
+    }
+    return { doc: data, res, kept };
+  }
+
+  protected build(candidate: Candidate, raw: Raw): ExtractedPackage {
+    const { doc, kept } = raw;
+    const versions = doc.versions ?? {};
     const latest = kept.find((k) => k.isLatest)?.record;
     const rawRef = { path: raw.res.entry.path, sha256: raw.res.entry.sha256 };
 
@@ -142,7 +201,7 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
         publishedAt: record.publishedAt,
         isLatest,
         quarterAnchor,
-        signals: signalsFor(versions[record.version] ?? {}),
+        signals: [...signalsFor(versions[record.version] ?? {}), mfaFor(record)],
         raw: rawRef,
       })),
     };
@@ -178,6 +237,21 @@ function signalsFor(m: Manifest) {
     // npm provenance is only accepted from public repositories, and its statements are
     // logged in the public Rekor instance.
     observed("transparency_log", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, Rekor-logged)`),
-    notExposed("mfa_enforced", "npm's per-package 'require 2FA' setting is not in the packument"),
   ];
+}
+
+/**
+ * `true` when the package was high-impact by downloads before the release, so its
+ * maintainers had to have 2FA. Otherwise `unknown`, never `false`: the package may have
+ * qualified by dependents, been in the earlier top-100/top-500 cohorts, or had a
+ * maintainer with 2FA by choice. The per-package "require 2FA" setting is not exposed.
+ */
+function mfaFor(r: NpmRecord): ExtractedSignal {
+  const policy = "npm high-impact rule: 2FA required above 1M weekly downloads or 500 dependents";
+  const source = `policy: ${policy} (effective ${NPM_HIGH_IMPACT_2FA.slice(0, 10)}); weekly downloads ${NOTICE_DAYS} days before publish`;
+  if (!r.weekly) return signal("mfa_enforced", "unknown", null, source);
+  const { downloads, window, url } = r.weekly;
+  return downloads != null && downloads > HIGH_IMPACT_WEEKLY
+    ? signal("mfa_enforced", "true", `${downloads} downloads in ${window}`, `${source}: ${url}`)
+    : signal("mfa_enforced", "unknown", downloads != null ? `${downloads} downloads in ${window}` : null, `${source}: ${url}`);
 }

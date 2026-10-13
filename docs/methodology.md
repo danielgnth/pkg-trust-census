@@ -114,6 +114,7 @@ was re-checked against primary sources on 2026-10-13 (docs/preflight.md §9).
 | npm | signature, tlog | `dist.attestations` present (Sigstore, signed by the publisher's CI; Rekor) | observable / inferred |
 | npm | registry integrity | `dist.signatures` present | observable, mandatory |
 | npm | SLSA, source link | `dist.attestations.provenance.predicateType` is SLSA provenance | observable |
+| npm | MFA | release on/after 2022-11-01 with more than 1M downloads in the week ending 15 days before it ⇒ `true`, else `unknown` | inferred |
 | crates.io | identity | `trustpub_data` non-null | observable |
 | crates.io | source link | `trustpub_data.sha` present | observable |
 | RubyGems | signature | `/api/v1/attestations/{g}-{v}.json` non-empty ⇒ `true`, else `unknown` | inferred |
@@ -204,11 +205,16 @@ rebuilt offline from the cached payloads.
 3. **Go and Packagist source links** are the registry's own record of the commit it resolved, not a
    signature. Go's is missing for versions the proxy cached before it began recording `Origin`, hence
    `unknown`. Packagist scores 100% by construction, because its releases *are* VCS tags.
-4. **PyPI MFA is policy-derived.** It is `true` for every release after the mandate's effective date, not
-   observed per account.
+4. **PyPI and npm MFA are policy-derived**, not observed per account. PyPI's is `true` for every release
+   after its all-accounts mandate. npm requires 2FA only for maintainers of high-impact packages (more than
+   1M weekly downloads or 500 dependents, from 2022-11-01). A release counts when npm's downloads API shows
+   the package above 1M in the week ending 15 days before it, which is npm's notice period, so the package
+   was already high-impact when it was published. Packages that qualify by dependents alone, the 2022
+   top-100/top-500 cohorts and 2FA by choice all stay `unknown`, so npm's share is a lower bound (≥).
 5. **RubyGems MFA is per-gem opt-in.** Owners of gems above 180M downloads must use MFA regardless (since
    2022-08-15). This rule does not capture that, so the share understates enforced MFA among the most
-   popular gems.
+   popular gems. Unlike npm's, the rule cannot be applied per release: RubyGems publishes only all-time
+   download totals, so when a gem crossed 180M is not known.
 6. **Maven dates** are `Last-Modified` headers on repo1.maven.org. They match deploy dates where checked
    (Guava 33.4.8: 2025-04-14 in both). A re-deployed file would carry a later date.
 7. **Backfill reflects present-day metadata.** A release's signals are read as the registry reports them
