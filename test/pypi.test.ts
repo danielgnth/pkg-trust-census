@@ -128,7 +128,7 @@ describe("PypiAdapter.fetch", () => {
     const simple = transport.calls.find((c) => c.url === simpleUrl("requests"))!;
     // Without this header PyPI serves HTML and `provenance` is unavailable entirely.
     expect(simple.req.headers.Accept).toBe(SIMPLE_ACCEPT);
-    expect(simple.req.headers["User-Agent"]).toContain("pkg-trust-scraper");
+    expect(simple.req.headers["User-Agent"]).toContain("pkg-trust-census");
   });
 
   test("re-fetching a cached package makes no further requests", async () => {

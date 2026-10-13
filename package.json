@@ -1,9 +1,10 @@
 {
-  "name": "pkg-trust-scraper",
+  "name": "pkg-trust-census",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
-  "description": "Cross-ecosystem package trust signal scraper — Seminar Software Supply Chain Security WiSe 26/27",
+  "description": "Census of trust-signal adoption across seven package registries — Seminar Software Supply Chain Security WiSe 26/27",
   "module": "src/cli.ts",
   "scripts": {
     "cli": "bun run src/cli.ts",

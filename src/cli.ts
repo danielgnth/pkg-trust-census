@@ -118,7 +118,7 @@ function spinner(): { start(m: string): void; message(m: string): void; stop(m: 
 }
 
 function banner(stage: string, snapshotId: string, ecosystems: EcosystemId[], transport: string) {
-  p.intro(`pkg-trust-scraper · ${stage}`);
+  p.intro(`pkg-trust-census · ${stage}`);
   p.log.info(
     [
       `snapshot   ${snapshotId}`,
@@ -255,7 +255,7 @@ const aggregate = defineCommand({
     const db = openDb();
     try {
       const snapshotId = await resolveSnapshot(db, args.snapshot);
-      p.intro(`pkg-trust-scraper · aggregate · ${snapshotId}`);
+      p.intro(`pkg-trust-census · aggregate · ${snapshotId}`);
       const { aggregate: agg, path } = await runAggregate(db, snapshotId);
       p.log.success(`${agg.matrix.length} matrix cells, ${agg.series.length} series points → ${path}`);
       p.outro(`next: bun run cli report --snapshot ${snapshotId}`);
@@ -272,7 +272,7 @@ const report = defineCommand({
     const db = openDb();
     try {
       const snapshotId = await resolveSnapshot(db, args.snapshot);
-      p.intro(`pkg-trust-scraper · report · ${snapshotId}`);
+      p.intro(`pkg-trust-census · report · ${snapshotId}`);
       const { dir, files } = await runReport(db, snapshotId);
       p.log.success(`${files.length} files → ${dir}`);
       p.outro(`open ${dir}/summary.md`);
@@ -319,7 +319,7 @@ const status = defineCommand({
       .orderBy(desc(snapshots.startedAt))
       .all();
 
-    p.intro("pkg-trust-scraper · status");
+    p.intro("pkg-trust-census · status");
     p.log.info(`db ${dbPath()}\ncached responses ${http.cache.size}\ntransport ${http.transport.name}`);
 
     if (snaps.length === 0) {
@@ -370,9 +370,9 @@ const status = defineCommand({
 
 const main = defineCommand({
   meta: {
-    name: "pkg-trust-scraper",
+    name: "pkg-trust-census",
     version: TOOL_VERSION,
-    description: "Cross-ecosystem package trust signal scraper",
+    description: "Census of trust-signal adoption across seven package registries",
   },
   subCommands: {
     rank,

@@ -166,7 +166,7 @@ rank → fetch → extract → aggregate → report
 Everything else is adapters; this is the shared risk.
 
 - Per-host **token bucket** with per-host concurrency caps. crates.io publishes a crawler policy demanding a descriptive User-Agent with contact info and roughly ≤1 req/s — comply exactly.
-- User-Agent: `pkg-trust-scraper/0.1 (SSCS Seminar WiSe 26/27; +https://github.com/danielgnth/expert-octo-carnival; <contact from PKG_TRUST_CONTACT>)`
+- User-Agent: `pkg-trust-census/0.1 (SSCS Seminar WiSe 26/27; +https://github.com/danielgnth/pkg-trust-census; <contact from PKG_TRUST_CONTACT>)`
 - Exponential backoff on 429/5xx, **honouring `Retry-After`**.
 - Content-addressed cache write: gzip body, sha256 it, record `{url, sha256, bytes, http_status, fetched_at, ecosystem, package}` in `manifest.jsonl`.
 - Distinguish "fetched, 404" (a fact — record it) from "failed to fetch" (an error — record `fetch_error`). Never let a missing field silently become `false`.

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "pkg-trust-scraper",
+      "name": "pkg-trust-census",
       "dependencies": {
         "@clack/prompts": "^1.7.0",
         "citty": "^0.2.2",

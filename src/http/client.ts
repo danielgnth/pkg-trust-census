@@ -23,8 +23,8 @@ export const TOOL_VERSION = "0.1.0";
  */
 export const USER_AGENT =
   process.env.PKG_TRUST_UA ??
-  `pkg-trust-scraper/${TOOL_VERSION} (SSCS Seminar WiSe 26/27; ` +
-    `+https://github.com/danielgnth/expert-octo-carnival` +
+  `pkg-trust-census/${TOOL_VERSION} (SSCS Seminar WiSe 26/27; ` +
+    `+https://github.com/danielgnth/pkg-trust-census` +
     (process.env.PKG_TRUST_CONTACT ? `; ${process.env.PKG_TRUST_CONTACT}` : "") +
     ")";
 
