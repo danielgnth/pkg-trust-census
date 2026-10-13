@@ -15,6 +15,7 @@ import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
 import { adoptionSvg, matrixSvg, measurable, scoresSvg } from "../report/charts.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
+import { BASELINE, BASELINE_PROPERTIES, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 
 export interface ReportResult {
   dir: string;
@@ -33,6 +34,8 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["summary.md", summaryMarkdown(agg)],
     ["matrix.csv", matrixCsv(agg)],
     ["scores.csv", scoresCsv(agg)],
+    ["baseline.md", baselineMarkdown(agg, true)],
+    ["baseline.csv", baselineCsv()],
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
@@ -121,6 +124,7 @@ export function summaryMarkdown(agg: Aggregate): string {
     ...coverageRows,
     "",
     scoresMarkdown(agg),
+    baselineMarkdown(agg, false),
     "## Headline numbers",
     "",
     `Latest version, against the ${first ?? "first"} quarter anchor. Cells with no mechanism or not exposed are omitted; see matrix.md.`,
@@ -154,6 +158,56 @@ export function scoresMarkdown(agg: Aggregate): string {
     "high end as present). All properties weigh equally.",
     "",
   ].join("\n");
+}
+
+const BASELINE_SYMBOL: Record<BaselineFact["value"], string> = { yes: "✓ yes", partial: "◐ partial", no: "✗ no", "n/a": "– n/a" };
+
+/**
+ * The registry baseline: what each ecosystem's default toolchain does against tampering and
+ * bad releases. Ecosystem-level and curated, so it is not part of the per-package score.
+ */
+export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const cell = (b: BaselineFact) => `${BASELINE_SYMBOL[b.value]}${b.since ? ` (since ${b.since})` : ""}`;
+  const lines = [
+    "### Registry baseline (default toolchain, verified 2026-10-13)",
+    "",
+    `| | ${BASELINE_PROPERTIES.map((p) => p.label).join(" | ")} |`,
+    `|---|${BASELINE_PROPERTIES.map(() => "---").join("|")}|`,
+    ...ecosystems.map(
+      (e) => `| **${ECOSYSTEM_LABEL[e]}** | ${BASELINE_PROPERTIES.map((p) => cell(baselineOf(e, p.id))).join(" | ")} |`,
+    ),
+    "",
+    "What each column asks:",
+    "",
+    ...BASELINE_PROPERTIES.map((p) => `- **${p.label}**: ${p.question}`),
+    "",
+    "Protections against tampering and bad releases, complementing the trust score, which measures whether",
+    "an outsider can verify who published a release and from what source. Not part of the score: these",
+    "describe ecosystem defaults, not the sampled packages. *since* marks a value that changed recently,",
+    "so the backfill quarters predate it.",
+    "",
+  ];
+  if (!withNotes) return lines.join("\n");
+
+  lines.push("#### Notes and sources", "");
+  for (const p of BASELINE_PROPERTIES) {
+    lines.push(`**${p.label}**`, "");
+    for (const e of ecosystems) {
+      const b = baselineOf(e, p.id);
+      const links = b.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}. ${b.note} ${links}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+function baselineCsv(): string {
+  return csv(
+    ["ecosystem", "property", "value", "since", "note", "sources"],
+    BASELINE.map((b) => [b.ecosystem, b.property, b.value, b.since ?? null, b.note, b.sources.join(" ")]),
+  );
 }
 
 function scoresCsv(agg: Aggregate): string {

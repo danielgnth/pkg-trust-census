@@ -12,6 +12,7 @@ import type { Candidate, EcosystemId, ExtractedPackage, FetchResult } from "../s
 import { CacheMissError, cacheKey, type RequestOptions, type Source } from "../src/http/client.ts";
 import { sha256 } from "../src/http/cache.ts";
 import { availabilityOf, AVAILABILITY } from "../src/facts/index.ts";
+import { BASELINE, BASELINE_PROPERTIES, baselineOf } from "../src/facts/baseline.ts";
 import { ECOSYSTEMS, SIGNALS } from "../src/types.ts";
 import { PypiAdapter, jsonUrl, simpleUrl } from "../src/adapters/pypi.ts";
 import { NpmAdapter, packumentUrl } from "../src/adapters/npm.ts";
@@ -81,6 +82,17 @@ describe("facts", () => {
   test("cover every ecosystem × signal exactly once", () => {
     expect(AVAILABILITY).toHaveLength(ECOSYSTEMS.length * SIGNALS.length);
     for (const e of ECOSYSTEMS) for (const s of SIGNALS) expect(() => availabilityOf(e, s)).not.toThrow();
+  });
+
+  test("the registry baseline covers every ecosystem × property exactly once, each cited", () => {
+    expect(BASELINE).toHaveLength(ECOSYSTEMS.length * BASELINE_PROPERTIES.length);
+    for (const e of ECOSYSTEMS) for (const p of BASELINE_PROPERTIES) expect(() => baselineOf(e, p.id)).not.toThrow();
+    for (const b of BASELINE) {
+      expect(b.sources.length).toBeGreaterThan(0);
+      for (const u of b.sources) expect(u).toStartWith("https://");
+      expect(b.note.length).toBeGreaterThan(10);
+      if (b.since) expect(b.since).toMatch(/^\d{4}-\d{2}$/);
+    }
   });
 });
 

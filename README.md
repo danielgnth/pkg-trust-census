@@ -108,6 +108,11 @@ findings**, and the second one is itself a result worth reporting.
 Each platform also gets a **trust summary**: *capability* (how many of the seven properties it offers)
 and *assurance* (how many its top packages actually have, as a range over unknowns).
 
+A separate **registry baseline** covers what the score does not: immutable versions, hash checking,
+lockfile pinning, signature checking by the client, scoped and expiring tokens, and whether dependencies
+run code at install. A platform can score low on provenance and still be strong here. crates.io is the
+clearest case.
+
 ## Reproducibility
 
 Every row in the output traces to an endpoint plus JSON path (`signal_source`) and to a byte-exact

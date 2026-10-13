@@ -156,6 +156,30 @@ properties: a Sigstore attestation is a publisher signature, a source link and a
 That is counted, because the consumer does get all three. Weights are a single constant (`WEIGHTS` in
 `src/stages/aggregate.ts`), so a threat-weighted variant can be reported as a sensitivity check.
 
+### Registry baseline
+
+The trust score measures whether an outsider can verify who published a release and from what source.
+It says nothing about the protections most ecosystems rely on day to day, and on those a low scorer can
+be strong: crates.io scores 6% but pins and checks hashes, never changes a published version, and
+offers scoped, expiring tokens. A separate, curated table therefore records, per ecosystem, what the
+*default toolchain* does:
+
+| Property | Question |
+|---|---|
+| Immutable versions | Once published, can a version's files never be replaced or added to? |
+| Install checks hash | Does the default client check each download against the registry's hash? |
+| Lockfile pins hashes | Does the default lockfile record artifact hashes? |
+| Client checks signature | Does the default client check a signature or transparency log, so a compromised registry or mirror is detected? |
+| Scoped, expiring tokens | Can publish credentials be limited to specific packages and made to expire? |
+| No code at install | Does installing or building leave dependency code unexecuted by default? |
+
+Each cell is `yes`, `partial`, `no` or `n/a`, with a note and primary sources (`src/facts/baseline.ts`;
+`baseline.md` in each report). The table is not part of the score: it describes ecosystem defaults, not
+the sampled packages, and several cells depend on which client a user runs. Several values changed in
+2025–26: npm 12 stopped running install scripts (2026-07), PyPI stopped accepting new files on old
+releases (2026-07), Packagist made stable versions immutable (2026-05), and npm limited write tokens to 90
+days (2025-11). The backfill quarters predate these changes, so the table describes the snapshot date only.
+
 ## Reproducibility
 
 Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP status and fetch time are

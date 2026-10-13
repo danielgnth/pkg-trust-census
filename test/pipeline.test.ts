@@ -124,6 +124,11 @@ describe("pipeline", () => {
     const summary = await Bun.file(join(dir, "summary.md")).text();
     expect(summary).toContain("error rate 0.0%");
     expect(summary).toContain("Trust summary per platform");
+    expect(summary).toContain("Registry baseline");
+    expect(summary).toMatch(/\| \*\*PyPI\*\* \| ✓ yes \(since 2026-07\) \| ✓ yes \|/);
+    const baseline = await Bun.file(join(dir, "baseline.md")).text();
+    expect(baseline).toContain("#### Notes and sources");
+    expect(baseline).toContain("https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/");
     expect(summary).toMatch(/\| \*\*PyPI\*\* \| 6\/7 \| 6\/7 \| 29%–43% \|/);
     expect(await Bun.file(join(dir, "charts/scores.svg")).text()).toContain("Trust summary per platform");
     const csv = await Bun.file(join(dir, "signals.csv")).text();
