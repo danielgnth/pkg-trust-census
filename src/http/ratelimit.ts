@@ -26,7 +26,8 @@ export const HOST_POLICIES: Record<string, HostPolicy> = {
   "proxy.golang.org": { rps: 4, concurrency: 4 },
   "pypi.org": { rps: 5, concurrency: 5 },
   "registry.npmjs.org": { rps: 5, concurrency: 5 },
-  "api.npmjs.org": { rps: 5, concurrency: 5 },
+  // The downloads API answered 5 req/s with HTTP 429 on two thirds of requests (2026-10-13).
+  "api.npmjs.org": { rps: 1, concurrency: 1 },
   "raw.githubusercontent.com": { rps: 4, concurrency: 4 },
 };
 
