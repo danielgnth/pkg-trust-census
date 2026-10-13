@@ -146,6 +146,11 @@ describe("pipeline", () => {
     const sigstoreChart = await Bun.file(join(dir, "charts/sigstore.svg")).text();
     expect(sigstoreChart).toContain("Sigstore across registries");
     expect(sigstoreChart).toContain("since Nov 2024");
+    const pqcChart = await Bun.file(join(dir, "charts/pqc.svg")).text();
+    expect(pqcChart).toContain("Post-quantum exposure");
+    expect(pqcChart).toContain("X25519MLKEM768");
+    expect(await Bun.file(join(dir, "pqc.md")).text()).toContain("#### Notes and sources");
+    expect(summary).toContain("Post-quantum exposure");
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");

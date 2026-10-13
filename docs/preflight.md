@@ -324,3 +324,35 @@ on. No registry answers it publicly:
 | PyPI | user page | Moot: 2FA is mandatory for every account |
 | Go | — | No accounts |
 
+## 13. Post-quantum evidence (2026-10-13)
+
+What each cell of `src/facts/pqc.ts` rests on.
+
+**TLS** (`bun run probe:tls`, OpenSSL 3.6.4, offering X25519MLKEM768 first):
+
+| Hosts | Protocol | Group | Certificate |
+|---|---|---|---|
+| registry.npmjs.org, api.npmjs.org | TLS 1.2 (TLS 1.3 refused: protocol_version alert) | X25519 | ECDSA P-256 |
+| pypi.org, files.pythonhosted.org, upload.pypi.org | TLS 1.3 | X25519MLKEM768 | RSA-2048 |
+| crates.io, index.crates.io, static.crates.io | TLS 1.3 | X25519MLKEM768 | RSA-2048 |
+| rubygems.org, index.rubygems.org | TLS 1.3 | X25519MLKEM768 | RSA-2048 |
+| proxy.golang.org, sum.golang.org | TLS 1.3 | X25519MLKEM768 | ECDSA P-256 |
+| repo1.maven.org, repo.maven.apache.org, central.sonatype.com | TLS 1.3 | X25519MLKEM768 | ECDSA P-256 |
+| packagist.org, repo.packagist.org | TLS 1.3 | X25519MLKEM768 | RSA-2048 |
+| api.github.com, codeload.github.com (Packagist archives) | TLS 1.3 | X25519 | ECDSA P-256 |
+
+**Signatures**:
+
+- npm registry key (`/-/npm/v1/keys`): `ecdsa-sha2-nistp256`. It also signs the publish attestation.
+- sum.golang.org: signed notes with algorithm byte 0x01, i.e. Ed25519 (`golang.org/x/mod/sumdb/note`).
+- Sigstore trusted root (`sigstore/root-signing` `targets/trusted_root.json`): Fulcio root and
+  intermediate ECDSA P-384, TSA ECDSA P-384, Rekor `PKIX_ECDSA_P256_SHA_256` and the Rekor v2 shard
+  `log2025-1` `PKIX_ED25519`, CT log ECDSA P-256. Leaf certificates in real bundles (PyPI `sigstore`, RubyGems
+  `rails`, npm `sigstore@5.0.0`): ECDSA P-256 keys, signed ecdsa-with-SHA384. Sigstore's ML-DSA instance is
+  targeted for mid-2027 as a separate trust root (Sigstore blog, 2026-10-02).
+- Maven `.pom.asc` on the latest release of the 50 sampled artifacts (signature packet algorithm byte):
+  RSA 34, EdDSA 6, ECDSA 5, DSA 4, one 404 (`javax.servlet:servlet-api` 2.5). None uses the RFC 9980
+  (2026-06) ML-DSA composites; GnuPG cannot produce them yet.
+- Trusted publishing: the OIDC JWKS of GitHub Actions (`token.actions.githubusercontent.com`) and GitLab
+  (`gitlab.com/oauth/discovery/keys`) contain only RSA keys, `RS256`.
+

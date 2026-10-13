@@ -12,6 +12,7 @@ import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
 import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineValue } from "../facts/baseline.ts";
 import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
+import { PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
 
 const FONT = "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 const SURFACE = "#fcfcfb";
@@ -307,6 +308,83 @@ export function sigstoreSvg(agg: Aggregate): string {
   }
   parts.push(
     `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">"Best install client" is the strongest default or opt-in check among the clients listed in sigstore.md, newer ones included.</text>`,
+  );
+  return svg(width, height, parts.join("\n"), HATCH);
+}
+
+/**
+ * Post-quantum status is ordinal too: safe darkest, partial mid, and the two failing states
+ * off the ramp. "Weak" (SHA-1, MD5) shares the vulnerable fill but gets a dashed outline,
+ * because it fails today rather than only against a quantum computer.
+ */
+const PQC_STYLE: Record<PqcStatus, { fill: string; ink: string; label: string; dashed?: boolean }> = {
+  safe: { fill: RAMP[9]!, ink: "#ffffff", label: "PQ-safe" },
+  partial: { fill: RAMP[4]!, ink: INK, label: "partly PQ-safe" },
+  vulnerable: { fill: NEUTRAL, ink: INK_2, label: "quantum-vulnerable" },
+  weak: { fill: NEUTRAL, ink: INK_2, label: "weak already", dashed: true },
+  "n/a": { fill: "url(#hatch)", ink: INK_2, label: "not used" },
+};
+
+/**
+ * Every cryptographic mechanism in the publish → install chain, per ecosystem, coloured by
+ * what a cryptographically relevant quantum computer would do to it. Each cell names the
+ * primitive; the hover title carries the reasoning.
+ */
+export function pqcSvg(agg: Aggregate): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const cellW = 136;
+  const cellH = 44;
+  const gap = 2;
+  const left = 120;
+  const top = 94;
+  const width = left + PQC_LAYERS.length * (cellW + gap) + 32;
+  const height = top + ecosystems.length * (cellH + gap) + 92;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Post-quantum exposure, publish to install</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">What a cryptographically relevant quantum computer would break · verified ${esc(humanDate(PQC_VERIFIED, true))}, TLS measured live · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+  ];
+
+  PQC_LAYERS.forEach((l, j) => {
+    const lines = twoLines(l.label);
+    lines.forEach((line, k) => {
+      parts.push(`<text x="${left + j * (cellW + gap) + cellW / 2}" y="${top - 10 - (lines.length - 1 - k) * 13}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle"><title>${esc(l.question)}</title>${esc(line)}</text>`);
+    });
+  });
+
+  ecosystems.forEach((e, i) => {
+    const y = top + i * (cellH + gap);
+    parts.push(`<text x="${left - 10}" y="${y + cellH / 2 + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(ECOSYSTEM_LABEL[e])}</text>`);
+    PQC_LAYERS.forEach((l, j) => {
+      const p = pqcOf(e, l.id);
+      const st = PQC_STYLE[p.status];
+      const x = left + j * (cellW + gap);
+      const cx = x + cellW / 2;
+      const outline = st.dashed ? ` stroke="${INK_2}" stroke-width="1.5" stroke-dasharray="4 3"` : "";
+      const sub = p.status === "n/a" ? null : st.label;
+      parts.push(
+        `<g><title>${esc(`${ECOSYSTEM_LABEL[e]} · ${l.label}: ${p.primitive} (${st.label}). ${p.note}`)}</title>`,
+        `<rect x="${x + (st.dashed ? 0.75 : 0)}" y="${y + (st.dashed ? 0.75 : 0)}" width="${cellW - (st.dashed ? 1.5 : 0)}" height="${cellH - (st.dashed ? 1.5 : 0)}" rx="4" fill="${st.fill}"${outline}/>`,
+        `<text x="${cx}" y="${y + (sub ? 20 : 26)}" font-size="12" font-weight="600" fill="${st.ink}" text-anchor="middle">${esc(p.primitive)}</text>`,
+        sub ? `<text x="${cx}" y="${y + 34}" font-size="10" fill="${st.ink}" text-anchor="middle" opacity="0.85">${esc(sub)}</text>` : "",
+        `</g>`,
+      );
+    });
+  });
+
+  const ly = top + ecosystems.length * (cellH + gap) + 22;
+  let lx = left;
+  for (const v of ["safe", "partial", "vulnerable", "weak", "n/a"] as const) {
+    const st = PQC_STYLE[v];
+    const outline = st.dashed ? ` stroke="${INK_2}" stroke-width="1" stroke-dasharray="3 2"` : v === "vulnerable" || v === "n/a" ? ` stroke="#c9c8c2" stroke-width="1"` : "";
+    parts.push(
+      `<rect x="${lx}" y="${ly}" width="14" height="10" rx="2" fill="${st.fill}"${outline}/>`,
+      `<text x="${lx + 20}" y="${ly + 9}" font-size="10" fill="${INK_2}">${st.label}</text>`,
+    );
+    lx += 36 + st.label.length * 5.6;
+  }
+  parts.push(
+    `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">Hashes and symmetric secrets keep half their strength against a quantum computer (Grover); RSA, ECDSA and EdDSA are broken (Shor).</text>`,
+    `<text x="${left}" y="${ly + 44}" font-size="10" fill="${MUTED}">Hybrid TLS (X25519MLKEM768) protects recorded traffic, not server authentication: every certificate is still RSA or ECDSA. Hover a cell for details.</text>`,
   );
   return svg(width, height, parts.join("\n"), HATCH);
 }

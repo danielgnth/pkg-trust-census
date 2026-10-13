@@ -14,6 +14,7 @@ import { sha256 } from "../src/http/cache.ts";
 import { availabilityOf, AVAILABILITY } from "../src/facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, baselineOf } from "../src/facts/baseline.ts";
 import { SIGSTORE, sigstoreOf } from "../src/facts/sigstore.ts";
+import { PQC, PQC_LAYERS, pqcOf } from "../src/facts/pqc.ts";
 import { ECOSYSTEMS, SIGNALS } from "../src/types.ts";
 import { PypiAdapter, jsonUrl, simpleUrl } from "../src/adapters/pypi.ts";
 import { NpmAdapter, highImpactWindow, packumentUrl, windowDownloadsUrl } from "../src/adapters/npm.ts";
@@ -107,6 +108,24 @@ describe("facts", () => {
       else expect([s.since, s.registryVerifies, s.clients.every((c) => c.verifies === "n/a")]).toEqual([undefined, "n/a", true]);
       expect(s.clients.length).toBeGreaterThan(0);
       for (const c of s.clients) expect(c.source).toStartWith("https://");
+    }
+  });
+
+  test("the post-quantum table covers every ecosystem × layer once, each cited", () => {
+    expect(PQC).toHaveLength(ECOSYSTEMS.length * PQC_LAYERS.length);
+    for (const e of ECOSYSTEMS) for (const l of PQC_LAYERS) expect(() => pqcOf(e, l.id)).not.toThrow();
+    for (const p of PQC) {
+      expect(p.sources.length).toBeGreaterThan(0);
+      for (const u of p.sources) expect(u).toStartWith("https://");
+      expect(p.note.length).toBeGreaterThan(5);
+    }
+  });
+
+  test("post-quantum cells agree with the Sigstore table", () => {
+    // A registry that accepts Sigstore bundles has a (classical) publisher signature and a log.
+    for (const s of SIGSTORE.filter((x) => x.status === "yes")) {
+      expect(pqcOf(s.ecosystem, "publisher_signature").status).toBe("vulnerable");
+      expect(pqcOf(s.ecosystem, "transparency_log").status).toBe("partial");
     }
   });
 

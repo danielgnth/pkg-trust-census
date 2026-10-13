@@ -12,11 +12,12 @@ import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
 import { packageVersions, packages, versionSignals } from "../db/schema.ts";
 import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
-import { adoptionSvg, baselineSvg, matrixSvg, measurable, scoresSvg, sigstoreSvg } from "../report/charts.ts";
+import { adoptionSvg, baselineSvg, matrixSvg, measurable, pqcSvg, scoresSvg, sigstoreSvg } from "../report/charts.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
+import { PQC, PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
 
 export interface ReportResult {
   dir: string;
@@ -41,6 +42,9 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["sigstore.md", sigstoreMarkdown(agg, true)],
     ["sigstore.csv", sigstoreCsv()],
     ["charts/sigstore.svg", sigstoreSvg(agg)],
+    ["pqc.md", pqcMarkdown(agg, true)],
+    ["pqc.csv", pqcCsv()],
+    ["charts/pqc.svg", pqcSvg(agg)],
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
@@ -131,6 +135,7 @@ export function summaryMarkdown(agg: Aggregate): string {
     scoresMarkdown(agg),
     baselineMarkdown(agg, false),
     sigstoreMarkdown(agg, false),
+    pqcMarkdown(agg, false),
     "## Headline numbers",
     "",
     `Latest version, against the ${first ?? "first"} quarter anchor. Cells with no mechanism or not exposed are omitted; see matrix.md.`,
@@ -255,6 +260,55 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
   }
   lines.push("");
   return lines.join("\n");
+}
+
+const PQC_SYMBOL: Record<PqcStatus, string> = { safe: "✓", partial: "◐", vulnerable: "✗", weak: "⚠", "n/a": "–" };
+
+/**
+ * Post-quantum exposure per ecosystem and layer: which primitive each mechanism rests on,
+ * and whether a cryptographically relevant quantum computer would break it.
+ */
+export function pqcMarkdown(agg: Aggregate, withNotes: boolean): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const lines = [
+    `### Post-quantum exposure (verified ${PQC_VERIFIED}, TLS measured live)`,
+    "",
+    `| | ${PQC_LAYERS.map((l) => l.label).join(" | ")} |`,
+    `|---|${PQC_LAYERS.map(() => "---").join("|")}|`,
+    ...ecosystems.map((e) => `| **${ECOSYSTEM_LABEL[e]}** | ${PQC_LAYERS.map((l) => {
+      const p = pqcOf(e, l.id);
+      return p.status === "n/a" ? "–" : `${PQC_SYMBOL[p.status]} ${p.primitive}`;
+    }).join(" | ")} |`),
+    "",
+    "✓ post-quantum safe (hash ≥ 256 bits or symmetric secret) · ◐ partly (hash-chained log with classical",
+    "checkpoint signatures, hybrid TLS with classical certificates, TOTP beside WebAuthn) · ✗ broken by a quantum",
+    "computer (RSA, ECDSA, EdDSA) · ⚠ weak already (SHA-1, MD5) · – not used.",
+    "",
+    "Every signature in every ecosystem is classical, Sigstore included (its ML-DSA instance is targeted for",
+    "mid-2027). What is already post-quantum safe is the hashing: lockfile and index hashes everywhere except",
+    "Maven (SHA-1) and Packagist (git SHA-1), and the Merkle trees under Rekor and sum.golang.org.",
+    "",
+  ];
+  if (!withNotes) return lines.join("\n");
+
+  lines.push("#### Notes and sources", "");
+  for (const l of PQC_LAYERS) {
+    lines.push(`**${l.label}**: ${l.question}`, "");
+    for (const e of ecosystems) {
+      const p = pqcOf(e, l.id);
+      const links = p.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${p.primitive} (${p.status}). ${p.note} ${links}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+function pqcCsv(): string {
+  return csv(
+    ["ecosystem", "layer", "primitive", "status", "note", "sources"],
+    PQC.map((p) => [p.ecosystem, p.layer, p.primitive, p.status, p.note, p.sources.join(" ")]),
+  );
 }
 
 function sigstoreCsv(): string {

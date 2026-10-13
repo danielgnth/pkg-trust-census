@@ -10,6 +10,7 @@ bun install
 bun test              # unit tests, no network
 bun run typecheck
 bun run cli status    # snapshots, cache and coverage
+bun run probe:tls     # which registry hosts negotiate post-quantum TLS (needs OpenSSL ≥ 3.5)
 bun run cli --help
 ```
 
@@ -60,9 +61,10 @@ Results land in `data/out/<snapshot>/`:
 | `timeseries.csv` | Signal adoption per quarter |
 | `baseline.md` / `baseline.csv` | Registry baseline (ecosystem-level properties) |
 | `sigstore.md` / `sigstore.csv` | Which registries accept Sigstore bundles, who verifies them, nearest equivalents |
+| `pqc.md` / `pqc.csv` | Post-quantum exposure of each mechanism, per ecosystem |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
-| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, Sigstore, adoption per signal |
+| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, Sigstore, post-quantum exposure, adoption per signal |
 
 ## Configuration
 

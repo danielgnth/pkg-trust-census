@@ -203,6 +203,20 @@ registry-level facts and, for the other three, the nearest equivalent: Go's own 
 nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
 `charts/sigstore.svg` draws the table alongside the share of sampled latest releases carrying a bundle.
 
+### Post-quantum exposure
+
+A third curated table (`src/facts/pqc.ts`; `pqc.md` and `charts/pqc.svg` in each report) asks what a
+cryptographically relevant quantum computer would break. It covers the whole chain: install hash, publisher
+signature, registry signature, transparency log, TLS, publish credential and MFA. Each cell names the
+primitive and is classed as post-quantum safe (hash of at least 256 bits, symmetric secret), partly safe
+(a hash-chained log with classical checkpoint signatures; hybrid TLS with classical certificates; TOTP
+next to WebAuthn), quantum-vulnerable (RSA, ECDSA, EdDSA) or weak already (SHA-1, MD5). TLS cells are
+measured with `scripts/probe-pq-tls.ts`; signature algorithms are read from the registries' published keys,
+Sigstore's trusted root and the sampled Maven `.asc` files (preflight §13).
+
+Every signature in every ecosystem is classical, Sigstore included. What is already safe is hashing:
+install hashes everywhere except Maven and Packagist, and the Merkle trees under Rekor and sum.golang.org.
+
 ## Reproducibility
 
 Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP status and fetch time are
