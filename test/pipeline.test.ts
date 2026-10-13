@@ -139,6 +139,9 @@ describe("pipeline", () => {
     expect(baselineChart).toContain("Registry baseline");
     expect(baselineChart).toContain("since Jul 2026");
     expect(baselineChart).toContain(">PyPI</text>");
+    const sigstore = await Bun.file(join(dir, "sigstore.md")).text();
+    expect(sigstore).toContain("#### What is signed, and sources");
+    expect(summary).toContain("Sigstore across registries");
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");

@@ -189,6 +189,15 @@ releases (2026-07), Packagist made stable versions immutable (2026-07), and npm 
 days (2025-11). The backfill quarters predate these changes, so the table describes the snapshot date only.
 The table is also drawn as `charts/baseline.svg`.
 
+### Sigstore
+
+Four of the seven registries accept Sigstore bundles: npm (2023), PyPI (2024), RubyGems (2024) and Maven
+Central (2025). Each verifies the bundle at upload; no default install client does (npm only in `npm audit
+signatures`). The bundles are already measured per release, as a publisher signature and a transparency-log
+entry. A separate curated table (`src/facts/sigstore.ts`; `sigstore.md` in each report) records the
+registry-level facts and, for the other three, the nearest equivalent: Go's own checksum transparency log,
+nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
+
 ## Reproducibility
 
 Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP status and fetch time are

@@ -16,6 +16,7 @@ import { adoptionSvg, baselineSvg, matrixSvg, measurable, scoresSvg } from "../r
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
+import { SIGSTORE, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 
 export interface ReportResult {
   dir: string;
@@ -37,6 +38,8 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["baseline.md", baselineMarkdown(agg, true)],
     ["baseline.csv", baselineCsv()],
     ["charts/baseline.svg", baselineSvg(agg)],
+    ["sigstore.md", sigstoreMarkdown(agg, true)],
+    ["sigstore.csv", sigstoreCsv()],
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
@@ -126,6 +129,7 @@ export function summaryMarkdown(agg: Aggregate): string {
     "",
     scoresMarkdown(agg),
     baselineMarkdown(agg, false),
+    sigstoreMarkdown(agg, false),
     "## Headline numbers",
     "",
     `Latest version, against the ${first ?? "first"} quarter anchor. Cells with no mechanism or not exposed are omitted; see matrix.md.`,
@@ -202,6 +206,50 @@ export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push("");
   }
   return lines.join("\n");
+}
+
+const SIGSTORE_STATUS: Record<SigstoreFact["status"], string> = { yes: "✓ yes", planned: "◐ planned", no: "✗ no" };
+
+/**
+ * Which registries accept Sigstore bundles, who checks them, and the nearest equivalent
+ * where there is none. Ecosystem-level and curated, like the baseline.
+ */
+export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e));
+  const using = SIGSTORE.filter((s) => s.status === "yes" && ecosystems.includes(s.ecosystem));
+  const lines = [
+    `### Sigstore across registries (verified ${BASELINE_VERIFIED})`,
+    "",
+    `${using.length} of ${ecosystems.length} registries accept Sigstore bundles (${using.map((s) => ECOSYSTEM_LABEL[s.ecosystem]).join(", ")}), all logged in the`,
+    "public Rekor instance. In the trust matrix each bundle counts as a publisher signature and a transparency-log entry.",
+    "",
+    "| | Sigstore | Since | Registry verifies on upload | Default client verifies | Nearest equivalent |",
+    "|---|---|---|---|---|---|",
+    ...ecosystems.map((e) => {
+      const f = sigstoreOf(e);
+      return `| **${ECOSYSTEM_LABEL[e]}** | ${SIGSTORE_STATUS[f.status]} | ${f.since ?? "–"} | ${f.registryVerifies} | ${f.clientVerifies} | ${f.similar} |`;
+    }),
+    "",
+    "No default install client verifies Sigstore bundles: npm checks them only in `npm audit signatures`.",
+    "",
+  ];
+  if (!withNotes) return lines.join("\n");
+
+  lines.push("#### What is signed, and sources", "");
+  for (const e of ecosystems) {
+    const f = sigstoreOf(e);
+    const links = f.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+    lines.push(`- **${ECOSYSTEM_LABEL[e]}**: ${f.signs} ${links}`);
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+function sigstoreCsv(): string {
+  return csv(
+    ["ecosystem", "status", "since", "registry_verifies", "client_verifies", "signs", "similar", "sources"],
+    SIGSTORE.map((s) => [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, s.clientVerifies, s.signs, s.similar, s.sources.join(" ")]),
+  );
 }
 
 function baselineCsv(): string {

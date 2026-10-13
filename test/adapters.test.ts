@@ -13,6 +13,7 @@ import { CacheMissError, cacheKey, type RequestOptions, type Source } from "../s
 import { sha256 } from "../src/http/cache.ts";
 import { availabilityOf, AVAILABILITY } from "../src/facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, baselineOf } from "../src/facts/baseline.ts";
+import { SIGSTORE, sigstoreOf } from "../src/facts/sigstore.ts";
 import { ECOSYSTEMS, SIGNALS } from "../src/types.ts";
 import { PypiAdapter, jsonUrl, simpleUrl } from "../src/adapters/pypi.ts";
 import { NpmAdapter, highImpactWindow, packumentUrl, windowDownloadsUrl } from "../src/adapters/npm.ts";
@@ -92,6 +93,25 @@ describe("facts", () => {
       for (const u of b.sources) expect(u).toStartWith("https://");
       expect(b.note.length).toBeGreaterThan(10);
       if (b.since) expect(b.since).toMatch(/^\d{4}-\d{2}$/);
+    }
+  });
+
+  test("the Sigstore table covers every ecosystem once, each cited", () => {
+    expect(SIGSTORE).toHaveLength(ECOSYSTEMS.length);
+    for (const e of ECOSYSTEMS) expect(() => sigstoreOf(e)).not.toThrow();
+    for (const s of SIGSTORE) {
+      expect(s.sources.length).toBeGreaterThan(0);
+      for (const u of s.sources) expect(u).toStartWith("https://");
+      // A registry that accepts bundles has a start date and says who checks them.
+      if (s.status === "yes") expect([s.since, s.registryVerifies]).toEqual([expect.stringMatching(/^\d{4}-\d{2}$/), expect.any(String)]);
+      else expect([s.since, s.registryVerifies, s.clientVerifies]).toEqual([undefined, "n/a", "n/a"]);
+    }
+  });
+
+  test("Sigstore facts agree with the signal availability they explain", () => {
+    // Every registry that accepts bundles measures them as a publisher signature.
+    for (const s of SIGSTORE.filter((x) => x.status === "yes")) {
+      expect([s.ecosystem, availabilityOf(s.ecosystem, "artifact_signature").availability]).not.toEqual([s.ecosystem, "no_mechanism"]);
     }
   });
 });

@@ -59,6 +59,7 @@ Results land in `data/out/<snapshot>/`:
 | `scores.csv`, `score_series.csv` | Trust summary score per ecosystem, and over time |
 | `timeseries.csv` | Signal adoption per quarter |
 | `baseline.md` / `baseline.csv` | Registry baseline (ecosystem-level properties) |
+| `sigstore.md` / `sigstore.csv` | Which registries accept Sigstore bundles, who verifies them, nearest equivalents |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
 | `charts/*.svg` | Charts: trust matrix, scores, registry baseline, adoption per signal |
