@@ -12,11 +12,11 @@ import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
 import { packageVersions, packages, versionSignals } from "../db/schema.ts";
 import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
-import { adoptionSvg, baselineSvg, matrixSvg, measurable, scoresSvg } from "../report/charts.ts";
+import { adoptionSvg, baselineSvg, matrixSvg, measurable, scoresSvg, sigstoreSvg } from "../report/charts.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, cellText, pctText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
-import { SIGSTORE, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
+import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 
 export interface ReportResult {
   dir: string;
@@ -40,6 +40,7 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["charts/baseline.svg", baselineSvg(agg)],
     ["sigstore.md", sigstoreMarkdown(agg, true)],
     ["sigstore.csv", sigstoreCsv()],
+    ["charts/sigstore.svg", sigstoreSvg(agg)],
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
@@ -223,14 +224,19 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
     `${using.length} of ${ecosystems.length} registries accept Sigstore bundles (${using.map((s) => ECOSYSTEM_LABEL[s.ecosystem]).join(", ")}), all logged in the`,
     "public Rekor instance. In the trust matrix each bundle counts as a publisher signature and a transparency-log entry.",
     "",
-    "| | Sigstore | Since | Registry verifies on upload | Default client verifies | Nearest equivalent |",
-    "|---|---|---|---|---|---|",
+    "| | Sigstore | Since | Latest releases with a bundle | Registry verifies on upload | Best install client | Nearest equivalent |",
+    "|---|---|---|---:|---|---|---|",
     ...ecosystems.map((e) => {
       const f = sigstoreOf(e);
-      return `| **${ECOSYSTEM_LABEL[e]}** | ${SIGSTORE_STATUS[f.status]} | ${f.since ?? "–"} | ${f.registryVerifies} | ${f.clientVerifies} | ${f.similar} |`;
+      const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === SIGSTORE_SIGNAL);
+      const share = f.status === "yes" && c ? `${pctText(c.pct)} (${c.t}/${c.n})` : "–";
+      const best = bestClient(f);
+      const client = best.verifies === "n/a" ? "n/a" : `${best.verifies} (${best.client})`;
+      return `| **${ECOSYSTEM_LABEL[e]}** | ${SIGSTORE_STATUS[f.status]} | ${f.since ?? "–"} | ${share} | ${f.registryVerifies} | ${client} | ${f.similar} |`;
     }),
     "",
-    "No default install client verifies Sigstore bundles: npm checks them only in `npm audit signatures`.",
+    "No install client checks Sigstore bundles by default, including newer ones (uv, pnpm, Yarn, Bun, Gradle).",
+    "The only check is npm's opt-in `npm audit signatures`, run after install.",
     "",
   ];
   if (!withNotes) return lines.join("\n");
@@ -241,14 +247,24 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
     const links = f.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
     lines.push(`- **${ECOSYSTEM_LABEL[e]}**: ${f.signs} ${links}`);
   }
+  lines.push("", "#### Install clients", "", "| Ecosystem | Client | Checks bundles | Note |", "|---|---|---|---|");
+  for (const e of ecosystems) {
+    for (const c of sigstoreOf(e).clients) {
+      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} [source](${c.source}) |`);
+    }
+  }
   lines.push("");
   return lines.join("\n");
 }
 
 function sigstoreCsv(): string {
   return csv(
-    ["ecosystem", "status", "since", "registry_verifies", "client_verifies", "signs", "similar", "sources"],
-    SIGSTORE.map((s) => [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, s.clientVerifies, s.signs, s.similar, s.sources.join(" ")]),
+    ["ecosystem", "status", "since", "registry_verifies", "best_client", "best_client_verifies", "clients", "signs", "similar", "sources"],
+    SIGSTORE.map((s) => {
+      const best = bestClient(s);
+      const clients = s.clients.map((c) => `${c.client}: ${c.verifies}`).join("; ");
+      return [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, best.client, best.verifies, clients, s.signs, s.similar, s.sources.join(" ")];
+    }),
   );
 }
 

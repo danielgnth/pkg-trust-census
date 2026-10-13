@@ -193,11 +193,15 @@ The table is also drawn as `charts/baseline.svg`.
 ### Sigstore
 
 Four of the seven registries accept Sigstore bundles: npm (2023), PyPI (2024), RubyGems (2024) and Maven
-Central (2025). Each verifies the bundle at upload; no default install client does (npm only in `npm audit
-signatures`). The bundles are already measured per release, as a publisher signature and a transparency-log
+Central (2025). Each verifies the bundle at upload. No install client checks bundles by default, newer
+ones included: uv uploads attestations but does not verify them, pnpm's opt-in `trustPolicy: no-downgrade`
+compares the packument's trusted-publisher/provenance fields without verifying them, Yarn and Bun only
+generate provenance, and Gradle's opt-in dependency verification knows PGP but not Sigstore. The only check
+is npm's opt-in `npm audit signatures`. The bundles are already measured per release, as a publisher signature and a transparency-log
 entry. A separate curated table (`src/facts/sigstore.ts`; `sigstore.md` in each report) records the
 registry-level facts and, for the other three, the nearest equivalent: Go's own checksum transparency log,
 nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
+`charts/sigstore.svg` draws the table alongside the share of sampled latest releases carrying a bundle.
 
 ## Reproducibility
 

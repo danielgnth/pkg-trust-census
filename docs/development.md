@@ -62,7 +62,7 @@ Results land in `data/out/<snapshot>/`:
 | `sigstore.md` / `sigstore.csv` | Which registries accept Sigstore bundles, who verifies them, nearest equivalents |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence and source |
-| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, adoption per signal |
+| `charts/*.svg` | Charts: trust matrix, scores, registry baseline, Sigstore, adoption per signal |
 
 ## Configuration
 

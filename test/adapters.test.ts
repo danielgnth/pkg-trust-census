@@ -104,7 +104,9 @@ describe("facts", () => {
       for (const u of s.sources) expect(u).toStartWith("https://");
       // A registry that accepts bundles has a start date and says who checks them.
       if (s.status === "yes") expect([s.since, s.registryVerifies]).toEqual([expect.stringMatching(/^\d{4}-\d{2}$/), expect.any(String)]);
-      else expect([s.since, s.registryVerifies, s.clientVerifies]).toEqual([undefined, "n/a", "n/a"]);
+      else expect([s.since, s.registryVerifies, s.clients.every((c) => c.verifies === "n/a")]).toEqual([undefined, "n/a", true]);
+      expect(s.clients.length).toBeGreaterThan(0);
+      for (const c of s.clients) expect(c.source).toStartWith("https://");
     }
   });
 

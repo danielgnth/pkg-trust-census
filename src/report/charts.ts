@@ -11,6 +11,7 @@ import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.t
 import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
 import { ECOSYSTEM_LABEL, SIGNAL_LABEL, humanDate, humanMonth, pctText } from "./labels.ts";
 import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineValue } from "../facts/baseline.ts";
+import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 
 const FONT = "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 const SURFACE = "#fcfcfb";
@@ -208,6 +209,105 @@ export function baselineSvg(agg: Aggregate): string {
     `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">"since" marks a value that changed recently, so the backfill quarters predate it. Hover a cell for the note; sources in baseline.md.</text>`,
   );
 
+  return svg(width, height, parts.join("\n"), HATCH);
+}
+
+/**
+ * Sigstore per registry: three policy cells (accepts bundles, registry checks them, the best
+ * any install client does) and one bar, the share of sampled latest releases that carry a
+ * bundle. Registries without Sigstore show their nearest equivalent in place of the bar.
+ * Rows run from earliest adopter to none, so the order reads as a timeline.
+ */
+export function sigstoreSvg(agg: Aggregate): string {
+  const rank = (f: SigstoreFact) => (f.status === "yes" ? 0 : f.status === "planned" ? 1 : 2);
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.scores.some((s) => s.ecosystem === e)).sort((a, b) => {
+    const fa = sigstoreOf(a);
+    const fb = sigstoreOf(b);
+    return rank(fa) - rank(fb) || (fa.since ?? "").localeCompare(fb.since ?? "");
+  });
+  const cellW = 120;
+  const cellH = 44;
+  const gap = 2;
+  const left = 120;
+  const top = 94;
+  const barX = left + 3 * (cellW + gap) + 22;
+  const barW = 240;
+  const width = barX + barW + 110;
+  const height = top + ecosystems.length * (cellH + gap) + 66;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Sigstore across registries</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Who accepts Sigstore bundles, who checks them, and how many top packages ship one · snapshot ${esc(humanDate(agg.asOf))}</text>`,
+  ];
+
+  const headers = ["Accepts bundles", "Registry checks at upload", "Best install client"];
+  headers.forEach((h, j) => {
+    const lines = twoLines(h);
+    lines.forEach((line, k) => {
+      parts.push(`<text x="${left + j * (cellW + gap) + cellW / 2}" y="${top - 10 - (lines.length - 1 - k) * 13}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle">${esc(line)}</text>`);
+    });
+  });
+  parts.push(
+    `<text x="${barX}" y="${top - 23}" font-size="11" font-weight="600" fill="${INK_2}">Latest releases with a bundle</text>`,
+    `<text x="${barX}" y="${top - 10}" font-size="11" fill="${MUTED}">share of sampled packages</text>`,
+  );
+
+  const cell = (x: number, y: number, v: BaselineValue, label: string, sub: string | null, title: string) => {
+    const st = BASELINE_STYLE[v];
+    return [
+      `<g><title>${esc(title)}</title>`,
+      `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" rx="4" fill="${st.fill}"/>`,
+      `<text x="${x + cellW / 2}" y="${y + (sub ? 20 : 26)}" font-size="13" font-weight="600" fill="${st.ink}" text-anchor="middle">${esc(label)}</text>`,
+      sub ? `<text x="${x + cellW / 2}" y="${y + 34}" font-size="10" fill="${st.ink}" text-anchor="middle" opacity="0.85">${esc(sub)}</text>` : "",
+      `</g>`,
+    ].join("");
+  };
+
+  ecosystems.forEach((e, i) => {
+    const f = sigstoreOf(e);
+    const y = top + i * (cellH + gap);
+    const name = ECOSYSTEM_LABEL[e];
+    parts.push(`<text x="${left - 10}" y="${y + cellH / 2 + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(name)}</text>`);
+
+    const accepts: BaselineValue = f.status === "yes" ? "yes" : f.status === "planned" ? "partial" : "no";
+    parts.push(cell(left, y, accepts, f.status, f.since ? `since ${humanMonth(f.since)}` : null, `${name}: ${f.signs}`));
+
+    const reg: BaselineValue = f.registryVerifies === "yes" ? "yes" : f.registryVerifies === "n/a" ? "n/a" : "no";
+    parts.push(cell(left + cellW + gap, y, reg, f.registryVerifies, null, `${name}: registry verifies bundles at upload: ${f.registryVerifies}`));
+
+    const best = bestClient(f);
+    const cv: BaselineValue = best.verifies === "yes" ? "yes" : best.verifies === "opt-in" ? "partial" : best.verifies === "n/a" ? "n/a" : "no";
+    const clientTitle = `${name} install clients: ${f.clients.map((c) => `${c.client} ${c.verifies}`).join("; ")}`;
+    parts.push(cell(left + 2 * (cellW + gap), y, cv, best.verifies, best.verifies === "opt-in" ? best.client : null, clientTitle));
+
+    const cy = y + cellH / 2;
+    const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === SIGSTORE_SIGNAL);
+    if (f.status === "yes" && c && c.pct != null) {
+      const w = c.pct * barW;
+      parts.push(
+        `<g><title>${esc(`${name}: ${c.t} of ${c.n} sampled latest releases carry a Sigstore bundle`)}</title>`,
+        `<rect x="${barX}" y="${cy - 9}" width="${barW}" height="18" rx="4" fill="${NEUTRAL}"/>`,
+        w >= 1 ? `<path d="${barPath(barX, barX + w, cy - 5, 10, true)}" fill="${RAMP[9]}"/>` : "",
+        `<text x="${barX + barW + 10}" y="${cy + 4}" font-size="11" fill="${INK}">${pctText(c.pct)} <tspan fill="${INK_2}">(${c.t}/${c.n})</tspan></text>`,
+        `</g>`,
+      );
+    } else {
+      parts.push(`<text x="${barX}" y="${cy + 4}" font-size="11" fill="${INK_2}"><title>${esc(f.similar)}</title>instead: ${esc(f.similarShort)}</text>`);
+    }
+  });
+
+  const ly = top + ecosystems.length * (cellH + gap) + 22;
+  let lx = left;
+  for (const [v, label] of [["yes", "yes"], ["partial", "opt-in / planned"], ["no", "no"], ["n/a", "n/a"]] as const) {
+    const st = BASELINE_STYLE[v];
+    parts.push(
+      `<rect x="${lx}" y="${ly}" width="14" height="10" rx="2" fill="${st.fill}"${v === "no" || v === "n/a" ? ` stroke="#c9c8c2" stroke-width="1"` : ""}/>`,
+      `<text x="${lx + 20}" y="${ly + 9}" font-size="10" fill="${INK_2}">${label}</text>`,
+    );
+    lx += 34 + label.length * 6;
+  }
+  parts.push(
+    `<text x="${left}" y="${ly + 30}" font-size="10" fill="${MUTED}">"Best install client" is the strongest default or opt-in check among the clients listed in sigstore.md, newer ones included.</text>`,
+  );
   return svg(width, height, parts.join("\n"), HATCH);
 }
 

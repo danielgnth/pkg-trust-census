@@ -142,6 +142,10 @@ describe("pipeline", () => {
     const sigstore = await Bun.file(join(dir, "sigstore.md")).text();
     expect(sigstore).toContain("#### What is signed, and sources");
     expect(summary).toContain("Sigstore across registries");
+    expect(sigstore).toContain("#### Install clients");
+    const sigstoreChart = await Bun.file(join(dir, "charts/sigstore.svg")).text();
+    expect(sigstoreChart).toContain("Sigstore across registries");
+    expect(sigstoreChart).toContain("since Nov 2024");
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");
