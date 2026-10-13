@@ -3,7 +3,8 @@
  * Captures small, real API responses as test fixtures — one per signal shape the
  * extractors will parse.
  *
- * Fixtures are deliberately *trimmed* (huge version arrays cut down) but never edited:
+ * Fixtures are deliberately *trimmed* (huge version arrays cut down) and *redacted* (email
+ * addresses, npm star lists — see redactPersonalData) but otherwise never edited:
  * field names, nesting and value shapes are exactly what the registry returned. Every
  * fixture's source URL, capture date and trim rule is recorded in fixtures.json so a
  * reviewer can tell a real capture from a hand-written mock.
@@ -39,6 +40,27 @@ interface Spec {
  */
 const keepNewestAtEnd = (arr: unknown[], n: number) => arr.splice(0, Math.max(0, arr.length - n));
 const keepNewestAtStart = (arr: unknown[], n: number) => arr.splice(n);
+
+/** Public registry data still names people; fixtures are committed, so they carry none of it. */
+const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+const KEEP = /no-?reply|example\.(com|org|invalid)/i;
+
+export function redactPersonalData<T>(value: T): T {
+  if (typeof value === "string") {
+    return value.replace(EMAIL, (m) => (KEEP.test(m) ? m : "redacted@example.invalid")) as T;
+  }
+  if (Array.isArray(value)) return value.map(redactPersonalData) as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      // npm's `users`: which npm accounts starred the package. Unused, and it names people.
+      if (k === "users" && v && typeof v === "object" && !Array.isArray(v)) continue;
+      out[k] = redactPersonalData(v);
+    }
+    return out as T;
+  }
+  return value;
+}
 
 const SPECS: Spec[] = [
   {
@@ -183,6 +205,20 @@ const SPECS: Spec[] = [
       return `versions ${before} -> ${keep.length}`;
     },
   },
+  {
+    name: "pypi-provenance-sigstore",
+    ecosystem: "pypi",
+    pkg: "sigstore",
+    url: "https://pypi.org/integrity/sigstore/4.5.0/sigstore-4.5.0.tar.gz/provenance",
+    why: "PEP 740 provenance object: 'publish' predicate (not SLSA) and a Fulcio certificate carrying repository + commit",
+  },
+  {
+    name: "rubygems-attestations-rails",
+    ecosystem: "rubygems",
+    pkg: "rails",
+    url: "https://rubygems.org/api/v1/attestations/rails-8.1.4.json",
+    why: "Sigstore attestation bundle (bare message signature) whose certificate carries repository + commit",
+  },
 ];
 
 async function main() {
@@ -207,7 +243,7 @@ async function main() {
       if (spec.text) {
         out = res.body;
       } else {
-        const data = JSON.parse(res.body);
+        const data = redactPersonalData(JSON.parse(res.body));
         note = spec.trim?.(data) ?? null;
         out = JSON.stringify(data, null, 2) + "\n";
       }
@@ -224,6 +260,7 @@ async function main() {
         full_response_sha256: res.entry.sha256,
         full_response_bytes: res.entry.bytes,
         trimmed: note,
+        redacted: "email addresses; npm per-user star lists",
         why: spec.why,
       });
       console.log(`  ok  ${spec.name}${note ? `  (${note})` : ""}`);

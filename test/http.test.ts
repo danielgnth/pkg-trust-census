@@ -282,6 +282,31 @@ describe("HttpClient", () => {
       srv.stop(true);
     }
   });
+
+  test("HEAD keeps Last-Modified as its cached body, separately from a GET of the same url", async () => {
+    const srv = serve((req) =>
+      req.method === "HEAD"
+        ? new Response(null, { headers: { "Last-Modified": "Mon, 14 Apr 2025 17:25:22 GMT" } })
+        : Response.json({ got: true }),
+    );
+    try {
+      const http = new HttpClient();
+      const url = `http://localhost:${srv.port}/a.pom`;
+      const head = await http.get(url, { ecosystem: "maven", package: "g:a", method: "HEAD" });
+      const get = await http.get(url, { ecosystem: "maven", package: "g:a" });
+
+      expect(JSON.parse(head.body)["last-modified"]).toBe("Mon, 14 Apr 2025 17:25:22 GMT");
+      expect(get.body).toBe('{"got":true}');
+      expect(head.entry.url).toBe(`HEAD ${url}`);
+
+      const { CacheSource } = await import("../src/http/client.ts");
+      const replay = new CacheSource(new ResponseCache());
+      const again = await replay.get(url, { ecosystem: "maven", package: "g:a", method: "HEAD" });
+      expect(again.body).toBe(head.body);
+    } finally {
+      srv.stop(true);
+    }
+  });
 });
 
 describe("RateLimiter", () => {

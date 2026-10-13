@@ -7,3 +7,4 @@ data/trust.sqlite-shm
 data/trust.sqlite
 data/rankings/
 data/out/
+.env

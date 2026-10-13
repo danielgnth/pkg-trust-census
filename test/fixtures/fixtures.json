@@ -12,7 +12,8 @@
     "full_response_sha256": "9c793ffd34887033c9e0276fdce58262b6297d94e04079dbe34a08704b7f87a7",
     "full_response_bytes": 72076,
     "trimmed": "files 132 -> 6 (kept newest)",
-    "why": "files[].provenance is non-null — PEP 740 attestation present"
+    "why": "files[].provenance is non-null — PEP 740 attestation present",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/pypi-simple-ruff.json",
@@ -27,7 +28,8 @@
     "full_response_sha256": "fb779190f26d89d180d1be0ccb8fabd1644d939a764d6a48dd9d168297711eda",
     "full_response_bytes": 4449402,
     "trimmed": "files 7044 -> 4 (kept newest)",
-    "why": "files[].provenance is null — the negative case, so `false` is a real negative"
+    "why": "files[].provenance is null — the negative case, so `false` is a real negative",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/npm-packument-sigstore.json",
@@ -39,7 +41,8 @@
     "full_response_sha256": "c370a3769c3a2bfae7dcc3e34eb5980955849e9d829cae17abcf6132f78eb414",
     "full_response_bytes": 121433,
     "trimmed": "versions 40 -> 4; readme dropped",
-    "why": "dist.attestations present; also exercises the `time` map the backfill needs"
+    "why": "dist.attestations present; also exercises the `time` map the backfill needs",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/npm-packument-chalk.json",
@@ -51,7 +54,8 @@
     "full_response_sha256": "dbbff88bcfafef2eed657dbe3c318d7b6056c4515116176e553ff188c6263c01",
     "full_response_bytes": 134775,
     "trimmed": "versions 44 -> 3; readme dropped",
-    "why": "dist.signatures present but no dist.attestations — proves signatures are not the differentiator"
+    "why": "dist.signatures present but no dist.attestations — proves signatures are not the differentiator",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/crates-versions-bon.json",
@@ -63,7 +67,8 @@
     "full_response_sha256": "bbdf321d54d97ee7d9f2eb25c429b8f47b47509d72d2da65605c27001e4d632e",
     "full_response_bytes": 7416,
     "trimmed": null,
-    "why": "trustpub_data populated — the only direct trusted-publishing observation of the seven"
+    "why": "trustpub_data populated — the only direct trusted-publishing observation of the seven",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/crates-versions-serde.json",
@@ -75,7 +80,8 @@
     "full_response_sha256": "aef853117cd091c05561e9e23a32a2619dcfd2af365d91d634ac22d8c6037d68",
     "full_response_bytes": 5094,
     "trimmed": null,
-    "why": "trustpub_data null — token-published negative case"
+    "why": "trustpub_data null — token-published negative case",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/rubygems-versions-trusted-publishing-test.json",
@@ -87,7 +93,8 @@
     "full_response_sha256": "03902cdb403dd1db3eecd61f4ee4729aa3e2fd445041dbb0aec41f01a7dd499d",
     "full_response_bytes": 16099,
     "trimmed": "versions 19 -> 4 (newest-first API, kept head)",
-    "why": "Ruby Central's own trusted-publishing gem exposes NO trusted-publishing field — pins the negative finding"
+    "why": "Ruby Central's own trusted-publishing gem exposes NO trusted-publishing field — pins the negative finding",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/rubygems-versions-rails.json",
@@ -99,7 +106,8 @@
     "full_response_sha256": "ab23d8cfbf2eca8b92cc9a858215c979bf7c6deb97fe3530f22cd548b2abbdcc",
     "full_response_bytes": 463850,
     "trimmed": "versions 519 -> 4 (newest-first API, kept head)",
-    "why": "metadata.rubygems_mfa_required present per version — the backfillable MFA signal"
+    "why": "metadata.rubygems_mfa_required present per version — the backfillable MFA signal",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/go-latest-gorilla-mux.json",
@@ -111,7 +119,8 @@
     "full_response_sha256": "104c0fb5c977a68b196744aa397c4c486c12ac2d66497a5bedbe0344782ce545",
     "full_response_bytes": 187,
     "trimmed": null,
-    "why": "Origin {VCS, URL, Ref, Hash} — source provenance built into the module proxy"
+    "why": "Origin {VCS, URL, Ref, Hash} — source provenance built into the module proxy",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/go-sumdb-gorilla-mux.txt",
@@ -123,7 +132,8 @@
     "full_response_sha256": "1868d3dd98a2881bc8f3faadf26b634c76c42803eebf28271ce4d5665f519988",
     "full_response_bytes": 361,
     "trimmed": null,
-    "why": "transparency-log inclusion proof; HTTP 200 is itself the signal"
+    "why": "transparency-log inclusion proof; HTTP 200 is itself the signal",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/maven-gav-sigstore.json",
@@ -135,7 +145,8 @@
     "full_response_sha256": "d87974fb9ee0c9baa5d1a66c5f777719d48d4b991997d039b52798a8779c1ae2",
     "full_response_bytes": 3590,
     "trimmed": null,
-    "why": "ec[] lists .jar.sigstore.json — the Sigstore positive case. Note it lists .jar.asc.sha256 but never a bare .jar.asc"
+    "why": "ec[] lists .jar.sigstore.json — the Sigstore positive case. Note it lists .jar.asc.sha256 but never a bare .jar.asc",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/maven-gav-guava.json",
@@ -147,7 +158,8 @@
     "full_response_sha256": "572342dd6e43c9684dc737e82df4496629d4fb530fe3557811a697db723ba63e",
     "full_response_bytes": 1284,
     "trimmed": null,
-    "why": "ec[] omits .asc even though the .asc file exists — pins the trap that ec is unreliable for GPG"
+    "why": "ec[] omits .asc even though the .asc file exists — pins the trap that ec is unreliable for GPG",
+    "redacted": "email addresses; npm per-user star lists"
   },
   {
     "fixture": "test/fixtures/packagist-monolog.json",
@@ -159,6 +171,33 @@
     "full_response_sha256": "d43b49f807355f5184c819dc2fe9175bf6c1f3ecc8e83840dafd15fe8fca2ba2",
     "full_response_bytes": 235864,
     "trimmed": "versions 93 -> 3",
-    "why": "no signing field of any kind exists on version objects — the no_mechanism case"
+    "why": "no signing field of any kind exists on version objects — the no_mechanism case",
+    "redacted": "email addresses; npm per-user star lists"
+  },
+  {
+    "fixture": "test/fixtures/pypi-provenance-sigstore.json",
+    "ecosystem": "pypi",
+    "package": "sigstore",
+    "source_url": "https://pypi.org/integrity/sigstore/4.5.0/sigstore-4.5.0.tar.gz/provenance",
+    "http_status": 200,
+    "captured_at": "2026-10-13T13:26:38.206616Z",
+    "full_response_sha256": "487392968b64bbfe0e682397f32e3ecbd084ca44bcd062fb49a50be8af6b5af3",
+    "full_response_bytes": 10018,
+    "trimmed": null,
+    "why": "PEP 740 provenance object: 'publish' predicate (not SLSA) and a Fulcio certificate carrying repository + commit",
+    "redacted": "email addresses; npm per-user star lists"
+  },
+  {
+    "fixture": "test/fixtures/rubygems-attestations-rails.json",
+    "ecosystem": "rubygems",
+    "package": "rails",
+    "source_url": "https://rubygems.org/api/v1/attestations/rails-8.1.4.json",
+    "http_status": 200,
+    "captured_at": "2026-10-13T13:26:38.905650Z",
+    "full_response_sha256": "f2957541fc2cd145e5a5ab8361c6a5571ab6996fcd86c5c6903a1c92b506c951",
+    "full_response_bytes": 9196,
+    "trimmed": null,
+    "why": "Sigstore attestation bundle (bare message signature) whose certificate carries repository + commit",
+    "redacted": "email addresses; npm per-user star lists"
   }
 ]

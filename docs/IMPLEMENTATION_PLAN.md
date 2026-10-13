@@ -1,7 +1,7 @@
 # Implementation Plan — Cross-Ecosystem Package Trust Signal Scraper
 
 **Project:** Seminar Software Supply Chain Security (WiSe 26/27) — "How can I trust my software package managers?"
-**Status:** plan approved, pre-flight (§8 of the spec) largely resolved against live APIs on 2026-08-17.
+**Status:** M0–M8 done, plus the availability audit and trust score (2026-10-13); M9 (N=250) not started. §2–§3 below record the plan as written; where implementation changed a finding, docs/preflight.md §8 and src/facts/index.ts are authoritative.
 **Stack:** Bun 1.3 + TypeScript + `bun:sqlite`, no build step, no native modules.
 
 ---
@@ -166,7 +166,7 @@ rank → fetch → extract → aggregate → report
 Everything else is adapters; this is the shared risk.
 
 - Per-host **token bucket** with per-host concurrency caps. crates.io publishes a crawler policy demanding a descriptive User-Agent with contact info and roughly ≤1 req/s — comply exactly.
-- User-Agent: `pkg-trust-scraper/0.1 (SSCS Seminar WiSe 26/27; +https://github.com/danielgnth/expert-octo-carnival)`
+- User-Agent: `pkg-trust-scraper/0.1 (SSCS Seminar WiSe 26/27; +https://github.com/danielgnth/expert-octo-carnival; <contact from PKG_TRUST_CONTACT>)`
 - Exponential backoff on 429/5xx, **honouring `Retry-After`**.
 - Content-addressed cache write: gzip body, sha256 it, record `{url, sha256, bytes, http_status, fetched_at, ecosystem, package}` in `manifest.jsonl`.
 - Distinguish "fetched, 404" (a fact — record it) from "failed to fetch" (an error — record `fetch_error`). Never let a missing field silently become `false`.
@@ -191,21 +191,22 @@ Seven implementations of one interface. The pilot proves the interface on PyPI b
 
 ```
 src/
-  cli.ts                    # citty commands: rank | fetch | extract | aggregate | report | status
-  http/{client,cache,ratelimit,transport}.ts
-  db/{schema.ts,validation.ts,open.ts}   # drizzle schema + drizzle-zod insert guards
-  stages/{rank,fetch}.ts
-  adapters/{index,types,pypi}.ts         # npm, crates, rubygems, go, maven, packagist land M4-M6
-drizzle/                    # generated migrations, applied on open
-  extract/signals.ts        # shared three-state logic + quarter-anchor selection
-  aggregate/{matrix,timeseries}.ts
-  report/{summary,charts}.ts
+  cli.ts                    # citty commands: rank | fetch | extract | aggregate | report | run | status
+  http/{client,cache,ratelimit,transport}.ts   # client also hosts Source / CacheSource
+  db/{schema.ts,validation.ts,open.ts}         # drizzle schema + drizzle-zod insert guards
+  stages/{rank,fetch,extract,aggregate,report}.ts
+  adapters/{index,types,ecosystems}.ts         # contract, GatheringAdapter base, ecosyste.ms ranking
+  adapters/{pypi,npm,crates,rubygems,go,maven,packagist}.ts
+  extract/{signals,quarters,probe,versions}.ts # kept-version selection, signal builders, anchor search
+  facts/index.ts            # curated signal_availability + ecosystem_facts, cited
+  report/{charts,labels}.ts # SVG figures, cell text
   types.ts
+drizzle/                    # generated migrations, applied on open
 data/
   cache/{ecosystem}/{slug}/{urlhash}.json.gz    # git-ignored
   cache/manifest.jsonl                          # committed — integrity record
-  rankings/{ecosystem}_{snapshot}.json          # committed
-  trust.sqlite                                  # committed
+  rankings/{ecosystem}_{snapshot}.json          # git-ignored (regenerable from the cache)
+  trust.sqlite                                  # git-ignored
   out/{snapshot}/{matrix.md,packages.csv,signals.csv,summary.md,charts/*.svg}
 docs/
   IMPLEMENTATION_PLAN.md
@@ -227,12 +228,13 @@ Cache paths use a filesystem-safe slug plus a URL hash — this sidesteps npm sc
 | ~~**M0**~~ | `docs/preflight.md` + 13 real fixtures across all 7 registries | **Done.** Signal shapes verified and locked by regression tests; 2FA policy text deferred to M7 (some doc hosts egress-blocked) |
 | ~~**M1**~~ | Bun skeleton: schema, HTTP client, cache, manifest, CLI | **Done.** 47 tests green under both transports; zero-refetch resume demonstrated |
 | ~~**M2**~~ | PyPI rank + fetch, N=20 | **Done.** Interrupted at 17/20; resume was 30 cache hits + 10 fetches; third run 0 fetches / 40 hits |
-| **M3** | PyPI extract + aggregate + charts | Matrix + adoption curve render; format judged paper-ready |
-| **M4** | crates.io + npm | The two richest signals (`trustpub_data`, `dist.attestations`) land end-to-end |
-| **M5** | RubyGems + Packagist | The two negative-finding ecosystems; `not_exposed` vs `no_mechanism` renders correctly |
-| **M6** | Go + Maven | Dependents sampling frame; module-path escaping and `.asc` HEAD both handled |
-| **M7** | `ecosystem_facts` + `signal_availability` curated | Every row cited to a primary source |
-| **M8** | Pilot run, N=50 × 7 | Error rate < 5%; results reviewed for plausibility before scaling |
+| ~~**M3**~~ | PyPI extract + aggregate + charts | **Done.** `extract` / `aggregate` / `report` stages; Markdown matrix, CSVs, SVG heatmap + per-signal adoption charts. *Caveats:* PyPI uses the "any file attested" rule (methodology.md); charts are light-mode print figures; "paper-ready" still needs your judgement on the rendered output |
+| ~~**M4**~~ | crates.io + npm | **Done.** *Caveats:* npm trusted publishing turned out to be directly observable (`_npmUser.trustedPublisher`, preflight §8.1); crates ranked by 90-day `recent_downloads` rather than all-time |
+| ~~**M5**~~ | RubyGems + Packagist | **Done.** *Caveat:* RubyGems is no longer purely negative — Sigstore attestations are exposed per version (preflight §8.2), so signature/provenance/tlog are measured; trusted publishing itself remains `not_exposed`. Packagist is four × `no_mechanism` + MFA `not_exposed` |
+| ~~**M6**~~ | Go + Maven | **Done.** *Caveats:* `search.maven.org` is stale, so Maven now uses `maven-metadata.xml` + HEAD `Last-Modified` (preflight §8.3); Go and Maven anchors use binary search over release order, exact unless backports break date order; Go build provenance is proxy-recorded `Origin`, not an attestation |
+| ~~**M7**~~ | `ecosystem_facts` + `signal_availability` curated | **Done.** `src/facts/index.ts`, seeded on every `extract`; all 19 cited URLs resolved 2026-10-13. *Caveats:* npm 2FA has no effective date to apply; RubyGems' 180M-download MFA rule is noted but not applied per gem |
+| ~~**M8**~~ | Pilot run, N=50 × 7 | **Done.** Snapshot `20261013-0914Z`: 350/350 packages fetched and extracted, **0% error rate**, 2,198 versions, 15,386 signals (after the seven-signal revision below). Spot-checked against live registries (boto3 unattested, zod trusted-published, serde token-published, all matching). *Caveats:* the first attempt lost 26 RubyGems + 1 crates fetches to the laptop sleeping; resumed with `caffeinate`, and the cache made the retry free; `javax.servlet:servlet-api` 2.5 (2006) is the one unsigned Maven artifact, since Maven's GPG mandate is not retroactive; Go's 76% build provenance is lower for old modules that predate proxy `Origin` recording (12 of 50 latest versions are 2016–2022) |
+| ~~**M8b**~~ | Availability audit + seven-signal taxonomy + trust score | **Done (2026-10-13).** Every `no_mechanism` / `not_exposed` cell re-checked against primary sources (preflight §9): 4 corrected (Maven identity, Maven/crates/Packagist MFA → `no_mechanism`), Maven SLSA found to exist. Equivalent mechanisms unified by splitting into 7 signals (registry integrity, SLSA provenance, source link). Per-platform capability + assurance-range score, equal weights. *Caveats:* equal weights make tag-derived source links (Packagist) and mandatory GPG (Maven) count the same; PyPI SLSA read from one attested file per release |
 | **M9** | Full run, N=250 × 7 | 1,750 packages; final CSV + matrix + charts + summary |
 | **M10** | *(later)* second snapshot | Trend datapoint; cheap because fetch skips warm cache |
 

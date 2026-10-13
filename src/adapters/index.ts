@@ -1,10 +1,21 @@
 import type { EcosystemId } from "../types.ts";
 import type { EcosystemAdapter } from "./types.ts";
 import { PypiAdapter } from "./pypi.ts";
+import { NpmAdapter } from "./npm.ts";
+import { CratesAdapter } from "./crates.ts";
+import { RubygemsAdapter } from "./rubygems.ts";
+import { GoAdapter } from "./go.ts";
+import { MavenAdapter } from "./maven.ts";
+import { PackagistAdapter } from "./packagist.ts";
 
-/** Adapters land per milestone: PyPI (M2), crates.io + npm (M4), RubyGems + Packagist (M5), Go + Maven (M6). */
 const REGISTRY: Partial<Record<EcosystemId, EcosystemAdapter>> = {
   pypi: new PypiAdapter(),
+  npm: new NpmAdapter(),
+  crates: new CratesAdapter(),
+  rubygems: new RubygemsAdapter(),
+  go: new GoAdapter(),
+  maven: new MavenAdapter(),
+  packagist: new PackagistAdapter(),
 };
 
 export function getAdapter(id: EcosystemId): EcosystemAdapter | null {

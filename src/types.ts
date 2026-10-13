@@ -12,17 +12,26 @@ export const ECOSYSTEMS = [
 export type EcosystemId = (typeof ECOSYSTEMS)[number];
 
 /**
- * The five trust dimensions. Two booleans could not represent an ecosystem like Maven
+ * The seven trust dimensions. Two booleans could not represent an ecosystem like Maven
  * (mandatory GPG, ~100%) or Go (mandatory transparency log, ~100%) without scoring them
  * a misleading zero — see docs/preflight.md §3.1.
+ *
+ * Seven rather than the original five because the availability audit (preflight §9.1)
+ * found equivalent mechanisms landing in different columns: a registry vouching for a
+ * hash is not the publisher signing it, and an SLSA statement is not the same evidence as
+ * a commit recorded by the registry. Each pair is now its own signal.
  */
 export const SIGNALS = [
   /** Published via OIDC / trusted publishing rather than a long-lived API token. */
   "identity_publish",
-  /** A cryptographic signature over the artifact (GPG, Sigstore, registry signing). */
+  /** Signed by (or for) the publisher: GPG, or Sigstore from the publisher's CI. */
   "artifact_signature",
-  /** Attestation linking artifact -> source commit -> builder (SLSA / in-toto). */
+  /** The registry itself vouches for the artifact's hash (npm registry signatures, Go sumdb). */
+  "registry_integrity",
+  /** An SLSA provenance statement: artifact → source commit → builder, signed by the builder. */
   "build_provenance",
+  /** Tied to a source commit by a party other than the uploader's machine (CI cert, registry). */
+  "source_link",
   /** Inclusion in a public append-only log (Go sumdb, Sigstore Rekor). */
   "transparency_log",
   /** MFA required for the publishing account. */
@@ -103,6 +112,8 @@ export interface ExtractedVersion {
   /** e.g. "2024Q1" when this version is the anchor for that quarter, else null. */
   quarterAnchor: string | null;
   signals: ExtractedSignal[];
+  /** The cached response the signals were primarily read from, for byte-exact tracing. */
+  raw: { path: string; sha256: string } | null;
 }
 
 export interface ExtractedPackage {

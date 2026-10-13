@@ -20,6 +20,8 @@ import type { Transport, TransportRequest, TransportResponse } from "../src/http
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
 
+const CTX = { asOf: new Date("2026-10-01T00:00:00Z") };
+
 /** Records every request so tests can assert on exact URLs and headers. */
 class MockTransport implements Transport {
   readonly name = "mock";
@@ -118,7 +120,7 @@ describe("PypiAdapter.fetch", () => {
       [jsonUrl("requests")]: JSON.stringify({ info: {} }),
     });
     const http = new HttpClient({ transport, cache: new ResponseCache() });
-    await new PypiAdapter().fetch(candidate, http);
+    await new PypiAdapter().fetch(candidate, http, CTX);
 
     expect(transport.calls.map((c) => c.url).sort()).toEqual(
       [jsonUrl("requests"), simpleUrl("requests")].sort(),
@@ -137,11 +139,11 @@ describe("PypiAdapter.fetch", () => {
     const cache = new ResponseCache();
     const adapter = new PypiAdapter();
 
-    await adapter.fetch(candidate, new HttpClient({ transport, cache }));
+    await adapter.fetch(candidate, new HttpClient({ transport, cache }), CTX);
     expect(transport.calls).toHaveLength(2);
 
     // Fresh client and fresh cache index, as a re-invoked CLI would have.
-    await adapter.fetch(candidate, new HttpClient({ transport, cache: new ResponseCache() }));
+    await adapter.fetch(candidate, new HttpClient({ transport, cache: new ResponseCache() }), CTX);
     expect(transport.calls).toHaveLength(2);
   });
 });

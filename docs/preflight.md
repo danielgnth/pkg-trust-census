@@ -173,3 +173,106 @@ will need either an allowlist entry or manual transcription.
 Known-but-uncited at time of writing, to be confirmed in M7 rather than relied upon now:
 PyPI mandates 2FA for publishing; npm has tiered 2FA tied to download volume; RubyGems has an MFA-required
 tier for popular gem owners; Go has no publisher accounts at all so `mfa_enforced` is `n/a` by construction.
+
+## 8. Addendum (2026-10-13): findings from implementing M3–M7
+
+Probes made while writing the extractors. Three of them change earlier findings.
+
+### 8.1 npm trusted publishing is *observable*, not inferred
+Versions published through npm trusted publishing carry `versions[v]._npmUser.trustedPublisher =
+{id, oidcConfigId}`, e.g. `sigstore@5.0.0`: `{"id":"github","oidcConfigId":"oidc:a123e7c7-…"}`; 4 of
+`sigstore`'s 40 versions carry it. This supersedes the claim in §3.5 that "the same asymmetry applies to
+npm". On npm, `identity_publish` is read directly, and its absence is a real negative.
+
+### 8.2 RubyGems exposes Sigstore attestations through an undocumented-in-API endpoint
+`GET https://rubygems.org/api/v1/attestations/{gem}-{version}.json` returns the Sigstore bundles for a
+version (`[]` when it has none; 404 for an unknown gem). The bundle is a `hashedrekord` message signature
+with a Fulcio certificate that binds the source repository, commit and workflow. RubyGems.org renders these
+as "Provenance" on the gem page. Positive: `rails-8.1.4`, `trusted_publishing_test-0.1.23` (Rekor logIndex
+2620824623). Negative: `nokogiri-1.18.10` and its platform build return `[]`.
+
+§3.2's finding still holds for **trusted publishing itself**: no per-version marker exists. But RubyGems is no
+longer a negative-finding ecosystem for signing, provenance or transparency logging. Those three are now
+measured.
+
+### 8.3 `search.maven.org` is stale; the Maven extraction path changed
+On 2026-10-13, solrsearch's newest Guava release was `33.4.8-jre` (2025-04-14), while
+`repo1.maven.org/…/guava/maven-metadata.xml` listed `33.7.2-jre` (lastUpdated 2026-09-29). Repeated queries
+also began returning non-JSON responses. The index is unusable for current data. Replacement:
+
+- versions: `maven-metadata.xml` (authoritative, in deploy order, undated);
+- dates: `HEAD {artifact}-{v}.pom` → `Last-Modified` (Guava 33.4.8: `Mon, 14 Apr 2025 17:25:22 GMT`, which
+  matches solr's timestamp);
+- signatures: `HEAD {artifact}-{v}.pom.asc` and `.pom.sigstore.json`. The `.pom` is used rather than the
+  `.jar` because every artifact has one, including BOMs and other `pom`-packaged artifacts.
+
+Because `ec[]` is no longer read, §3.3's trap is avoided by construction.
+
+`<release>` in `maven-metadata.xml` is the last deployed non-SNAPSHOT, which can be a pre-release
+(`org.slf4j:slf4j-api` → `2.1.0-alpha1`). The newest stable entry is used as "latest" instead.
+
+### 8.4 Smaller facts
+- **crates.io** `/crates/{c}/versions?sort=date` paginates by `meta.next_page` (seek token). The crate
+  endpoint with `?include=default_version` returns `crate.default_version` without the full version list.
+  `/owners` mixes `kind: "user"` and `kind: "team"`.
+- **Go**: `@v/list` returns tags unordered; `.info` carries `Origin` for 2024-era releases too
+  (`testify v1.9.0`). sumdb returns 404 for a version it does not know.
+- **npm downloads API**: the bulk form (`/point/last-month/a,b,c`) rejects scoped names; those need one
+  request each.
+- **Packagist** `popular.json` paginates via `next`, and reports all-time `downloads` alongside an ordering
+  that is not by that number (`symfony/deprecation-contracts`, 969M, ranks above `psr/log`, 1.3B).
+- **RubyGems 2FA policy** (now cited in `ecosystem_facts`): MFA required for owners of gems above 180M
+  downloads since 2022-08-15. **PyPI**: 2FA required for all accounts from 2024-01-01. **npm**: 2FA for local
+  publishing and 7-day granular tokens were announced 2025-12-15 without effective dates, so npm MFA stays
+  `not_exposed`.
+
+## 9. Availability audit (2026-10-13)
+
+Every `no_mechanism` and `not_exposed` cell, re-checked against primary sources. The rule applied: a cell is
+**no_mechanism** when the registry offers no way to have the property (for `mfa_enforced`: no way to *require*
+MFA for a publish), and **not_exposed** when the mechanism exists but the public API does not say who uses it.
+
+| Cell | Was | Verdict | Evidence |
+|---|---|---|---|
+| crates · artifact_signature | no_mechanism | **confirmed** | No signing in production. A TUF signing experiment exists (`rf-signing-experiment/tuf-repository`); the 2026-01 and 2026-07 crates.io updates announce none |
+| crates · build_provenance | no_mechanism | **confirmed, with a consistency issue** | No attestation format. But `trustpub_data` records repository, run id and commit, the same kind of registry-recorded source link as Go's `Origin`, which *is* counted (§9.1) |
+| crates · transparency_log | no_mechanism | **confirmed** | — |
+| crates · mfa_enforced | not_exposed | **corrected → no_mechanism** | crates.io has no MFA; GitHub OAuth does not reveal whether 2FA was used; publishing uses API tokens |
+| go · identity_publish | no_mechanism | **confirmed** | No publisher accounts |
+| go · artifact_signature | no_mechanism | **confirmed for publisher signing, with a consistency issue** | Module authors cannot sign. sum.golang.org is a Google-signed Merkle log of hashes, the same kind of registry-applied integrity statement as npm's `dist.signatures`, which *is* counted (§9.1) |
+| go · mfa_enforced | no_mechanism | **confirmed** | No publisher accounts |
+| maven · build_provenance | no_mechanism | **wrong** | slsa-github-generator's Maven and Gradle builders publish `{artifactId}-{version}.jar.build.slsa` to Central (`actions/maven/publish/action.yml`). Central does not validate these, but they are detectable by HEAD |
+| packagist · identity / signature / provenance | no_mechanism | **confirmed** | Trusted publishing, hosted artifacts and SLSA provenance are a stated long-term direction, not live (Packagist blog, 2026-05-27) |
+| packagist · transparency_log | no_mechanism | **confirmed, note added** | A security-event log (ownership, maintainers, version-reference changes) went live 2026-05. It is login-gated (`/transparency-log` redirects to `/login/`) and is not a tamper-evident log of artifacts |
+| npm · mfa_enforced | not_exposed | **confirmed** | A per-package "require 2FA" publishing setting exists (npm docs) but does not appear in the packument |
+| rubygems · identity_publish | not_exposed | **confirmed** | §3.2 and §8.2 |
+| maven · identity_publish | not_exposed | **corrected → no_mechanism** | The Central Portal Publisher API authenticates "via a user token header" only; there is no OIDC option |
+| maven · mfa_enforced | not_exposed | **corrected → no_mechanism** | Sonatype account MFA is optional and covers portal login; deployments use user tokens |
+| packagist · mfa_enforced | not_exposed | **corrected → no_mechanism** | MFA is optional; mandatory MFA and public MFA status were announced 2026-05-27 and are not live (no MFA field on profiles or in the package JSON, checked 2026-10-13) |
+
+### 9.1 Equivalent mechanisms scored inconsistently
+The audit found that the same mechanism, seen in different registries, landed in different cells:
+
+| Mechanism | Where it appears | Currently scored as |
+|---|---|---|
+| Registry-applied integrity signature | npm `dist.signatures`; Go sum.golang.org signed tree heads | npm: artifact_signature (100%); Go: no mechanism |
+| Registry-recorded source commit | Go `.info` `Origin`; crates.io `trustpub_data.sha` | Go: build_provenance (inferred); crates: no mechanism |
+| CI-identity Sigstore signature (Fulcio certificate binding repo, workflow, commit; Rekor-logged) | PyPI PEP 740 *publish* attestation; RubyGems attestations; Maven `.sigstore.json`; npm attestations | PyPI and RubyGems: signature + provenance + tlog; Maven: signature + tlog only |
+| SLSA provenance statement | npm `dist.attestations.provenance`; PyPI (second accepted predicate); Maven `.jar.build.slsa` | npm: provenance; PyPI: not distinguished from publish attestations; Maven: not measured |
+
+Also: one attestation drives three columns on PyPI and RubyGems (signature, provenance, tlog) and two on npm,
+so the columns are not independent measurements.
+
+**Resolution (2026-10-13).** The taxonomy went from five signals to seven, so that each mechanism above
+lands in exactly one place:
+
+- **registry_integrity**: npm `dist.signatures` and Go's sum.golang.org. `artifact_signature` now means
+  publisher-originated only.
+- **build_provenance**: SLSA statements only (npm; PyPI's SLSA predicate, read from the provenance object;
+  Maven `.jar.build.slsa`; RubyGems DSSE bundles).
+- **source_link**: a commit established by someone other than the uploader's machine. That is a Fulcio
+  certificate's source digest (PyPI, RubyGems, Maven Sigstore), crates.io `trustpub_data.sha`, Go `Origin`, or
+  Packagist's `source.reference`.
+
+In the pilot, **no PyPI attestation in the top 50 is SLSA**. All are the publish predicate, so PyPI's
+SLSA share is 0%, while its source-link share equals its attestation share (64%).

@@ -9,7 +9,7 @@ registries, as a reproducible point-in-time snapshot with an adoption-over-time 
 | | |
 |---|---|
 | **Ecosystems** | PyPI, npm, crates.io, RubyGems, Go, Maven Central, Packagist |
-| **Signals** | identity-bound publish · artifact signature · build provenance · transparency log · MFA enforcement |
+| **Signals** | identity-bound publish · publisher signature · registry integrity · SLSA provenance · source link · transparency log · MFA enforced |
 | **Sample** | top 250 per ecosystem (pilot: 50) |
 | **Backfill** | quarterly anchors to 2024-01, derived from a single snapshot |
 | **Stack** | Bun + TypeScript + Drizzle ORM over `bun:sqlite`, no build step, no native modules |
@@ -17,7 +17,8 @@ registries, as a reproducible point-in-time snapshot with an adoption-over-time 
 ## Documents
 
 - [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) — architecture, data model, milestones
-- [`docs/preflight.md`](docs/preflight.md) — verified API findings (M0), with evidence
+- [`docs/preflight.md`](docs/preflight.md) — verified API findings (M0, plus the §8 addendum), with evidence
+- [`docs/methodology.md`](docs/methodology.md) — paste-ready methodology: sampling, version selection, detection rules, limitations
 
 ## Quick start
 
@@ -28,18 +29,33 @@ bun run cli status    # snapshots, cache and coverage
 bun run cli --help
 ```
 
-Pipeline stages, each independently re-runnable and keyed by snapshot id:
+Everything in one go (all seven ecosystems, a new snapshot):
 
 ```sh
-bun run cli rank      --ecosystem pypi --n 50
+bun run cli run --n 50
+```
+
+Or stage by stage, each independently re-runnable and keyed by snapshot id:
+
+```sh
+bun run cli rank      --ecosystem pypi,npm --n 50
 bun run cli fetch     --snapshot <id>     # omit --snapshot to continue the latest
 bun run cli extract   --snapshot <id>
 bun run cli aggregate --snapshot <id>
 bun run cli report    --snapshot <id>
 ```
 
+Results land in `data/out/<snapshot>/`: `summary.md` (coverage, error rate, headline numbers),
+`matrix.md` (paste-ready table), `matrix.csv`, `scores.csv`, `score_series.csv`, `timeseries.csv`,
+`packages.csv`, `signals.csv` (every signal with its evidence and source), and `charts/*.svg`.
+
 `fetch` is the only stage that touches the network, and it skips anything already cached — an
-interrupted run resumes for free. `extract` is pure, so parsers can be refined and re-run offline
+interrupted run resumes for free.
+
+A full run is rate-limited by design (crates.io at 1 req/s) and takes a while. On a laptop, keep the
+machine awake (`caffeinate -i bun run cli run --n 50` on macOS): if it sleeps mid-run, requests fail
+with connection errors and land as `fetch_error`. Re-running `fetch --snapshot <id>` retries exactly
+those. `extract` is pure, so parsers can be refined and re-run offline
 without re-hitting any registry.
 
 The CLI prompts only when it is attached to a TTY *and* a needed choice was not given on the command
@@ -66,25 +82,31 @@ Both layers earn their place: a CHECK violation reports only `SQLITE_CONSTRAINT_
 indication of which of several thousand rows was at fault, whereas the zod layer names the package and
 the field. The constraints remain as the backstop for any future caller that writes without the helpers.
 
-## Why five signals instead of two
+## Why seven signals instead of two
 
 The obvious data model — a `has_trusted_publishing` boolean and a `has_provenance_attestation`
 boolean — does not survive contact with the registries:
 
 - **crates.io** reports trusted publishing directly (`trustpub_data`) but has no attestation scheme at all.
-- **PyPI and npm** report attestations, from which trusted publishing can only be *inferred*.
+- **PyPI** reports attestations, from which trusted publishing can only be *inferred*; **npm** reports both.
 - **Maven Central** mandates GPG signing (~100% adoption) and has no OIDC equivalent.
 - **Go** mandates transparency-log inclusion for every module and has no publisher accounts at all.
-- **Packagist** has no mechanism of any kind.
-- **RubyGems** has trusted publishing, but does not expose adoption through its public API.
+- **Packagist** has no signing or attestation mechanism of any kind.
+- **RubyGems** has trusted publishing, but does not expose adoption through its public API (it does expose Sigstore attestations).
 
-Two booleans would score Maven and Go at zero, which is precisely backwards. So each package-version
-is scored on five dimensions, each three-state (`true` / `false` / `unknown`), alongside a
-`signal_availability` table recording whether a given ecosystem makes a given signal
-`observable`, `inferred`, `not_exposed`, or `no_mechanism`.
+Two booleans would score Maven and Go at zero, which is precisely backwards. So each package-version is
+scored on seven dimensions — identity-bound publish, publisher signature, registry integrity, SLSA
+provenance, source link, transparency log, MFA enforced — each three-state (`true` / `false` / `unknown`),
+alongside a `signal_availability` table recording whether a given ecosystem makes a given signal
+`observable`, `inferred`, `not_exposed`, or `no_mechanism`. The pairs that look alike (publisher vs
+registry signatures; SLSA provenance vs a weaker source link) are separated because they protect against
+different things; [methodology.md](docs/methodology.md#signals) explains each.
 
 That distinction is the point: **"0% adoption" and "the registry will not tell you" are different
 findings**, and the second one is itself a result worth reporting.
+
+Each platform also gets a **trust summary**: *capability* (how many of the seven properties it offers)
+and *assurance* (how many its top packages actually have, as a range over unknowns).
 
 ## Reproducibility
 
@@ -104,9 +126,19 @@ silently converted into `false`.
 All data is public metadata from documented public APIs. No authentication, no scraping behind auth,
 no rate-limit circumvention.
 
-Requests are paced per host, identify the project and a contact address, and honour `Retry-After`.
-crates.io publishes a crawler policy asking for roughly one request per second with an identifying
-User-Agent; that limit is configured in [`src/http/ratelimit.ts`](src/http/ratelimit.ts).
+Requests are paced per host, identify the project, and honour `Retry-After`. crates.io publishes a
+crawler policy asking for roughly one request per second with an identifying User-Agent; that limit is
+configured in [`src/http/ratelimit.ts`](src/http/ratelimit.ts).
 
-Override the contact string with `PKG_TRUST_UA` if you re-run this yourself — please do not send
-requests carrying someone else's email address.
+The User-Agent names the project and its repository. Registries recommend a contact address as well;
+put yours in a git-ignored `.env` (Bun loads it automatically), so it never lands in the code:
+
+```sh
+cp .env.example .env    # then set PKG_TRUST_CONTACT=you@example.org
+```
+
+`PKG_TRUST_UA` replaces the whole User-Agent if you need to.
+
+Test fixtures are real registry responses with personal data removed: email addresses are replaced by
+`redacted@example.invalid` and npm's per-user star lists are dropped. `scripts/capture-fixtures.ts`
+applies the same redaction on every capture.

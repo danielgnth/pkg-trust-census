@@ -10,7 +10,7 @@ import { and, eq } from "drizzle-orm";
 import type { EcosystemId } from "../types.ts";
 import type { HttpClient } from "../http/client.ts";
 import { getAdapter } from "../adapters/index.ts";
-import type { Db } from "../db/open.ts";
+import { snapshotAsOf, type Db } from "../db/open.ts";
 import { packages } from "../db/schema.ts";
 import { loadCandidates } from "./rank.ts";
 
@@ -46,6 +46,7 @@ export async function runFetch(
     if (candidates.length === 0) continue;
 
     const summary: FetchSummary = { ecosystem: eco, attempted: 0, succeeded: 0, failed: 0 };
+    const ctx = { asOf: snapshotAsOf(db, snapshotId) };
 
     for (const [i, c] of candidates.entries()) {
       summary.attempted++;
@@ -57,7 +58,7 @@ export async function runFetch(
       );
 
       try {
-        await adapter.fetch(c, http);
+        await adapter.fetch(c, http, ctx);
         db.update(packages).set({ fetchTimestamp: now, fetchError: null }).where(where).run();
         summary.succeeded++;
         onProgress?.({ ecosystem: eco, index: i + 1, total: candidates.length, package: c.name });

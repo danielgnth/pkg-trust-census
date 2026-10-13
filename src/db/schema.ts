@@ -100,6 +100,8 @@ export const packages = sqliteTable(
     fetchTimestamp: text("fetch_timestamp"),
     /** Populated instead of dropping the row, so partial failures stay visible. */
     fetchError: text("fetch_error"),
+    /** Why `extract` produced no versions for this package, e.g. a missing cache entry. */
+    extractError: text("extract_error"),
   },
   (t) => [
     primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName] }),

@@ -27,6 +27,9 @@ import { HttpClient, TOOL_VERSION, USER_AGENT } from "./http/client.ts";
 import { implementedEcosystems } from "./adapters/index.ts";
 import { runRank } from "./stages/rank.ts";
 import { runFetch } from "./stages/fetch.ts";
+import { runExtract } from "./stages/extract.ts";
+import { runAggregate } from "./stages/aggregate.ts";
+import { runReport } from "./stages/report.ts";
 import { count, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 const isInteractive = () => process.stdout.isTTY === true && !process.env.CI;
@@ -95,6 +98,25 @@ async function resolveSnapshot(db: Db, explicit: string | undefined): Promise<st
   return choice;
 }
 
+/**
+ * clack's spinner redraws many times a second, which floods a CI log or a piped file.
+ * Off a TTY the same calls print the start and stop lines, plus a progress line at most
+ * every 15 seconds so a long unattended run still shows where it is.
+ */
+function spinner(): { start(m: string): void; message(m: string): void; stop(m: string): void } {
+  if (isInteractive()) return p.spinner();
+  let last = Date.now();
+  return {
+    start: (m) => p.log.step(m),
+    message: (m) => {
+      if (Date.now() - last < 15_000) return;
+      last = Date.now();
+      p.log.message(m);
+    },
+    stop: (m) => p.log.step(m),
+  };
+}
+
 function banner(stage: string, snapshotId: string, ecosystems: EcosystemId[], transport: string) {
   p.intro(`pkg-trust-scraper · ${stage}`);
   p.log.info(
@@ -129,7 +151,7 @@ const rank = defineCommand({
     banner("rank", snapshotId, runnable, http.transport.name);
     if (skipped.length) p.log.warn(`no adapter yet: ${skipped.join(", ")}`);
 
-    const s = p.spinner();
+    const s = spinner();
     s.start(`ranking top ${n}`);
     try {
       const results = await runRank(runnable, n, snapshotId, db, http, (m) => s.message(m));
@@ -160,7 +182,7 @@ const fetch = defineCommand({
     await http.cache.load();
     banner("fetch", snapshotId, runnable, http.transport.name);
 
-    const s = p.spinner();
+    const s = spinner();
     s.start("fetching");
     try {
       const summaries = await runFetch(runnable, snapshotId, db, http, (prog) => {
@@ -191,13 +213,94 @@ const fetch = defineCommand({
   },
 });
 
-const pending = (name: string, milestone: string) =>
-  defineCommand({
-    meta: { name, description: `(${milestone}) not implemented yet` },
-    run() {
-      p.log.warn(`\`${name}\` lands in ${milestone}`);
-    },
-  });
+const extract = defineCommand({
+  meta: { name: "extract", description: "Parse cached responses into versions and signals (offline)" },
+  args: sharedArgs,
+  async run({ args }) {
+    const { runnable } = withAdapters(parseEcosystems(args.ecosystem));
+    const db = openDb();
+    const snapshotId = await resolveSnapshot(db, args.snapshot);
+    const http = new HttpClient();
+    await http.cache.load();
+    banner("extract", snapshotId, runnable, "cache only");
+
+    const s = spinner();
+    s.start("extracting");
+    try {
+      const summaries = await runExtract(runnable, snapshotId, db, http.cache, (prog) => {
+        s.message(`[${prog.ecosystem}] ${prog.index}/${prog.total} ${prog.package}`);
+        if (prog.error) p.log.error(`${prog.package}: ${prog.error}`);
+      });
+      s.stop("extract complete");
+      for (const sum of summaries) {
+        const line = `${sum.ecosystem}: ${sum.extracted}/${sum.packages} packages, ${sum.versions} versions, ${sum.signals} signals`;
+        if (sum.failed) p.log.warn(`${line} (${sum.failed} failed — recorded as extract_error)`);
+        else p.log.success(line);
+      }
+      if (summaries.length === 0) p.log.warn("nothing to extract — run `rank` and `fetch` first");
+    } catch (err) {
+      s.stop("extract failed");
+      throw err;
+    } finally {
+      closeDb(db);
+    }
+    p.outro(`next: bun run cli aggregate --snapshot ${snapshotId}`);
+  },
+});
+
+const aggregate = defineCommand({
+  meta: { name: "aggregate", description: "Compute the maturity matrix and adoption series" },
+  args: { snapshot: sharedArgs.snapshot },
+  async run({ args }) {
+    const db = openDb();
+    try {
+      const snapshotId = await resolveSnapshot(db, args.snapshot);
+      p.intro(`pkg-trust-scraper · aggregate · ${snapshotId}`);
+      const { aggregate: agg, path } = await runAggregate(db, snapshotId);
+      p.log.success(`${agg.matrix.length} matrix cells, ${agg.series.length} series points → ${path}`);
+      p.outro(`next: bun run cli report --snapshot ${snapshotId}`);
+    } finally {
+      closeDb(db);
+    }
+  },
+});
+
+const report = defineCommand({
+  meta: { name: "report", description: "Write summary, matrix, CSVs and charts" },
+  args: { snapshot: sharedArgs.snapshot },
+  async run({ args }) {
+    const db = openDb();
+    try {
+      const snapshotId = await resolveSnapshot(db, args.snapshot);
+      p.intro(`pkg-trust-scraper · report · ${snapshotId}`);
+      const { dir, files } = await runReport(db, snapshotId);
+      p.log.success(`${files.length} files → ${dir}`);
+      p.outro(`open ${dir}/summary.md`);
+    } finally {
+      closeDb(db);
+    }
+  },
+});
+
+/** All five stages in order: the unattended path for a scheduled run. */
+const run = defineCommand({
+  meta: { name: "run", description: "rank → fetch → extract → aggregate → report, in one go" },
+  args: {
+    ...sharedArgs,
+    n: { type: "string", description: "sample size per ecosystem", default: "50" },
+  },
+  async run({ args }) {
+    const n = Number(args.n);
+    if (!Number.isInteger(n) || n < 1) throw new Error("--n must be a positive integer");
+    const snapshotId = args.snapshot ?? newSnapshotId();
+    const shared = { ecosystem: args.ecosystem, snapshot: snapshotId };
+    await rank.run!({ args: { ...shared, n: args.n }, rawArgs: [], cmd: rank } as never);
+    await fetch.run!({ args: shared, rawArgs: [], cmd: fetch } as never);
+    await extract.run!({ args: shared, rawArgs: [], cmd: extract } as never);
+    await aggregate.run!({ args: { snapshot: snapshotId }, rawArgs: [], cmd: aggregate } as never);
+    await report.run!({ args: { snapshot: snapshotId }, rawArgs: [], cmd: report } as never);
+  },
+});
 
 const status = defineCommand({
   meta: { name: "status", description: "Show snapshots, cache and coverage" },
@@ -236,6 +339,7 @@ const status = defineCommand({
           total: count(),
           fetched: sql<number>`SUM(CASE WHEN ${packages.fetchTimestamp} IS NOT NULL THEN 1 ELSE 0 END)`,
           errors: sql<number>`SUM(CASE WHEN ${packages.fetchError} IS NOT NULL THEN 1 ELSE 0 END)`,
+          extractErrors: sql<number>`SUM(CASE WHEN ${packages.extractError} IS NOT NULL THEN 1 ELSE 0 END)`,
         })
         .from(packages)
         .where(eq(packages.snapshotId, latest!))
@@ -245,7 +349,8 @@ const status = defineCommand({
       for (const c of coverage) {
         p.log.message(
           `  ${c.ecosystem}: ${c.total} sampled, ${c.fetched} fetched` +
-            (c.errors ? `, ${c.errors} errors` : ""),
+            (c.errors ? `, ${c.errors} fetch errors` : "") +
+            (c.extractErrors ? `, ${c.extractErrors} extract errors` : ""),
         );
       }
     }
@@ -272,9 +377,10 @@ const main = defineCommand({
   subCommands: {
     rank,
     fetch,
-    extract: pending("extract", "M3"),
-    aggregate: pending("aggregate", "M3"),
-    report: pending("report", "M3"),
+    extract,
+    aggregate,
+    report,
+    run,
     status,
   },
   setup() {

@@ -16,7 +16,7 @@ const load = async <T = any>(name: string): Promise<T> => JSON.parse(await Bun.f
 describe("fixture manifest", () => {
   test("records provenance for every fixture", async () => {
     const manifest = await load<any[]>("fixtures.json");
-    expect(manifest.length).toBe(13);
+    expect(manifest.length).toBe(15);
     for (const m of manifest) {
       expect(m.source_url).toStartWith("https://");
       expect(m.http_status).toBe(200);
@@ -162,5 +162,30 @@ describe("Packagist — no mechanism exists", () => {
     const d = await load("packagist-monolog.json");
     expect(d.package.downloads.monthly).toBeGreaterThan(0);
     expect(Array.isArray(d.package.maintainers)).toBe(true);
+  });
+});
+
+describe("Attestation contents (preflight §8.2, §9.1)", () => {
+  const { fulcioSourceRef } = require("../src/extract/fulcio.ts");
+
+  test("a PyPI attestation is the 'publish' predicate, not SLSA, and its certificate names the commit", async () => {
+    const d = await load("pypi-provenance-sigstore.json");
+    const a = d.attestation_bundles[0].attestations[0];
+    const statement = JSON.parse(Buffer.from(a.envelope.statement, "base64").toString("utf8"));
+    expect(statement.predicateType).toBe("https://docs.pypi.org/attestations/publish/v1");
+    expect(d.attestation_bundles[0].publisher).toMatchObject({ kind: "GitHub", repository: "sigstore/sigstore-python" });
+    const ref = fulcioSourceRef(a.verification_material.certificate);
+    expect(ref.repository).toBe("https://github.com/sigstore/sigstore-python");
+    expect(ref.digest).toMatch(/^[0-9a-f]{40}$/);
+  });
+
+  test("a RubyGems attestation is a bare message signature whose certificate names the commit", async () => {
+    const [bundle] = await load<any[]>("rubygems-attestations-rails.json");
+    expect(bundle.messageSignature).toBeDefined();
+    expect(bundle.dsseEnvelope).toBeUndefined();
+    expect(bundle.verificationMaterial.tlogEntries[0].logIndex).toBeTruthy();
+    const ref = fulcioSourceRef(bundle.verificationMaterial.certificate.rawBytes);
+    expect(ref.repository).toBe("https://github.com/rails/rails");
+    expect(ref.digest).toMatch(/^[0-9a-f]{40}$/);
   });
 });

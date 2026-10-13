@@ -1,0 +1,310 @@
+/**
+ * Static SVG figures for the paper: the maturity heatmap and one adoption-over-time chart
+ * per signal. Hand-written SVG, no dependencies, plain hex attributes rather than CSS
+ * variables so the files survive conversion to PDF (rsvg, Inkscape) for LaTeX.
+ *
+ * Light mode only, deliberately: these are print figures. Each mark carries a <title>
+ * so a browser shows the exact counts on hover, and the same numbers are in the CSVs.
+ */
+
+import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
+import type { Aggregate, MatrixCell, Score } from "../stages/aggregate.ts";
+import { ECOSYSTEM_LABEL, SIGNAL_LABEL, pctText } from "./labels.ts";
+
+const FONT = "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
+const SURFACE = "#fcfcfb";
+const INK = "#0b0b0b";
+const INK_2 = "#52514e";
+const MUTED = "#8a8984";
+const GRID = "#e6e5e1";
+const NEUTRAL = "#f0efec";
+
+/** Sequential blue, steps 100 → 700. */
+const RAMP = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5", "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281", "#0d366b"];
+
+/**
+ * Categorical slots in fixed order, one per ecosystem, so an ecosystem keeps its colour
+ * in every chart regardless of which others are present. Validated (light surface):
+ * worst adjacent CVD ΔE 9.1, normal-vision ΔE 19.6. Three slots sit below 3:1 contrast,
+ * so every chart carries a legend and direct end labels.
+ */
+const SERIES: Record<EcosystemId, string> = {
+  pypi: "#2a78d6",
+  npm: "#eb6834",
+  crates: "#1baf7a",
+  rubygems: "#eda100",
+  go: "#e87ba4",
+  maven: "#008300",
+  packagist: "#4a3aa7",
+};
+
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function rampColor(p: number): string {
+  return RAMP[Math.min(RAMP.length - 1, Math.round(p * (RAMP.length - 1)))]!;
+}
+
+/** White text on the darker half of the ramp, ink on the lighter half. */
+function inkOn(p: number): string {
+  return Math.round(p * (RAMP.length - 1)) >= 6 ? "#ffffff" : INK;
+}
+
+export function matrixSvg(agg: Aggregate): string {
+  const ecosystems = ECOSYSTEMS.filter((e) => agg.matrix.some((c) => c.ecosystem === e));
+  const cellW = 128;
+  const cellH = 50;
+  const gap = 2;
+  const left = 120;
+  const top = 76;
+  const legendH = 78;
+  const width = left + SIGNALS.length * (cellW + gap) + 32;
+  const height = top + ecosystems.length * (cellH + gap) + legendH;
+  const parts: string[] = [];
+
+  parts.push(
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Trust-signal adoption, latest version</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages whose latest release carries the signal · snapshot ${esc(agg.snapshotId)}</text>`,
+  );
+
+  SIGNALS.forEach((s, j) => {
+    const x = left + j * (cellW + gap) + cellW / 2;
+    parts.push(`<text x="${x}" y="${top - 8}" font-size="11" font-weight="600" fill="${INK_2}" text-anchor="middle">${esc(SIGNAL_LABEL[s])}</text>`);
+  });
+
+  ecosystems.forEach((e, i) => {
+    const y = top + i * (cellH + gap);
+    parts.push(`<text x="${left - 10}" y="${y + cellH / 2 + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(ECOSYSTEM_LABEL[e])}</text>`);
+    SIGNALS.forEach((s, j) => {
+      const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === s);
+      if (c) parts.push(matrixCell(c, left + j * (cellW + gap), y, cellW, cellH));
+    });
+  });
+
+  // Legend: the ramp, then the two non-measurable cell styles.
+  const ly = top + ecosystems.length * (cellH + gap) + 22;
+  const rampW = 180;
+  RAMP.forEach((c, k) => {
+    parts.push(`<rect x="${left + (k * rampW) / RAMP.length}" y="${ly}" width="${rampW / RAMP.length + 0.5}" height="10" fill="${c}"/>`);
+  });
+  parts.push(
+    `<text x="${left}" y="${ly + 24}" font-size="10" fill="${INK_2}">0%</text>`,
+    `<text x="${left + rampW}" y="${ly + 24}" font-size="10" fill="${INK_2}" text-anchor="end">100%</text>`,
+    `<rect x="${left + rampW + 28}" y="${ly}" width="14" height="10" fill="${NEUTRAL}"/>`,
+    `<text x="${left + rampW + 48}" y="${ly + 9}" font-size="10" fill="${INK_2}">no mechanism</text>`,
+    `<rect x="${left + rampW + 136}" y="${ly}" width="14" height="10" fill="url(#hatch)"/>`,
+    `<text x="${left + rampW + 156}" y="${ly + 9}" font-size="10" fill="${INK_2}">not exposed by registry</text>`,
+    `<text x="${left}" y="${ly + 44}" font-size="10" fill="${MUTED}">≥ marks an inferred signal: unknowns count as not adopted, so the figure is a lower bound.</text>`,
+  );
+
+  return svg(width, height, parts.join("\n"), `<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${NEUTRAL}"/><line x1="0" y1="0" x2="0" y2="6" stroke="#c9c8c2" stroke-width="2"/></pattern>`);
+}
+
+function matrixCell(c: MatrixCell, x: number, y: number, w: number, h: number): string {
+  const title = `${ECOSYSTEM_LABEL[c.ecosystem]} · ${SIGNAL_LABEL[c.signal]}: ${c.availability}${c.mandatory ? ", mandatory" : ""} · true ${c.t}, false ${c.f}, unknown ${c.u} of ${c.n}`;
+  const cx = x + w / 2;
+  if (c.availability === "no_mechanism" || c.availability === "not_exposed" || c.n === 0 || c.pct == null) {
+    const fill = c.availability === "not_exposed" ? "url(#hatch)" : NEUTRAL;
+    const label = c.availability === "no_mechanism" ? "no mechanism" : c.availability === "not_exposed" ? "not exposed" : "no data";
+    return `<g><title>${esc(title)}</title><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${fill}"/><text x="${cx}" y="${y + h / 2 + 4}" font-size="11" fill="${INK_2}" text-anchor="middle">${label}</text></g>`;
+  }
+  const ink = inkOn(c.pct);
+  const bound = c.availability === "inferred" && c.u > 0 ? "≥ " : "";
+  const sub = `${c.t}/${c.n}${c.mandatory ? " · mandatory" : ""}`;
+  return [
+    `<g><title>${esc(title)}</title>`,
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${rampColor(c.pct)}"/>`,
+    `<text x="${cx}" y="${y + 23}" font-size="14" font-weight="600" fill="${ink}" text-anchor="middle">${bound}${pctText(c.pct)}</text>`,
+    `<text x="${cx}" y="${y + 38}" font-size="10" fill="${ink}" text-anchor="middle" opacity="0.85">${esc(sub)}</text>`,
+    `</g>`,
+  ].join("");
+}
+
+/** Ecosystems whose availability for this signal yields a measurable series. */
+export function measurable(agg: Aggregate, signal: SignalId): EcosystemId[] {
+  return ECOSYSTEMS.filter((e) => {
+    const c = agg.matrix.find((m) => m.ecosystem === e && m.signal === signal);
+    return c && (c.availability === "observable" || c.availability === "inferred");
+  });
+}
+
+export function adoptionSvg(agg: Aggregate, signal: SignalId): string {
+  const ecosystems = measurable(agg, signal);
+  const width = 680;
+  const height = 376;
+  const m = { l: 48, r: 112, t: 84, b: 56 };
+  const pw = width - m.l - m.r;
+  const ph = height - m.t - m.b;
+  const qs = agg.quarters;
+  const x = (i: number) => m.l + (qs.length === 1 ? pw / 2 : (i * pw) / (qs.length - 1));
+  const y = (p: number) => m.t + ph - p * ph;
+  const parts: string[] = [];
+
+  const inferred = ecosystems.filter((e) => agg.matrix.find((c) => c.ecosystem === e && c.signal === signal)?.availability === "inferred");
+  parts.push(
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">${esc(SIGNAL_LABEL[signal])}: adoption by quarter</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of sampled packages whose installable release at quarter end carried the signal</text>`,
+  );
+
+  // Legend row: always present for two or more series.
+  let lx = 16;
+  for (const e of ecosystems) {
+    parts.push(
+      `<line x1="${lx}" y1="62" x2="${lx + 16}" y2="62" stroke="${SERIES[e]}" stroke-width="2" stroke-linecap="round"/>`,
+      `<text x="${lx + 22}" y="66" font-size="11" fill="${INK_2}">${esc(ECOSYSTEM_LABEL[e])}${inferred.includes(e) ? " (≥)" : ""}</text>`,
+    );
+    lx += 34 + ECOSYSTEM_LABEL[e].length * 6.6 + (inferred.includes(e) ? 18 : 0);
+  }
+
+  for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+    parts.push(
+      `<line x1="${m.l}" y1="${y(p)}" x2="${m.l + pw}" y2="${y(p)}" stroke="${GRID}" stroke-width="1"/>`,
+      `<text x="${m.l - 8}" y="${y(p) + 4}" font-size="10" fill="${MUTED}" text-anchor="end">${p * 100}%</text>`,
+    );
+  }
+  // Label every other quarter when crowded, always including the last.
+  const every = qs.length > 8 ? 2 : 1;
+  qs.forEach((q, i) => {
+    if (i % every === 0 || i === qs.length - 1) {
+      parts.push(`<text x="${x(i)}" y="${m.t + ph + 18}" font-size="10" fill="${MUTED}" text-anchor="middle">${q}</text>`);
+    }
+  });
+
+  if (inferred.length) {
+    parts.push(`<text x="16" y="${height - 12}" font-size="10" fill="${MUTED}">(≥) inferred signal: unknowns count as not adopted, so the line is a lower bound.</text>`);
+  }
+
+  if (ecosystems.length === 0) {
+    parts.push(`<text x="${m.l + pw / 2}" y="${m.t + ph / 2}" font-size="12" fill="${INK_2}" text-anchor="middle">No ecosystem exposes this signal</text>`);
+    return svg(width, height, parts.join("\n"));
+  }
+
+  const ends: Array<{ e: EcosystemId; y: number; text: string }> = [];
+  for (const e of ecosystems) {
+    const pts = qs
+      .map((q, i) => ({ i, q, pt: agg.series.find((s) => s.quarter === q && s.ecosystem === e && s.signal === signal) }))
+      .filter((d) => d.pt && d.pt.pct != null);
+    if (pts.length === 0) continue;
+    const path = pts.map((d, k) => `${k ? "L" : "M"}${x(d.i).toFixed(1)},${y(d.pt!.pct!).toFixed(1)}`).join(" ");
+    parts.push(`<path d="${path}" fill="none" stroke="${SERIES[e]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`);
+    for (const d of pts) {
+      const pt = d.pt!;
+      const tip = `${ECOSYSTEM_LABEL[e]} ${d.q}: ${pctText(pt.pct)} (${pt.t}/${pt.n}; ${pt.u} unknown)`;
+      // Invisible enlarged hit target; the visible dot only at the series end.
+      parts.push(`<circle cx="${x(d.i)}" cy="${y(pt.pct!)}" r="8" fill="transparent"><title>${esc(tip)}</title></circle>`);
+    }
+    const last = pts.at(-1)!;
+    parts.push(`<circle cx="${x(last.i)}" cy="${y(last.pt!.pct!)}" r="4" fill="${SERIES[e]}" stroke="${SURFACE}" stroke-width="2"/>`);
+    ends.push({ e, y: y(last.pt!.pct!), text: `${ECOSYSTEM_LABEL[e]} ${pctText(last.pt!.pct)}` });
+  }
+
+  // Direct end labels only where they do not collide; the legend carries the rest.
+  ends.sort((a, b) => a.y - b.y);
+  ends.forEach((lab, k) => {
+    const prev = ends[k - 1];
+    const next = ends[k + 1];
+    const clear = (!prev || lab.y - prev.y >= 13) && (!next || next.y - lab.y >= 13);
+    if (clear) parts.push(`<text x="${m.l + pw + 10}" y="${lab.y + 4}" font-size="11" fill="${INK}">${esc(lab.text)}</text>`);
+  });
+
+  return svg(width, height, parts.join("\n"));
+}
+
+/**
+ * Per-platform trust summary on one axis (share of the seven properties). The pale track
+ * is capability — the most a package *could* have on that platform. Inside it, the dark
+ * bar grows from 0 to the assurance packages are known to reach, and a mid-tone segment
+ * continues to what unknowns could add. Both are shares of the same seven properties, so
+ * one axis is honest.
+ */
+export function scoresSvg(agg: Aggregate): string {
+  const rows = [...agg.scores].sort((a, b) => (b.assuranceLow ?? 0) - (a.assuranceLow ?? 0) || b.capability - a.capability);
+  const left = 120;
+  const plotW = 400;
+  const rowH = 40;
+  const top = 92;
+  const width = left + plotW + 210;
+  const height = top + rows.length * rowH + 64;
+  const x = (p: number) => left + p * plotW;
+  const parts: string[] = [
+    `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">Trust summary per platform</text>`,
+    `<text x="16" y="42" font-size="11" fill="${INK_2}">Share of the ${agg.scores[0]?.total ?? 7} trust properties · latest release of each sampled package · snapshot ${esc(agg.snapshotId)}</text>`,
+    // Legend
+    `<rect x="16" y="58" width="22" height="10" rx="3" fill="${RAMP[1]}"/>`,
+    `<text x="44" y="67" font-size="11" fill="${INK_2}">capability (offered by the platform)</text>`,
+    `<rect x="250" y="58" width="22" height="10" rx="3" fill="${RAMP[9]}"/>`,
+    `<text x="278" y="67" font-size="11" fill="${INK_2}">assurance (known)</text>`,
+    `<rect x="392" y="58" width="22" height="10" rx="3" fill="${RAMP[5]}"/>`,
+    `<text x="420" y="67" font-size="11" fill="${INK_2}">possible if unknowns hold</text>`,
+  ];
+  for (const p of [0, 0.25, 0.5, 0.75, 1]) {
+    parts.push(
+      `<line x1="${x(p)}" y1="${top - 6}" x2="${x(p)}" y2="${top + rows.length * rowH - 10}" stroke="${GRID}" stroke-width="1"/>`,
+      `<text x="${x(p)}" y="${top + rows.length * rowH + 6}" font-size="10" fill="${MUTED}" text-anchor="middle">${p * 100}%</text>`,
+    );
+  }
+  rows.forEach((r: Score, i) => {
+    const cy = top + i * rowH + 10;
+    const lo = r.assuranceLow ?? 0;
+    const hi = r.assuranceHigh ?? lo;
+    const tip = `${ECOSYSTEM_LABEL[r.ecosystem]}: capability ${r.offered}/${r.total} offered (${r.auditable} auditable); assurance ${pctText(lo)}–${pctText(hi)} over ${r.n} packages`;
+    parts.push(
+      `<g><title>${esc(tip)}</title>`,
+      `<text x="${left - 12}" y="${cy + 4}" font-size="12" fill="${INK}" text-anchor="end">${esc(ECOSYSTEM_LABEL[r.ecosystem])}</text>`,
+      `<rect x="${x(0)}" y="${cy - 9}" width="${Math.max(0, x(r.capability) - x(0))}" height="18" rx="4" fill="${RAMP[1]}"/>`,
+      ...assuranceBars(x(0), x(lo), x(hi), cy),
+      `<text x="${left + plotW + 14}" y="${cy + 4}" font-size="11" fill="${INK}">${pctText(lo)}${hi - lo >= 0.005 ? `–${pctText(hi)}` : ""}</text>`,
+      `<text x="${left + plotW + 84}" y="${cy + 4}" font-size="11" fill="${INK_2}">${r.offered}/${r.total} offered</text>`,
+      `</g>`,
+    );
+  });
+  parts.push(
+    `<text x="16" y="${height - 14}" font-size="10" fill="${MUTED}">Equal weights. Not-exposed properties count as offered but unknown, so they widen the range rather than being guessed.</text>`,
+  );
+  return svg(width, height, parts.join("\n"));
+}
+
+/**
+ * Known assurance as a bar from the baseline, then the unknown range as a second segment.
+ * Square at the baseline, 4px-rounded at the data end, 2px surface gap between segments.
+ */
+function assuranceBars(x0: number, xLo: number, xHi: number, cy: number): string[] {
+  const h = 10;
+  const y = cy - h / 2;
+  const gap = 2;
+  const hasRange = xHi - xLo >= gap + 2;
+  const out: string[] = [];
+  if (xLo - x0 >= 1) {
+    out.push(`<path d="${barPath(x0, xLo, y, h, !hasRange)}" fill="${RAMP[9]}"/>`);
+  }
+  if (hasRange) {
+    const start = xLo - x0 >= 1 ? xLo + gap : xLo;
+    out.push(`<path d="${barPath(start, xHi, y, h, true)}" fill="${RAMP[5]}"/>`);
+  }
+  return out;
+}
+
+/** A horizontal bar, square on the left; the right end rounded when it is the data end. */
+function barPath(x1: number, x2: number, y: number, h: number, roundRight: boolean): string {
+  const r = roundRight ? Math.min(4, (x2 - x1) / 2, h / 2) : 0;
+  const f = (n: number) => n.toFixed(2);
+  return [
+    `M${f(x1)},${f(y)}`,
+    `H${f(x2 - r)}`,
+    r ? `Q${f(x2)},${f(y)} ${f(x2)},${f(y + r)}` : "",
+    `V${f(y + h - r)}`,
+    r ? `Q${f(x2)},${f(y + h)} ${f(x2 - r)},${f(y + h)}` : "",
+    `H${f(x1)}`,
+    "Z",
+  ].join(" ");
+}
+
+function svg(width: number, height: number, body: string, defs = ""): string {
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" font-family="${FONT}">`,
+    defs ? `<defs>${defs}</defs>` : "",
+    `<rect width="${width}" height="${height}" fill="${SURFACE}"/>`,
+    body,
+    `</svg>`,
+    "",
+  ].join("\n");
+}

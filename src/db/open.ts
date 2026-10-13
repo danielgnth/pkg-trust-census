@@ -72,6 +72,20 @@ export function newSnapshotId(now: Date = new Date()): string {
   return now.toISOString().slice(0, 16).replace(/[-:]/g, "").replace("T", "-") + "Z";
 }
 
+/**
+ * The instant a snapshot describes. `fetch` and `extract` both select quarter anchors
+ * relative to this rather than to "now", so they agree on which releases to read.
+ */
+export function snapshotAsOf(db: Db, snapshotId: string): Date {
+  const row = db
+    .select({ startedAt: schema.snapshots.startedAt })
+    .from(schema.snapshots)
+    .where(eq(schema.snapshots.snapshotId, snapshotId))
+    .get();
+  if (!row) throw new Error(`no snapshot "${snapshotId}" — run \`rank\` first`);
+  return new Date(row.startedAt);
+}
+
 export function latestSnapshot(db: Db): string | null {
   const row = db
     .select({ id: schema.snapshots.snapshotId })

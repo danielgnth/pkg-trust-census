@@ -16,10 +16,17 @@ import { defaultTransport, type Transport } from "./transport.ts";
 
 export const TOOL_VERSION = "0.1.0";
 
+/**
+ * Identifies the project to every registry. A contact address is added only from the
+ * environment (`PKG_TRUST_CONTACT`, e.g. in a git-ignored `.env`), so no personal address
+ * lives in the code and nobody re-running this sends requests in someone else's name.
+ */
 export const USER_AGENT =
   process.env.PKG_TRUST_UA ??
   `pkg-trust-scraper/${TOOL_VERSION} (SSCS Seminar WiSe 26/27; ` +
-    `+https://github.com/danielgnth/expert-octo-carnival)`;
+    `+https://github.com/danielgnth/expert-octo-carnival` +
+    (process.env.PKG_TRUST_CONTACT ? `; ${process.env.PKG_TRUST_CONTACT}` : "") +
+    ")";
 
 /** Retried: transient by nature. Anything else is returned to the caller as-is. */
 const RETRYABLE = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -59,8 +66,9 @@ export class HttpClient {
   }
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
+    const key = cacheKey(url, opts.method);
     if (!opts.force) {
-      const hit = await this.cache.get(url);
+      const hit = await this.cache.get(key);
       if (hit) {
         this.stats.cacheHits++;
         return { url, status: hit.entry.httpStatus, body: hit.body, fromCache: true, entry: hit.entry };
@@ -81,8 +89,9 @@ export class HttpClient {
           headers: { "User-Agent": USER_AGENT, ...opts.headers },
         });
         status = res.status;
-        // A HEAD has no body; the status alone is the signal (Maven .asc probing).
-        body = res.body;
+        // A HEAD has no body, so the headers worth keeping become the cached body. The
+        // status is the signal (Maven .asc probing); Last-Modified dates the release.
+        body = opts.method === "HEAD" ? headBody(res.headers) : res.body;
 
         if (RETRYABLE.has(status)) {
           const retryAfter = Number(res.headers.get("retry-after"));
@@ -115,7 +124,7 @@ export class HttpClient {
 
       this.stats.fetched++;
       const entry = await this.cache.put({
-        url,
+        url: key,
         body,
         httpStatus: status,
         ecosystem: opts.ecosystem,
@@ -129,18 +138,71 @@ export class HttpClient {
   }
 
   async getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
-    const res = await this.get(url, opts);
-    if (res.status === 404) return { data: null, res };
-    try {
-      return { data: JSON.parse(res.body) as T, res };
-    } catch (err) {
-      throw new Error(`invalid JSON from ${url}: ${err instanceof Error ? err.message : String(err)}`);
-    }
+    return parseJsonResult<T>(await this.get(url, opts));
   }
 
   flush(): Promise<void> {
     return this.cache.flush();
   }
+}
+
+/**
+ * What adapters read through: the live client during `fetch`, the cache alone during
+ * `extract`. One gathering routine serves both, so `extract` replays exactly the requests
+ * `fetch` made — including the data-dependent ones (Go and Maven probe per release).
+ */
+export interface Source {
+  get(url: string, opts: RequestOptions): Promise<FetchResult>;
+  getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }>;
+}
+
+/** Thrown by `CacheSource` when `extract` needs a response that `fetch` never stored. */
+export class CacheMissError extends Error {
+  constructor(readonly url: string) {
+    super(`not in cache: ${url} — run \`fetch\` first`);
+    this.name = "CacheMissError";
+  }
+}
+
+/** Cache-only `Source`: never touches the network, which is what keeps `extract` pure. */
+export class CacheSource implements Source {
+  constructor(readonly cache: ResponseCache) {}
+
+  async get(url: string, opts: RequestOptions): Promise<FetchResult> {
+    const hit = await this.cache.get(cacheKey(url, opts.method));
+    if (!hit) throw new CacheMissError(url);
+    return { url, status: hit.entry.httpStatus, body: hit.body, fromCache: true, entry: hit.entry };
+  }
+
+  async getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
+    return parseJsonResult<T>(await this.get(url, opts));
+  }
+}
+
+/** HEAD and GET of one URL are different facts, so they must not share a cache entry. */
+export function cacheKey(url: string, method: RequestOptions["method"] = "GET"): string {
+  return method === "HEAD" ? `HEAD ${url}` : url;
+}
+
+function parseJsonResult<T>(res: FetchResult): { data: T | null; res: FetchResult } {
+  if (res.status === 404 || res.status === 410) return { data: null, res };
+  try {
+    return { data: JSON.parse(res.body) as T, res };
+  } catch (err) {
+    throw new Error(`invalid JSON from ${res.url}: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/** Response headers kept for a HEAD request; everything else is transport noise. */
+const HEAD_HEADERS = ["last-modified", "content-length", "etag"];
+
+function headBody(headers: Map<string, string>): string {
+  const kept: Record<string, string> = {};
+  for (const h of HEAD_HEADERS) {
+    const v = headers.get(h);
+    if (v !== undefined) kept[h] = v;
+  }
+  return JSON.stringify(kept);
 }
 
 class RetryableError extends Error {
