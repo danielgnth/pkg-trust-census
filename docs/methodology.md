@@ -58,6 +58,13 @@ Each stored version is scored on seven signals. Each signal takes one of three v
 `unknown`. `unknown` means the registry's data does not settle the question. It is never converted to
 `false`.
 
+Two booleans (trusted publishing, provenance attestation) would be the obvious model, but they do not
+survive contact with the registries. crates.io reports trusted publishing but has no attestation scheme.
+PyPI reports attestations, from which trusted publishing can only be inferred. Maven Central mandates
+GPG signing and has no OIDC equivalent. Go mandates transparency-log inclusion and has no publisher
+accounts at all. Packagist has no signing mechanism of any kind. Two booleans would score Maven and Go
+at zero, which is precisely backwards, so each mechanism gets its own signal:
+
 | Signal | Meaning |
 |---|---|
 | Identity-bound publish | Published via OIDC / trusted publishing rather than a long-lived token |
