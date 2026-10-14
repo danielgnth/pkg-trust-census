@@ -148,6 +148,9 @@ describe("pipeline", () => {
     const scoresChart = await Bun.file(join(dir, "charts/scores.svg")).text();
     expect(scoresChart).toMatch(/snapshot \d{1,2} [A-Z][a-z]{2} \d{4}, \d{2}:\d{2} UTC/);
     expect(scoresChart).not.toContain("snap-e2e");
+    // The chart prints its own arithmetic: attested is strong, plain's identity is unknown.
+    expect(scoresChart).toContain("(1 × 1 + 0 × ½) ÷ 2 · 1 unknown");
+    expect(scoresChart).toContain("(50 + 50 + 0) ÷ 3");
     const baselineChart = await Bun.file(join(dir, "charts/baseline.svg")).text();
     expect(baselineChart).toContain("Registry baseline");
     expect(baselineChart).toContain("since Jul 2026");

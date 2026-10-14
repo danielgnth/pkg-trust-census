@@ -77,6 +77,21 @@ export interface CategoryScore {
   auditable: number;
   assuranceLow: number | null;
   assuranceHigh: number | null;
+  /** Packages by level, from which `assuranceLow` follows: (strong + ½ × weak) / n. */
+  counts: LevelCounts;
+}
+
+/**
+ * Packages per level in one category. `strong` and `weak` are known levels; `weakOrStrong`
+ * are weak but could be strong, `unknown` have no known level but could have one. Both
+ * count at their known level in the low end and at the possible one in the high end.
+ */
+export interface LevelCounts {
+  strong: number;
+  weak: number;
+  weakOrStrong: number;
+  unknown: number;
+  none: number;
 }
 
 export interface ScorePoint {
@@ -251,11 +266,16 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
   const assurance = (scope: string, ecosystem: EcosystemId) => {
     const prefix = `${scope}/${ecosystem}/`;
     const releases = [...perPackage].filter(([key]) => key.startsWith(prefix)).map(([, values]) => values);
-    const categories = CATEGORIES.map((c) => ({
-      category: c.id,
-      low: mean(releases.map((v) => best(c, (s) => v.get(s) === "true"))),
-      high: mean(releases.map((v) => best(c, (s) => v.get(s) !== "false"))),
-    }));
+    const categories = CATEGORIES.map((c) => {
+      const levels = releases.map((v) => ({ low: best(c, (s) => v.get(s) === "true"), high: best(c, (s) => v.get(s) !== "false") }));
+      const counts: LevelCounts = { strong: 0, weak: 0, weakOrStrong: 0, unknown: 0, none: 0 };
+      for (const { low, high } of levels) {
+        if (low === 1) counts.strong++;
+        else if (low > 0) counts[high > low ? "weakOrStrong" : "weak"]++;
+        else counts[high > 0 ? "unknown" : "none"]++;
+      }
+      return { category: c.id, low: mean(levels.map((l) => l.low)), high: mean(levels.map((l) => l.high)), counts };
+    });
     return {
       categories,
       low: releases.length ? mean(categories.map((c) => c.low!)) : null,
@@ -273,6 +293,7 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
       auditable: best(c, (s) => av(s) === "observable" || av(s) === "inferred"),
       assuranceLow: a.categories[i]!.low,
       assuranceHigh: a.categories[i]!.high,
+      counts: a.categories[i]!.counts,
     }));
     return {
       ecosystem,

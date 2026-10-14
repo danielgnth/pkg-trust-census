@@ -13,7 +13,7 @@ import * as Plot from "@observablehq/plot";
 import { parseHTML } from "linkedom";
 import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
 import { CATEGORIES, type Aggregate, type MatrixCell, type SeriesPoint } from "../stages/aggregate.ts";
-import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, humanDate, humanMonth, pctSmall, pctText, pointsText } from "./labels.ts";
+import { CATEGORY_LABEL, ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, humanDate, humanMonth, pctSmall, pctText, pointsText } from "./labels.ts";
 import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineProperty, type BaselineValue } from "../facts/baseline.ts";
 import { POLICIES_VERIFIED, POLICY_PROPERTIES, policyOf, type PolicyProperty } from "../facts/policies.ts";
 import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
@@ -48,6 +48,7 @@ const SERIES: Record<EcosystemId, string> = {
   packagist: "#4a3aa7",
 };
 
+const HATCH_WEAK = `<pattern id="hatch-weak" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${RAMP[3]}"/><line x1="0" y1="0" x2="0" y2="6" stroke="${RAMP[9]}" stroke-width="2"/></pattern>`;
 const HATCH = `<pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${NEUTRAL}"/><line x1="0" y1="0" x2="0" y2="6" stroke="${OUTLINE}" stroke-width="2"/></pattern>`;
 
 const { document } = parseHTML("<!doctype html><html><body></body></html>");
@@ -132,7 +133,7 @@ function figure(o: {
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" font-family="${FONT}" color="${INK}">`,
-    `<defs>${HATCH}</defs>`,
+    `<defs>${HATCH}${HATCH_WEAK}</defs>`,
     `<rect width="${width}" height="${height}" fill="${SURFACE}"/>`,
     `<text x="16" y="24" font-size="15" font-weight="600" fill="${INK}">${esc(o.title)}</text>`,
     `<text x="16" y="42" font-size="11" fill="${INK_2}">${esc(o.subtitle)}</text>`,
@@ -707,58 +708,130 @@ export function adoptionSvg(agg: Aggregate, signal: SignalId): string {
 // ---------------------------------------------------------------------------------------
 // Trust summary
 
+const STRONG = RAMP[9];
+const WEAK = RAMP[3];
+const SCORE_ROW = 50;
+const SCORE_HEADER = 62;
+const SCORE_BAR = 12;
+const SCORE_BAR_W = 160;
+/** Bar sits in the upper part of the row, its formula below it; offsets from the row centre. */
+const BAR_TOP = 9;
+const BAR_DY = BAR_TOP + SCORE_BAR / 2 - SCORE_ROW / 2;
+const FORMULA_DY = BAR_DY + 17;
+
+/** "½" for a half, else the number. */
+const half = (k: number) => (k === 0.5 ? "½" : String(k));
+
 /**
- * Per-platform trust summary on one axis (share of the category points). The pale track
- * is capability — the most a package *could* have on that platform. Inside it, the dark
- * bar grows from 0 to the assurance packages are known to reach, and a mid-tone segment
- * continues to what unknowns could add. All three are shares of the same points, so one
- * axis is honest.
+ * The trust summary, drawn as its own calculation. One panel per category: the bar splits
+ * the sampled packages by the level their release reached, and the line under it is the
+ * arithmetic, in package counts, that gives the category value. The last panel averages
+ * the three category values into the score.
  */
 export function scoresSvg(agg: Aggregate): string {
   const rows = [...agg.scores]
     .sort((a, b) => (b.assuranceLow ?? 0) - (a.assuranceLow ?? 0) || b.capability - a.capability)
-    .map((r) => ({ ...r, name: ECOSYSTEM_LABEL[r.ecosystem], lo: r.assuranceLow ?? 0, hi: r.assuranceHigh ?? r.assuranceLow ?? 0 }));
-  type Row = (typeof rows)[number];
-  const rowH = 40;
-  const inset = (h: number) => (rowH - h) / 2;
-  const hasRange = (r: Row) => r.hi - r.lo >= 0.01;
-  const tip = (r: Row) => `${r.name}: capability ${pointsText(r.capability)} offered (${pointsText(r.auditable)} auditable); assurance ${pctText(r.lo)}–${pctText(r.hi)} over ${r.n} packages`;
+    .map((r) => ({ ...r, name: ECOSYSTEM_LABEL[r.ecosystem] }));
+  const names = rows.map((r) => r.name);
+  const range = (lo: number | null, hi: number | null) =>
+    lo == null ? "–" : hi != null && hi - lo >= 0.005 ? `${Math.round(lo * 100)}–${pctText(hi)}` : pctText(lo);
 
-  const panel = plot({
-    width: 120 + 400 + 210,
-    height: rows.length * rowH + 24,
-    marginTop: 0,
-    marginLeft: 120,
-    marginRight: 210,
-    marginBottom: 24,
+  const frame = (marginLeft: number, marginRight: number, header: string[]) => ({
+    width: marginLeft + SCORE_BAR_W + marginRight,
+    height: SCORE_HEADER + rows.length * SCORE_ROW,
+    marginTop: SCORE_HEADER,
+    marginLeft,
+    marginRight,
+    marginBottom: 0,
     x: { domain: [0, 1], axis: null },
-    y: { domain: rows.map((r) => r.name), padding: 0, axis: null },
+    y: { domain: names, padding: 0, axis: null },
+    header: header.map((text, i) =>
+      Plot.text([text], { frameAnchor: "top-left", dy: -SCORE_HEADER + 10 + i * 15, textAnchor: "start", fontSize: i ? 10.5 : 12, fontWeight: i ? 400 : 600, fill: i ? INK_2 : INK }),
+    ),
+  });
+  const bar = { y: "name", insetTop: BAR_TOP, insetBottom: SCORE_ROW - BAR_TOP - SCORE_BAR } as const;
+
+  const categoryPanels = CATEGORIES.map((cat, i) => {
+    const [strong, weak] = cat.levels;
+    const f = frame(i === 0 ? 120 : 0, 92, [CATEGORY_LABEL[cat.id], `${SIGNAL_LABEL[strong.signal]} = ${half(strong.points)}`, `${SIGNAL_LABEL[weak.signal]} = ${half(weak.points)}`]);
+    const cells = rows.map((r) => ({ name: r.name, n: r.n, ecosystem: r.ecosystem, ...r.categories[i]! }));
+    const offered = cells.filter((c) => c.capability > 0);
+    const where = (c: (typeof cells)[number]) => `${ECOSYSTEM_LABEL[c.ecosystem]} · ${CATEGORY_LABEL[cat.id]}`;
+
+    // Strong, weak, weak-but-maybe-strong, unknown: consecutive segments of the packages.
+    const segments = offered.flatMap((c) => {
+      const parts = [
+        { k: c.counts.strong, fill: STRONG, what: `strong (${SIGNAL_LABEL[strong.signal]})` },
+        { k: c.counts.weak, fill: WEAK, what: `weak (${SIGNAL_LABEL[weak.signal]})` },
+        { k: c.counts.weakOrStrong, fill: "url(#hatch-weak)", what: `weak, strong unknown` },
+        { k: c.counts.unknown, fill: HATCH_FILL, what: "no known level, a signal unknown" },
+      ];
+      let x = 0;
+      return parts.filter((p) => p.k > 0).map((p) => {
+        const x1 = x;
+        x += p.k / c.n;
+        return { name: c.name, x1, x2: x, fill: p.fill, title: `${where(c)}: ${p.k} of ${c.n} packages ${p.what}` };
+      });
+    });
+    const formula = (c: (typeof cells)[number]) => {
+      const weakCount = c.counts.weak + c.counts.weakOrStrong;
+      const terms = c.capability === 1 ? `${c.counts.strong} × 1 + ${weakCount} × ½` : `${weakCount} × ½`;
+      const unknown = c.counts.weakOrStrong + c.counts.unknown;
+      return `(${terms}) ÷ ${c.n}${unknown ? ` · ${unknown} unknown` : ""}${c.capability < 1 ? " · no strong level" : ""}`;
+    };
+
+    return plot({
+      ...f,
+      marks: [
+        ...f.header,
+        i === 0 ? Plot.axisY({ tickSize: 0, tickPadding: 12, fontSize: 12, fill: INK, label: null, dy: BAR_DY }) : null,
+        Plot.barX(offered, { ...bar, x1: 0, x2: 1, fill: NEUTRAL, rx: 3, title: (c) => `${where(c)}: ${c.counts.none} of ${c.n} packages at no level` }),
+        Plot.barX(segments, { ...bar, x1: "x1", x2: "x2", fill: "fill", insetRight: 1, insetLeft: 1, title: "title" }),
+        Plot.text(offered, { y: "name", x: 1, dx: 10, dy: BAR_DY, textAnchor: "start", fontSize: 12, fontWeight: 600, text: (c) => range(c.assuranceLow, c.assuranceHigh) }),
+        Plot.text(offered, { y: "name", x: 0, dy: FORMULA_DY, textAnchor: "start", fontSize: 10, fill: INK_2, text: formula }),
+        Plot.text(cells.filter((c) => c.capability === 0), { y: "name", x: 0, dy: BAR_DY, textAnchor: "start", fontSize: 11, fill: MUTED, text: () => "no mechanism (0)" }),
+      ],
+    });
+  });
+
+  const f = frame(0, 92, ["Score", `Mean of the ${CATEGORIES.length} categories`, "Capability: points the platform offers"]);
+  const scorePanel = plot({
+    ...f,
     marks: [
-      Plot.gridX(QUARTILES, { stroke: GRID, strokeOpacity: 1 }),
-      Plot.axisX({ ticks: QUARTILES, tickFormat: "%", tickSize: 0, fontSize: 10, fill: MUTED, label: null }),
-      Plot.axisY({ tickSize: 0, tickPadding: 12, fontSize: 12, fill: INK, label: null }),
-      Plot.barX(rows, { x1: 0, x2: "capability", y: "name", fill: RAMP[1], rx: 4, insetTop: inset(TRACK), insetBottom: inset(TRACK), title: tip }),
-      // Known assurance, square at the baseline; rounded at the data end unless a range continues it.
-      Plot.barX(rows.filter((r) => r.lo > 0 && !hasRange(r)), { x1: 0, x2: "lo", y: "name", fill: RAMP[9], rx2: 4, insetTop: inset(BAR), insetBottom: inset(BAR), title: tip }),
-      Plot.barX(rows.filter((r) => r.lo > 0 && hasRange(r)), { x1: 0, x2: "lo", y: "name", fill: RAMP[9], insetTop: inset(BAR), insetBottom: inset(BAR), title: tip }),
-      // What unknowns could add, after a 2px surface gap.
-      Plot.barX(rows.filter(hasRange), { x1: "lo", x2: "hi", y: "name", fill: RAMP[5], rx2: 4, insetLeft: 2, insetTop: inset(BAR), insetBottom: inset(BAR), title: tip }),
-      Plot.text(rows, { x: 1, y: "name", dx: 14, textAnchor: "start", fontSize: 11, text: (r: Row) => `${pctText(r.lo)}${r.hi - r.lo >= 0.005 ? `–${pctText(r.hi)}` : ""}` }),
-      Plot.text(rows, { x: 1, y: "name", dx: 84, textAnchor: "start", fontSize: 11, fill: INK_2, text: (r: Row) => `${pointsText(r.capability)} offered` }),
+      ...f.header,
+      Plot.barX(rows, { ...bar, x1: 0, x2: 1, fill: NEUTRAL, rx: 3 }),
+      Plot.barX(rows.filter((r) => (r.assuranceLow ?? 0) > 0), { ...bar, x1: 0, x2: "assuranceLow", fill: STRONG, insetRight: 1, title: (r) => `${r.name}: score ${range(r.assuranceLow, r.assuranceHigh)}` }),
+      Plot.barX(rows.filter((r) => (r.assuranceHigh ?? 0) - (r.assuranceLow ?? 0) >= 0.005), { ...bar, x1: "assuranceLow", x2: "assuranceHigh", fill: HATCH_FILL, insetLeft: 1, title: (r) => `${r.name}: up to ${pctText(r.assuranceHigh)} if unknown signals hold` }),
+      Plot.text(rows, { y: "name", x: 1, dx: 10, dy: BAR_DY, textAnchor: "start", fontSize: 13, fontWeight: 700, text: (r) => range(r.assuranceLow, r.assuranceHigh) }),
+      Plot.text(rows, {
+        y: "name", x: 0, dy: FORMULA_DY, textAnchor: "start", fontSize: 10, fill: INK_2,
+        text: (r: (typeof rows)[number]) => `(${r.categories.map((c) => Math.round((c.assuranceLow ?? 0) * 100)).join(" + ")}) ÷ ${CATEGORIES.length} · capability ${pointsText(r.capability)}`,
+      }),
     ],
+  });
+
+  const GAP = 20;
+  let x = 0;
+  const panels = [...categoryPanels, scorePanel].map((p, i) => {
+    const placed = { ...p, x: x + (i === 0 ? 0 : GAP) };
+    x = placed.x + p.width;
+    return placed;
   });
   return figure({
     title: "Trust summary per platform",
-    subtitle: `Share of the ${CATEGORIES.length} score categories · latest release of each sampled package · snapshot ${humanDate(agg.asOf)}`,
+    subtitle: `Latest release of each sampled package (n = ${rows[0]?.n ?? 0} per platform) · snapshot ${humanDate(agg.asOf)}`,
     legend: [
-      { label: "capability (offered by the platform)", fill: RAMP[1]! },
-      { label: "assurance (known)", fill: RAMP[9]! },
-      { label: "possible if unknowns hold", fill: RAMP[5]! },
+      { label: "strong level: 1 point", fill: STRONG },
+      { label: "weak level: ½ point", fill: WEAK },
+      { label: "weak, strong unknown", fill: "url(#hatch-weak)" },
+      { label: "unknown", fill: HATCH_FILL },
+      { label: "neither: 0", fill: NEUTRAL, outline: true },
     ],
-    panels: [panel],
+    panels,
     notes: [
-      "Each category scores its strongest signal: 1 for the strong level, ½ for the weak one. Transparency log is not scored.",
-      "Not-exposed signals count as offered but unknown, so they widen the range rather than being guessed.",
+      "Each category: a release earns 1 point for the strong signal, ½ for only the weak one, 0 for neither. The category value is the mean over",
+      "packages, (strong × 1 + weak × ½) ÷ n; the score is the mean of the three category values. Ranges: the upper end counts unknown signals as",
+      "present. Transparency log is not scored, because every Sigstore signature is logged. ½ is a convention (docs/methodology.md).",
     ],
   });
 }
