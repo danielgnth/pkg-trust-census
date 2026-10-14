@@ -3,7 +3,7 @@
  *
  * The cheapest of the seven: one Simple API call returns every file of every version
  * *with* its PEP 740 provenance URL, so the whole quarterly backfill costs a single
- * request. See docs/preflight.md §1.
+ * request. See docs/registries.md#pypi.
  */
 
 import type { Candidate, ExtractedPackage, FetchResult } from "../types.ts";
@@ -211,7 +211,7 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
       latestVersion: latestRecord?.version ?? latest,
       latestPublishDate: latestRecord?.publishedAt ?? null,
       // PyPI exposes only free-text author/maintainer emails; parsing those into a count
-      // would produce a number that looks real but is not (preflight §4).
+      // would produce a number that looks real but is not (docs/registries.md#pypi).
       maintainerCount: null,
       maintainerCountSource: "unavailable",
       repositoryUrl: repositoryFrom(raw.json),
@@ -314,7 +314,7 @@ function signalsFor(v: PypiVersion, prov: Provenance | null) {
 
   return [
     // PEP 740 attestations on PyPI are issued only through Trusted Publishing, but Trusted
-    // Publishing does not always emit attestations, so absence proves nothing (preflight §3.5).
+    // Publishing does not always emit attestations, so absence proves nothing (docs/registries.md#pypi).
     impliedBy(
       "identity_publish",
       evidence && publisher ? `${publisher.kind} ${publisher.repository} ${publisher.workflow}` : evidence,

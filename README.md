@@ -12,7 +12,8 @@ package managers?"*
 > [!NOTE]
 > This project was developed with AI assistance (Claude Code) under the author's direction. Every
 > detection rule is documented in the [methodology](docs/methodology.md) and traceable to the registry
-> response it was read from, so results can be checked independently. The software is provided as is,
+> response it was read from, and every curated claim quotes an archived [source](docs/sources.md), so
+> results can be checked independently. The software is provided as is,
 > without warranty. Please verify findings before relying on them.
 
 ## What it measures
@@ -50,7 +51,7 @@ The tool collects only public metadata from documented public APIs. It uses no a
 nothing behind a login, and never works around rate limits.
 
 - **Paced requests.** Requests are rate-limited per host and honour `Retry-After`. crates.io is held to
-  one request per second, as its crawler policy asks ([`src/http/ratelimit.ts`](src/http/ratelimit.ts)).
+  one request per second, as its crawler policy asks ([`src/http/client.ts`](src/http/client.ts)).
 - **Identified traffic.** Every request carries a User-Agent naming this project and repository. To add
   a contact address, as registries recommend:
   ```sh
@@ -64,9 +65,9 @@ nothing behind a login, and never works around rate limits.
 | Document | Contents |
 |---|---|
 | [Methodology](docs/methodology.md) | Sampling, version selection, signal definitions, detection rules, limitations |
-| [Development](docs/development.md) | CLI stages, output files, database, configuration |
-| [Pre-flight findings](docs/preflight.md) | Verified API behaviour per registry, with evidence |
-| [Implementation plan](docs/IMPLEMENTATION_PLAN.md) | Architecture, data model, milestones |
+| [Registry reference](docs/registries.md) | Which endpoint and field each signal is read from, per registry |
+| [Sources](docs/sources.md) | Every source the curated facts cite, with access date and archived copy |
+| [Development](docs/development.md) | Layout, CLI stages, output files, sources workflow, database |
 
 ## License
 

@@ -2,8 +2,8 @@
  * Locks the M0 findings against real captured responses.
  *
  * These are not tests of our code — they are regression tests on the *registries*. Each
- * assertion is a claim docs/preflight.md makes about an API shape, and the adapters in
- * M2-M6 will be written against exactly these shapes. If a registry changes its response
+ * assertion is a claim docs/registries.md makes about an API shape, and the adapters are
+ * written against exactly these shapes. If a registry changes its response
  * format, this file fails and tells us which finding to re-verify, rather than the
  * extractor silently emitting `false` for a signal that moved.
  */
@@ -184,7 +184,7 @@ describe("Packagist — no mechanism exists", () => {
   });
 });
 
-describe("Attestation contents (preflight §8.2, §9.1)", () => {
+describe("Attestation contents", () => {
   const { fulcioSourceRef } = require("../src/extract/fulcio.ts");
 
   test("a PyPI attestation is the 'publish' predicate, not SLSA, and its certificate names the commit", async () => {

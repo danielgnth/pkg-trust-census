@@ -2,7 +2,7 @@
  * RubyGems adapter.
  *
  * RubyGems has trusted publishing, but its public API exposes no per-version marker for it,
- * not even on Ruby Central's own test gem (preflight §3.2). What it *does* expose:
+ * not even on Ruby Central's own test gem (docs/registries.md#rubygems). What it *does* expose:
  *
  *  - who pushed each version, on its web page ("Pushed by": a user, i.e. an API key, or a
  *    trusted publisher). Not in any JSON endpoint, so the page is read; versions pushed
@@ -13,7 +13,7 @@
  *  - `metadata.rubygems_mfa_required` per version, which makes MFA enforcement backfillable;
  *  - the attestations themselves, per version at `/api/v1/attestations/{gem}-{version}.json`
  *    (`[]` when there are none). Found 2026-10-13; the M0 probe missed it because the
- *    versions and gem endpoints carry no hint that it exists (preflight §8).
+ *    versions and gem endpoints carry no hint that it exists.
  */
 
 import type { Candidate, ExtractedPackage, ExtractedSignal, FetchResult } from "../types.ts";

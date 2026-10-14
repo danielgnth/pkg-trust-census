@@ -10,9 +10,26 @@ bun install
 bun test              # unit tests, no network
 bun run typecheck
 bun run cli status    # snapshots, cache and coverage
+bun run sources       # archive sources missing from sources/manifest.json; --refresh re-archives all
 bun run probe:tls     # which registry hosts negotiate post-quantum TLS (needs OpenSSL ≥ 3.5)
 bun run cli --help
 ```
+
+## Layout
+
+| Path | Role |
+|---|---|
+| `src/cli.ts` | citty commands for the five stages, `run` and `status` |
+| `src/stages/` | rank → fetch → extract → aggregate → report |
+| `src/adapters/` | one per registry: ranking, the requests `fetch` makes, and parsing into versions and signals |
+| `src/extract/` | registry-independent helpers: quarter anchors, version rules, signal construction |
+| `src/facts/` | curated tables: availability classes, registry policies, baseline, Sigstore, post-quantum |
+| `src/sources/` | the source registry, citations and quote matching |
+| `src/http/` | the shared client (ky for retries, p-queue for per-host pacing), the response cache, transports |
+| `src/report/` | labels and the SVG charts (Observable Plot, rendered headlessly through linkedom) |
+| `src/db/` | Drizzle schema, migrations runner, zod validation |
+| `sources/` | archived sources and their manifest (committed) |
+| `docs/` | methodology, registry reference, this file, and the generated source list |
 
 ## Running the pipeline
 
@@ -76,6 +93,8 @@ Set in a git-ignored `.env`, which Bun loads automatically (see [`.env.example`]
 |---|---|
 | `PKG_TRUST_CONTACT` | Contact address appended to the User-Agent |
 | `PKG_TRUST_UA` | Replaces the whole User-Agent |
+| `PKG_TRUST_TRANSPORT` | `fetch` or `curl`, overriding the automatic choice |
+| `PKG_TRUST_DATA_DIR` | Where the database, cache and output live (default `data`) |
 
 ## Database
 
@@ -96,6 +115,47 @@ the enum domains and non-negative counts at the database level.
 Both layers earn their place. A CHECK violation reports only `SQLITE_CONSTRAINT_CHECK`, with no
 indication of which of several thousand rows was at fault. The zod layer names the package and the
 field. The constraints remain as the backstop for any future caller that writes without the helpers.
+
+## Sources
+
+Every claim in `src/facts/` cites a source by id with the passage it rests on:
+
+```ts
+cite("npmUnpublishPolicy", "Once `package@version` has been used, you can never use it again.")
+```
+
+To add or change a claim:
+
+1. Add the URL to [`src/sources/registry.ts`](../src/sources/registry.ts) if it is new. This file is the
+   only place a source URL may appear. Prefer primary sources; for behaviour defined by code, link the file
+   on GitHub (`/blob/` links are archived as raw files).
+2. `bun run sources` archives it to `sources/archive/` and records the access time and sha256 in
+   `sources/manifest.json`. It also regenerates [`docs/sources.md`](sources.md).
+3. Copy the supporting passage from the archived file into `cite(...)`. Whitespace, Markdown links and
+   emphasis, typographic quotes and case are ignored when matching; the words must be the source's.
+4. `bun test` checks that every quote is in its archive, every source is archived and cited, and no
+   source URL appears outside the registry.
+
+`bun run sources --refresh` re-fetches everything; a quote that no longer matches means the page changed
+and the claim needs re-checking. A page that moved should get its new URL in the registry, not a redirect.
+
+## HTTP
+
+[`src/http/client.ts`](../src/http/client.ts) is the only way adapters reach the network. ky retries
+transient statuses and honours `Retry-After`; a p-queue per host enforces the request rate and concurrency
+in `HOST_POLICIES` (crates.io: one request per second, as its crawler policy asks). Every response goes
+through the cache, and `extract` replays from the cache alone.
+
+Bun's `fetch` cannot traverse an HTTPS CONNECT proxy, which sandboxed environments often use. When
+`HTTPS_PROXY` is set, a curl-backed transport is used instead; `PKG_TRUST_TRANSPORT=fetch|curl` pins the
+choice.
+
+## Charts
+
+[`src/report/charts.ts`](../src/report/charts.ts) draws the figures with Observable Plot, rendered without a
+browser through linkedom. `figure()` adds the title, legend and notes, which Plot would render as HTML.
+Colours are plain hex attributes so the SVGs convert to PDF for LaTeX; every mark carries a `<title>` with
+its exact numbers.
 
 ## Cache
 

@@ -3,7 +3,7 @@
  *
  * Payloads are git-ignored (npm packuments alone run to hundreds of MB per snapshot);
  * `manifest.jsonl` is committed, so a reviewer can verify byte-exact integrity and the
- * extract stage can be re-derived offline without re-fetching. See plan §7.
+ * extract stage can be re-derived offline without re-fetching.
  */
 
 import { createHash } from "node:crypto";

@@ -98,8 +98,9 @@ Separately, each ecosystem × signal pair has an **availability** class:
 - **no mechanism**: the ecosystem has no such feature. For MFA, this means there is no way to *require* it for
   a publish. Releases are recorded `false`, but no percentage is reported.
 
-A *mandatory* flag marks signals required registry-wide by policy. Every no-mechanism and not-exposed cell
-was re-checked against primary sources on 2026-10-13 (docs/preflight.md §9).
+A *mandatory* flag marks signals required registry-wide by policy. The reason for each class is stored
+with it (`signal_availability.notes`); [registries.md](registries.md) lists the endpoint and field behind
+every signal.
 
 ### Detection rules
 
@@ -195,10 +196,10 @@ The table is also drawn as `charts/baseline.svg`.
 Four of the seven registries accept Sigstore bundles: npm (2023), PyPI (2024), RubyGems (2024) and Maven
 Central (2025). Each verifies the bundle at upload. No install client checks bundles by default, newer
 ones included: uv uploads attestations but does not verify them, pnpm's opt-in `trustPolicy: no-downgrade`
-compares the packument's trusted-publisher/provenance fields without verifying them, Yarn and Bun only
-generate provenance, and Gradle's opt-in dependency verification knows PGP but not Sigstore. The only check
-is npm's opt-in `npm audit signatures`. The bundles are already measured per release, as a publisher signature and a transparency-log
-entry. A separate curated table (`src/facts/sigstore.ts`; `sigstore.md` in each report) records the
+compares the packument's trusted-publisher/provenance fields without verifying them, Yarn only generates
+provenance, Bun ignores attestations, and Gradle's opt-in dependency verification knows PGP but not
+Sigstore. The only check is npm's opt-in `npm audit signatures`. The bundles are already measured per
+release, as a publisher signature and a transparency-log entry. A separate curated table (`src/facts/sigstore.ts`; `sigstore.md` in each report) records the
 registry-level facts and, for the other three, the nearest equivalent: Go's own checksum transparency log,
 nothing on crates.io (the Cargo Sigstore RFC was closed in 2023), and a stated plan on Packagist.
 `charts/sigstore.svg` draws the table alongside the share of sampled latest releases carrying a bundle.
@@ -239,11 +240,25 @@ signature, registry signature, transparency log, TLS, publish credential and MFA
 primitive and is classed as post-quantum safe (hash of at least 256 bits, symmetric secret), partly safe
 (a hash-chained log with classical checkpoint signatures; hybrid TLS with classical certificates; TOTP
 next to WebAuthn), quantum-vulnerable (RSA, ECDSA, EdDSA) or weak already (SHA-1, MD5). TLS cells are
-measured with `scripts/probe-pq-tls.ts`; signature algorithms are read from the registries' published keys,
-Sigstore's trusted root and the sampled Maven `.asc` files (preflight §13).
+measured with `scripts/probe-pq-tls.ts`, whose output is archived as a source (`probePqTls`); signature
+algorithms are read from the registries' published keys, Sigstore's trusted root and the sampled Maven
+`.asc` files.
 
 Every signature in every ecosystem is classical, Sigstore included. What is already safe is hashing:
 install hashes everywhere except Maven and Packagist, and the Merkle trees under Rekor and sum.golang.org.
+
+### Curated facts and their sources
+
+The four curated tables, the availability classes and the registry policy facts (`src/facts/`) are
+judgements about mechanisms, not measurements, so each value carries its evidence: the id of a source in
+[`src/sources/registry.ts`](../src/sources/registry.ts) and the passage quoted from it. `bun run sources`
+archives every source under `sources/` (readable text, the access time and the sha256 of the original
+response), and `bun test` fails if a quote is not found in its archived copy. Where code is the best
+evidence (name-similarity rules, checksum checks, Bundler's and Cargo's verification), the source is the
+file in the registry's or client's repository. Claims that something does *not* exist (PEP 458 is not
+deployed, a token type never expires) cite the closest primary source; an absence cannot be quoted. The
+"verified" date on each table is the newest access date among its sources. All sources are listed with
+their access dates in [sources.md](sources.md).
 
 ## Reproducibility
 
@@ -251,7 +266,8 @@ Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP 
 appended to the committed `data/cache/manifest.jsonl`. Every stored version references the sha256 of the
 response its signals were read from, and every signal row names its endpoint and field (`signal_source`).
 `extract` reads only from the cache and makes exactly the requests `fetch` made, so the dataset can be
-rebuilt offline from the cached payloads.
+rebuilt offline from the cached payloads. The sources of the curated facts are archived and committed
+(see above).
 
 ## Limitations
 

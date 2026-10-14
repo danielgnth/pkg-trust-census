@@ -151,7 +151,7 @@ export class MavenAdapter extends GatheringAdapter<Raw> {
           quarterAnchor,
           signals: [
             noMechanism("identity_publish", "the Central Portal authenticates deployments with user tokens only"),
-            // The `ec` index cannot be trusted for this (preflight §3.3), hence the HEAD.
+            // The `ec` index cannot be trusted for this (docs/registries.md, Maven Central), hence the HEAD.
             observed(
               "artifact_signature",
               asc ?? sigstore,

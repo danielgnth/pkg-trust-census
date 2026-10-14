@@ -14,10 +14,9 @@ export type EcosystemId = (typeof ECOSYSTEMS)[number];
 /**
  * The seven trust dimensions. Two booleans could not represent an ecosystem like Maven
  * (mandatory GPG, ~100%) or Go (mandatory transparency log, ~100%) without scoring them
- * a misleading zero — see docs/preflight.md §3.1.
+ * a misleading zero — see docs/registries.md, "Cross-registry findings".
  *
- * Seven rather than the original five because the availability audit (preflight §9.1)
- * found equivalent mechanisms landing in different columns: a registry vouching for a
+ * Seven rather than the original five because an availability audit found equivalent mechanisms landing in different columns: a registry vouching for a
  * hash is not the publisher signing it, and an SLSA statement is not the same evidence as
  * a commit recorded by the registry. Each pair is now its own signal.
  */

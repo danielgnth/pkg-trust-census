@@ -3,7 +3,7 @@
  *
  * One full packument per package carries every version's `dist` block, the `time` map the
  * backfill needs, and `maintainers` — the abbreviated packument drops the last two, so the
- * multi-megabyte full form is mandatory (preflight §4).
+ * multi-megabyte full form is mandatory (docs/registries.md#npm).
  *
  * Trusted publishing is *observable* on npm: versions published through it carry
  * `_npmUser.trustedPublisher`. Verified live against `sigstore@5.0.0` on 2026-10-13.
@@ -230,7 +230,7 @@ function signalsFor(m: Manifest) {
     // publisher's CI identity. `dist.signatures` does not count here: the registry applies
     // it to every tarball, so a hijacked account's upload is "signed" too.
     observed("artifact_signature", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, publisher CI identity)`),
-    // Registry-applied on serve, including to 2016-era tarballs (preflight §3.4).
+    // Registry-applied on serve, including to 2016-era tarballs (docs/registries.md#npm).
     observed(
       "registry_integrity",
       sig ? `registry signature, keyid ${sig.keyid ?? "unknown"}` : null,

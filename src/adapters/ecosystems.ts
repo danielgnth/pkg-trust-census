@@ -1,8 +1,8 @@
 /**
  * Ranking via ecosyste.ms, for the registries that publish no ranking of their own.
  *
- * ecosyste.ms is a third-party aggregator, so it is used only to *seed* candidate lists
- * (plan §9). Where a registry publishes authoritative counts (npm), the adapter re-counts.
+ * ecosyste.ms is a third-party aggregator, so it is used only to *seed* candidate lists.
+ * Where a registry publishes authoritative counts (npm), the adapter re-counts.
  * Go and Maven publish no download counts anywhere, which is why they rank by dependents.
  */
 
