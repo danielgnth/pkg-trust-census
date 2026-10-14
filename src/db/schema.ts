@@ -19,7 +19,7 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type ResponseRef } from "../types.ts";
 
 /** Renders a string[] as a SQL `IN (...)` list for CHECK constraints. */
 const inList = (values: readonly string[]) => values.map((v) => `'${v}'`).join(", ");
@@ -135,8 +135,6 @@ export const packageVersions = sqliteTable(
     isLatest: integer("is_latest", { mode: "boolean" }).notNull().default(false),
     /** '2024Q1', or several comma-joined when one release anchors many quarters. */
     quarterAnchor: text("quarter_anchor"),
-    rawResponsePath: text("raw_response_path"),
-    rawSha256: text("raw_sha256"),
   },
   (t) => [
     primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName, t.version] }),
@@ -166,8 +164,10 @@ export const versionSignals = sqliteTable(
     value: text("value").notNull(),
     /** The raw observed value, e.g. a provenance URL or a trustpub repository. */
     evidence: text("evidence"),
-    /** Endpoint + JSON path the value came from. Required for reproducibility. */
+    /** The rule: endpoint + JSON path the value is read from, the same for every release. */
     signalSource: text("signal_source").notNull(),
+    /** JSON array of the cached responses ({url, sha256}) this release's value was read from. */
+    responses: text("responses", { mode: "json" }).$type<ResponseRef[]>().notNull().default([]),
   },
   (t) => [
     primaryKey({

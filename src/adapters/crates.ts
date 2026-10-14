@@ -160,17 +160,17 @@ export class CratesAdapter extends GatheringAdapter<Raw> {
               "identity_publish",
               tp ? `${tp.provider}:${tp.repository} run ${tp.run_id} @ ${tp.sha}` : null,
               SRC,
+              record.res,
             ),
             noMechanism("artifact_signature", "crates.io has no artifact signing scheme"),
             noMechanism("registry_integrity", "index checksums are served over TLS but not signed"),
             noMechanism("build_provenance", "crates.io has no attestation scheme"),
             // Taken by crates.io from the CI provider's signed OIDC token at publish time,
             // so the uploader cannot simply assert it.
-            observed("source_link", tp?.sha ? `${tp.repository}@${tp.sha} (run ${tp.run_id})` : null, `${SRC}.sha`),
+            observed("source_link", tp?.sha ? `${tp.repository}@${tp.sha} (run ${tp.run_id})` : null, `${SRC}.sha`, record.res),
             noMechanism("transparency_log", "crates.io publishes to no transparency log"),
             noMechanism("mfa_enforced", "crates.io has no MFA; publishing authenticates with API tokens"),
           ],
-          raw: { path: record.res.entry.path, sha256: record.res.entry.sha256 },
         };
       }),
       withdrawals: [

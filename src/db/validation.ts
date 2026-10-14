@@ -97,8 +97,10 @@ export const packageVersionInsert = createInsertSchema(packageVersions, {
   version: z.string().min(1),
   publishedAt: isoTimestamp.nullish(),
   quarterAnchor: quarterAnchor.nullish(),
-  rawSha256: sha256Hex.nullish(),
 });
+
+/** Rows that rest on a curated fact rather than a response: policy, no mechanism, not exposed. */
+const CURATED_SOURCE = /^(policy|no_mechanism|not_exposed):/;
 
 export const versionSignalInsert = createInsertSchema(versionSignals, {
   ecosystem: ecosystemEnum,
@@ -109,9 +111,14 @@ export const versionSignalInsert = createInsertSchema(versionSignals, {
   // Without this an aggregate number could not be traced back to an endpoint, which is
   // the whole reproducibility claim.
   signalSource: z.string().min(1),
+  responses: z.array(z.object({ url: z.url(), sha256: sha256Hex })),
 }).refine((s) => s.value === "unknown" || s.evidence != null || s.value === "false", {
   error: "a 'true' signal must carry evidence",
   path: ["evidence"],
+}).refine((s) => CURATED_SOURCE.test(s.signalSource) || (s.responses?.length ?? 0) > 0, {
+  // The per-signal trace from a matrix cell back to the bytes it was read from.
+  error: "a signal read from the registry must name the response it was read from",
+  path: ["responses"],
 });
 
 export const packageWithdrawalInsert = createInsertSchema(packageWithdrawals, {

@@ -13,9 +13,9 @@ import { join } from "node:path";
 import { ECOSYSTEMS, SIGNALS } from "../types.ts";
 import type { Db } from "../db/open.ts";
 import { packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
-import { aggregatePath, outDir, type Aggregate } from "./aggregate.ts";
+import { CATEGORIES, aggregatePath, outDir, type Aggregate, type Score } from "./aggregate.ts";
 import { adoptionSvg, baselineSvg, matrixSvg, measurable, policiesSvg, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg, withdrawalsSvg } from "../report/charts.ts";
-import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText } from "../report/labels.ts";
+import { CATEGORY_LABEL, ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SHARED_MECHANISM, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText, pointsText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
@@ -99,6 +99,13 @@ export function matrixMarkdown(agg: Aggregate): string {
         const f = availabilityOf(c.ecosystem, c.signal);
         return `- **${ECOSYSTEM_LABEL[c.ecosystem]} · ${SIGNAL_LABEL[c.signal]}**: ${f.detectionMethod}.${f.notes ? ` ${f.notes}` : ""}`;
       }),
+    "",
+    "Columns read from one mechanism move together and are not independent evidence. The trust score therefore",
+    "groups signals into categories and counts each category once:",
+    "",
+    ...SHARED_MECHANISM.filter((g) => agg.matrix.some((c) => c.ecosystem === g.ecosystem)).map(
+      (g) => `- **${ECOSYSTEM_LABEL[g.ecosystem]}**: ${g.signals.map((s) => SIGNAL_LABEL[s]).join(", ")} are ${g.signals.length === 2 ? "both" : "all"} read from ${g.mechanism}.`,
+    ),
     "",
   ].join("\n");
 }
@@ -189,22 +196,29 @@ export function publishAuthMarkdown(agg: Aggregate): string {
 export function scoresMarkdown(agg: Aggregate): string {
   const rows = [...agg.scores].sort((a, b) => (b.assuranceLow ?? 0) - (a.assuranceLow ?? 0));
   const first = agg.quarters[0];
+  const range = (lo: number | null, hi: number | null) =>
+    lo == null ? "–" : hi != null && hi - lo >= 0.005 ? `${pctText(lo)}–${pctText(hi)}` : pctText(lo);
+  const level = (c: Score["categories"][number]) =>
+    c.capability === 0 ? "— no mechanism" : range(c.assuranceLow, c.assuranceHigh);
   return [
     `### Trust summary per platform (snapshot ${agg.snapshotId})`,
     "",
-    `| Platform | Capability | Auditable | Assurance (latest) | Assurance (${first ?? "first quarter"}) |`,
-    "|---|---:|---:|---:|---:|",
+    `| Platform | Capability | Auditable | Assurance (latest) | Assurance (${first ?? "first quarter"}) | ${CATEGORIES.map((c) => CATEGORY_LABEL[c.id]).join(" | ")} |`,
+    `|---|---:|---:|---:|---:|${CATEGORIES.map(() => "---:").join("|")}|`,
     ...rows.map((r) => {
       const then = agg.scoreSeries.find((p) => p.quarter === first && p.ecosystem === r.ecosystem);
-      const range = (lo: number | null, hi: number | null) =>
-        lo == null ? "–" : hi != null && hi - lo >= 0.005 ? `${pctText(lo)}–${pctText(hi)}` : pctText(lo);
-      return `| **${ECOSYSTEM_LABEL[r.ecosystem]}** | ${r.offered}/${r.total} | ${r.auditable}/${r.total} | ${range(r.assuranceLow, r.assuranceHigh)} | ${then ? range(then.assuranceLow, then.assuranceHigh) : "–"} |`;
+      return `| **${ECOSYSTEM_LABEL[r.ecosystem]}** | ${pointsText(r.capability)} | ${pointsText(r.auditable)} | ${range(r.assuranceLow, r.assuranceHigh)} | ${then ? range(then.assuranceLow, then.assuranceHigh) : "–"} | ${r.categories.map(level).join(" | ")} |`;
     }),
     "",
-    "*Capability*: how many of the seven properties the platform offers at all. *Auditable*: how many of those",
-    "the public API lets an outsider check. *Assurance*: the average share of the seven properties a sampled",
-    "package's release actually has; a range means some properties are unknown (low end counts them as absent,",
-    "high end as present). All properties weigh equally.",
+    "Three categories, each answered by the strongest signal a release has: 1 point for the strong level, ½ for",
+    "the weak one. *Publisher authentication*: identity-bound publish (1) or enforced MFA (½). *Artifact",
+    "authenticity*: publisher signature (1) or registry signature (½). *Source provenance*: SLSA provenance (1)",
+    "or source link (½). Transparency log is reported in the matrix but not scored, because every Sigstore",
+    "signature is logged and would count twice.",
+    "",
+    "*Capability*: the points the platform offers at all. *Auditable*: those the public API lets an outsider",
+    "check. *Assurance*: the average share of the points a sampled package's release actually has; a range",
+    "means some signals are unknown (low end counts them as absent, high end as present).",
     "",
   ].join("\n");
 }
@@ -450,8 +464,11 @@ function baselineCsv(): string {
 
 function scoresCsv(agg: Aggregate): string {
   return csv(
-    ["ecosystem", "offered", "auditable", "total", "capability", "assurance_low", "assurance_high", "n"],
-    agg.scores.map((s) => [s.ecosystem, s.offered, s.auditable, s.total, s.capability, s.assuranceLow, s.assuranceHigh, s.n]),
+    ["ecosystem", "capability", "auditable", "assurance_low", "assurance_high", "n", ...CATEGORIES.flatMap((c) => [`${c.id}_low`, `${c.id}_high`])],
+    agg.scores.map((s) => [
+      s.ecosystem, s.capability, s.auditable, s.assuranceLow, s.assuranceHigh, s.n,
+      ...s.categories.flatMap((c) => [c.assuranceLow, c.assuranceHigh]),
+    ]),
   );
 }
 
@@ -508,7 +525,7 @@ function signalsCsv(db: Db, snapshotId: string): string {
       value: versionSignals.value,
       evidence: versionSignals.evidence,
       source: versionSignals.signalSource,
-      rawSha256: packageVersions.rawSha256,
+      responses: versionSignals.responses,
     })
     .from(versionSignals)
     .innerJoin(
@@ -524,8 +541,13 @@ function signalsCsv(db: Db, snapshotId: string): string {
     .orderBy(asc(versionSignals.ecosystem), asc(versionSignals.packageName), asc(packageVersions.publishedAt))
     .all();
   return csv(
-    ["ecosystem", "package", "version", "published_at", "is_latest", "quarter_anchor", "signal", "value", "evidence", "signal_source", "raw_sha256"],
-    rows.map((r) => [r.ecosystem, r.packageName, r.version, r.publishedAt, r.isLatest, r.quarterAnchor, r.signal, r.value, r.evidence, r.source, r.rawSha256]),
+    // A value can rest on several responses (Maven's `.asc` and `.sigstore.json`); they are space-separated, in the same order.
+    ["ecosystem", "package", "version", "published_at", "is_latest", "quarter_anchor", "signal", "value", "evidence", "signal_source", "response_urls", "response_sha256s"],
+    rows.map((r) => [
+      r.ecosystem, r.packageName, r.version, r.publishedAt, r.isLatest, r.quarterAnchor, r.signal, r.value, r.evidence, r.source,
+      r.responses.map((x) => x.url).join(" "),
+      r.responses.map((x) => x.sha256).join(" "),
+    ]),
   );
 }
 

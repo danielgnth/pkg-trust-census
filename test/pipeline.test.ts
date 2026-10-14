@@ -93,7 +93,12 @@ describe("pipeline", () => {
 
     const latest = db.select().from(packageVersions).where(eq(packageVersions.isLatest, true)).all();
     expect(latest.map((v) => [v.packageName, v.version]).sort()).toEqual([["attested", "2.0"], ["plain", "0.9"]]);
-    expect(latest.every((v) => /^[0-9a-f]{64}$/.test(v.rawSha256 ?? ""))).toBe(true);
+    // SLSA is read from the provenance object, not from the index that lists it.
+    const slsa = db.select().from(versionSignals).where(eq(versionSignals.signalId, "build_provenance")).all();
+    expect(slsa.find((s) => s.packageName === "attested" && s.version === "2.0")!.responses.map((r) => r.url)).toEqual([
+      "https://pypi.org/integrity/attested/2.0/attested-2.0.tar.gz/provenance",
+    ]);
+    expect(slsa.find((s) => s.packageName === "plain")!.responses.map((r) => r.url)).toEqual([simpleUrl("plain")]);
     expect(db.select().from(signalAvailability).all()).toHaveLength(49);
 
     const { aggregate } = await runAggregate(db, "snap-e2e");
@@ -102,12 +107,18 @@ describe("pipeline", () => {
     // A publish attestation is not SLSA provenance.
     expect(aggregate.matrix.find((c) => c.signal === "build_provenance")).toMatchObject({ t: 0, f: 2 });
 
-    // attested@2.0: identity, signature, tlog, MFA (post-mandate) = 4 of 7.
-    // plain@0.9 (2022): nothing true; identity and MFA unknown = 0 to 2 of 7.
+    // attested@2.0: publisher auth 1 (identity), authenticity 1 (signature), source 0 = 2 of 3.
+    // plain@0.9 (2022): nothing true; identity unknown = 0 of 3, up to 1 of 3.
+    // PyPI offers identity, signature and SLSA, so every category is fully offered.
     const score = aggregate.scores.find((s) => s.ecosystem === "pypi")!;
-    expect(score).toMatchObject({ offered: 6, auditable: 6, total: 7, n: 2 });
-    expect(score.assuranceLow).toBeCloseTo(2 / 7, 6);
-    expect(score.assuranceHigh).toBeCloseTo(3 / 7, 6);
+    expect(score).toMatchObject({ capability: 1, auditable: 1, n: 2 });
+    expect(score.assuranceLow).toBeCloseTo(1 / 3, 6);
+    expect(score.assuranceHigh).toBeCloseTo(1 / 2, 6);
+    expect(score.categories.map((c) => [c.category, c.assuranceLow, c.assuranceHigh])).toEqual([
+      ["publisher_auth", 0.5, 1],
+      ["artifact_authenticity", 0.5, 0.5],
+      ["source_provenance", 0, 0],
+    ]);
     const identity = aggregate.matrix.find((c) => c.signal === "identity_publish")!;
     expect(identity).toMatchObject({ availability: "inferred", t: 1, u: 1 });
 
@@ -129,7 +140,9 @@ describe("pipeline", () => {
     const baseline = await Bun.file(join(dir, "baseline.md")).text();
     expect(baseline).toContain("#### Notes and sources");
     expect(baseline).toContain("https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/");
-    expect(summary).toMatch(/\| \*\*PyPI\*\* \| 6\/7 \| 6\/7 \| 29%–43% \|/);
+    expect(summary).toMatch(/\| \*\*PyPI\*\* \| 3\/3 \| 3\/3 \| 33%–50% \| [^|]+ \| 50%–100% \| 50% \| 0% \|/);
+    const signalsCsv = await Bun.file(join(dir, "signals.csv")).text();
+    expect(signalsCsv.split("\n")[0]).toEndWith("signal_source,response_urls,response_sha256s");
     expect(await Bun.file(join(dir, "charts/scores.svg")).text()).toContain("Trust summary per platform");
     // Charts name the snapshot by a readable instant, never by its id.
     const scoresChart = await Bun.file(join(dir, "charts/scores.svg")).text();

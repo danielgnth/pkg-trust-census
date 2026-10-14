@@ -39,6 +39,8 @@ interface Info {
 
 interface Kept extends VersionRecord {
   info: Info | null;
+  /** The `.info` (or `@latest`) response `info` was read from. */
+  infoRes: FetchResult | null;
 }
 
 interface Raw {
@@ -81,18 +83,15 @@ export class GoAdapter extends GatheringAdapter<Raw> {
     const mod = escapeModulePath(candidate.name);
 
     const list = await src.get(`${PROXY}/${mod}/@v/list`, opts);
-    const { data: latest } = await src.getJson<Info>(`${PROXY}/${mod}/@latest`, opts);
+    const { data: latest, res: latestRes } = await src.getJson<Info>(`${PROXY}/${mod}/@latest`, opts);
     if (list.status !== 200 && !latest) {
       throw new Error(`proxy.golang.org cannot serve "${candidate.name}" (HTTP ${list.status})`);
     }
 
-    const infos = new Map<string, Info | null>();
+    const infos = new Map<string, { data: Info | null; res: FetchResult }>();
     const infoOf = async (v: string): Promise<Info | null> => {
-      if (!infos.has(v)) {
-        const { data } = await src.getJson<Info>(`${PROXY}/${mod}/@v/${escapeModulePath(v)}.info`, opts);
-        infos.set(v, data);
-      }
-      return infos.get(v)!;
+      if (!infos.has(v)) infos.set(v, await src.getJson<Info>(`${PROXY}/${mod}/@v/${escapeModulePath(v)}.info`, opts));
+      return infos.get(v)!.data;
     };
 
     const tags = list.status === 200 ? list.body.split("\n").map((s) => s.trim()).filter(Boolean) : [];
@@ -102,12 +101,13 @@ export class GoAdapter extends GatheringAdapter<Raw> {
     const records: Kept[] = [...probed].map(([version, publishedAt]) => ({
       version,
       publishedAt,
-      info: infos.get(version) ?? null,
+      info: infos.get(version)?.data ?? null,
+      infoRes: infos.get(version)?.res ?? null,
     }));
     // `@latest` may name a pseudo-version for an untagged module; it is still what
     // `go get` resolves, so it is kept as the latest version.
     if (latest && !probed.has(latest.Version)) {
-      records.push({ version: latest.Version, publishedAt: latest.Time ?? null, info: latest });
+      records.push({ version: latest.Version, publishedAt: latest.Time ?? null, info: latest, infoRes: latestRes });
     }
     const kept = selectKeptVersions(records, latest?.Version ?? null, ctx.asOf);
 
@@ -152,6 +152,7 @@ export class GoAdapter extends GatheringAdapter<Raw> {
               "registry_integrity",
               logged ? `sum.golang.org signed tree head over ${logged}` : null,
               "sum.golang.org /lookup/{mod}@{v} (signed note)",
+              lookup,
             ),
             noMechanism("build_provenance", "Go has no build step and no attestation format"),
             // The proxy's own record of the commit it fetched. Older versions predate
@@ -160,15 +161,16 @@ export class GoAdapter extends GatheringAdapter<Raw> {
               "source_link",
               o?.Hash ? `${o.VCS ?? "vcs"} ${o.URL ?? ""} ${o.Ref ?? ""} @ ${o.Hash}`.replace(/\s+/g, " ") : null,
               "proxy.golang.org /@v/{v}.info Origin (proxy-recorded VCS source)",
+              record.infoRes,
             ),
             observed(
               "transparency_log",
               logged ? `sum.golang.org record ${logged}` : null,
               "sum.golang.org /lookup/{mod}@{v} (HTTP 200 = logged)",
+              lookup,
             ),
             noMechanism("mfa_enforced", "Go has no publisher accounts"),
           ],
-          raw: { path: lookup.entry.path, sha256: lookup.entry.sha256 },
         };
       }),
       // Retracted versions are undated without one .info request each, so they are

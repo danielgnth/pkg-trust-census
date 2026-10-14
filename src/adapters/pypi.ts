@@ -202,7 +202,6 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
   protected build(candidate: Candidate, raw: Raw, ctx: RunContext): ExtractedPackage {
     const latest = raw.json?.info?.version ?? null;
     const kept = raw.kept;
-    const rawRef = { path: raw.simpleRes.entry.path, sha256: raw.simpleRes.entry.sha256 };
 
     const latestRecord = kept.find((k) => k.isLatest)?.record ?? null;
     return {
@@ -221,8 +220,7 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
         publishedAt: record.publishedAt,
         isLatest,
         quarterAnchor,
-        signals: signalsFor(record, raw.provenance.get(record.version)?.data ?? null),
-        raw: rawRef,
+        signals: signalsFor(record, raw.simpleRes, raw.provenance.get(record.version) ?? null),
       })),
       withdrawals: [
         withdrawalIn(
@@ -282,18 +280,20 @@ export function predicateTypes(p: Provenance | null): string[] {
  * with wheels built elsewhere are common, and "all" would score them as non-adopters. The
  * attested/total file count is kept in `evidence`, so the stricter rule can be re-derived.
  */
-function signalsFor(v: PypiVersion, prov: Provenance | null) {
+function signalsFor(v: PypiVersion, index: FetchResult, provenance: { data: Provenance | null; res: FetchResult } | null) {
+  const prov = provenance?.data ?? null;
+  const provRes = provenance?.res;
   const mfa = policySince("mfa_enforced", v.publishedAt, PYPI_2FA_MANDATE, "PyPI requires 2FA for all accounts");
   const registry = noMechanism("registry_integrity", "PyPI serves sha256 digests over TLS but signs nothing (PEP 458 not deployed)");
   if (v.files.length === 0) {
     const why = `${SOURCE}: no files matched this version`;
     return [
-      signal("identity_publish", "unknown", null, why),
-      signal("artifact_signature", "unknown", null, why),
+      signal("identity_publish", "unknown", null, why, index),
+      signal("artifact_signature", "unknown", null, why, index),
       registry,
-      signal("build_provenance", "unknown", null, why),
-      signal("source_link", "unknown", null, why),
-      signal("transparency_log", "unknown", null, why),
+      signal("build_provenance", "unknown", null, why, index),
+      signal("source_link", "unknown", null, why, index),
+      signal("transparency_log", "unknown", null, why, index),
       mfa,
     ];
   }
@@ -319,20 +319,21 @@ function signalsFor(v: PypiVersion, prov: Provenance | null) {
       "identity_publish",
       evidence && publisher ? `${publisher.kind} ${publisher.repository} ${publisher.workflow}` : evidence,
       `${rule}; attestation implies Trusted Publishing`,
+      index,
     ),
     // The attestation is a Sigstore signature over the distribution file, made by the
     // publisher's CI. PyPI dropped GPG signatures in 2023.
-    observed("artifact_signature", evidence, `${rule}; PEP 740 Sigstore signature`),
+    observed("artifact_signature", evidence, `${rule}; PEP 740 Sigstore signature`, index),
     registry,
     // Most PyPI attestations are the *publish* predicate, which is not SLSA provenance.
     detailsMissing
-      ? signal("build_provenance", "unknown", null, `${provSource}: provenance object unavailable`)
-      : observed("build_provenance", slsa ? `${SLSA_PROVENANCE} in ${attested[0]!.provenance}` : null, `${provSource} predicateType (one attested file)`),
+      ? signal("build_provenance", "unknown", null, `${provSource}: provenance object unavailable`, provRes)
+      : observed("build_provenance", slsa ? `${SLSA_PROVENANCE} in ${attested[0]!.provenance}` : null, `${provSource} predicateType (one attested file)`, provRes ?? index),
     detailsMissing
-      ? signal("source_link", "unknown", null, `${provSource}: provenance object unavailable`)
-      : observed("source_link", cert ? `${cert.repository ?? "unknown repository"}@${cert.digest}` : null, `${provSource} Fulcio certificate source repository digest`),
+      ? signal("source_link", "unknown", null, `${provSource}: provenance object unavailable`, provRes)
+      : observed("source_link", cert ? `${cert.repository ?? "unknown repository"}@${cert.digest}` : null, `${provSource} Fulcio certificate source repository digest`, provRes ?? index),
     // Sigstore bundles are logged in Rekor; no other transparency log exists for PyPI.
-    observed("transparency_log", evidence, `${rule}; Sigstore bundles are Rekor-logged`),
+    observed("transparency_log", evidence, `${rule}; Sigstore bundles are Rekor-logged`, index),
     mfa,
   ];
 }

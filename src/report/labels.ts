@@ -1,5 +1,5 @@
 import type { EcosystemId, SignalId, WithdrawalKind } from "../types.ts";
-import type { MatrixCell } from "../stages/aggregate.ts";
+import { CATEGORIES, type CategoryId, type MatrixCell } from "../stages/aggregate.ts";
 
 export const SIGNAL_LABEL: Record<SignalId, string> = {
   identity_publish: "Identity-bound publish",
@@ -10,6 +10,47 @@ export const SIGNAL_LABEL: Record<SignalId, string> = {
   transparency_log: "Transparency log",
   mfa_enforced: "MFA enforced",
 };
+
+export const CATEGORY_LABEL: Record<CategoryId, string> = {
+  publisher_auth: "Publisher authentication",
+  artifact_authenticity: "Artifact authenticity",
+  source_provenance: "Source provenance",
+};
+
+/** A share of the score categories as points: 5/6 of three categories reads "2½/3". */
+export function pointsText(share: number): string {
+  const halves = Math.round(share * CATEGORIES.length * 2);
+  const whole = Math.floor(halves / 2);
+  const text = halves % 2 ? (whole ? `${whole}½` : "½") : String(whole);
+  return `${text}/${CATEGORIES.length}`;
+}
+
+/**
+ * Matrix columns read from one mechanism, so they move together and are not independent
+ * evidence. The detection rules make them so (docs/methodology.md, Detection rules).
+ */
+export const SHARED_MECHANISM: ReadonlyArray<{ ecosystem: EcosystemId; signals: SignalId[]; mechanism: string }> = [
+  {
+    ecosystem: "npm",
+    signals: ["artifact_signature", "build_provenance", "source_link", "transparency_log"],
+    mechanism: "`dist.attestations`, which npm accepts only with an SLSA predicate, so the four columns are identical",
+  },
+  {
+    ecosystem: "pypi",
+    signals: ["identity_publish", "artifact_signature", "transparency_log"],
+    mechanism: "a PEP 740 attestation on any file of the release",
+  },
+  {
+    ecosystem: "rubygems",
+    signals: ["artifact_signature", "transparency_log"],
+    mechanism: "a non-empty attestation list",
+  },
+  {
+    ecosystem: "go",
+    signals: ["registry_integrity", "transparency_log"],
+    mechanism: "the sum.golang.org lookup",
+  },
+];
 
 export const ECOSYSTEM_LABEL: Record<EcosystemId, string> = {
   pypi: "PyPI",

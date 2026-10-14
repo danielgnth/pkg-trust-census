@@ -69,7 +69,7 @@ interface Raw {
   kept: KeptVersion<GemRecord>[];
   attestations: Map<string, { bundles: Bundle[] | null; res: FetchResult }>;
   /** The version's web page, for its "Pushed by" section; null when it did not answer 200. */
-  pages: Map<string, { html: string | null; url: string }>;
+  pages: Map<string, { html: string | null; res: FetchResult }>;
   versionsRes: FetchResult;
   gem: GemInfo | null;
   owners: unknown[] | null;
@@ -160,7 +160,7 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
       const platform = build?.platform && build.platform !== "ruby" ? `-${build.platform}` : "";
       const url = `https://rubygems.org/gems/${enc}/versions/${encodeURIComponent(record.version)}${platform}`;
       const res = await src.get(url, { ...opts, headers: { Accept: "text/html" } });
-      pages.set(record.version, { html: res.status === 200 ? res.body : null, url });
+      pages.set(record.version, { html: res.status === 200 ? res.body : null, res });
     }
     return { kept, attestations, pages, versionsRes, gem, owners };
   }
@@ -191,30 +191,31 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
           isLatest,
           quarterAnchor,
           signals: [
-            identityFor(pusherOf(raw.pages.get(record.version)?.html ?? null), evidence),
+            identityFor(raw.pages.get(record.version)!, att.res, evidence),
             // Sigstore signatures are observable; legacy `gem cert` X.509 signatures are
             // not, so an empty attestation list does not prove the gem is unsigned.
-            impliedBy("artifact_signature", evidence, `${ATT_SRC} (Sigstore; gem cert signatures not exposed)`),
+            impliedBy("artifact_signature", evidence, `${ATT_SRC} (Sigstore; gem cert signatures not exposed)`, att.res),
             noMechanism("registry_integrity", "RubyGems.org serves sha256 checksums over TLS but signs nothing"),
             // Bundles are usually bare message signatures; only an in-toto statement with an
             // SLSA predicate is build provenance.
-            observed("build_provenance", slsa ? `${att.res.url} (${slsa})` : null, `${ATT_SRC} dsseEnvelope predicateType`),
+            observed("build_provenance", slsa ? `${att.res.url} (${slsa})` : null, `${ATT_SRC} dsseEnvelope predicateType`, att.res),
             // The Fulcio certificate binds source repository and commit — the facts
             // RubyGems.org renders as "Provenance" on the gem page.
             observed(
               "source_link",
               source ? `${source.repository ?? "unknown repository"}@${source.digest}` : null,
               `${ATT_SRC} Fulcio certificate source repository digest`,
+              att.res,
             ),
-            observed("transparency_log", evidence, `${ATT_SRC} verificationMaterial.tlogEntries (Rekor)`),
+            observed("transparency_log", evidence, `${ATT_SRC} verificationMaterial.tlogEntries (Rekor)`, att.res),
             // The gem opts its owners into mandatory MFA for push; absence means it did not.
             observed(
               "mfa_enforced",
               meta.rubygems_mfa_required === "true" ? "metadata.rubygems_mfa_required=true" : null,
               MFA_SRC,
+              raw.versionsRes,
             ),
           ],
-          raw: { path: att.res.entry.path, sha256: att.res.entry.sha256 },
         };
       }),
     };
@@ -226,11 +227,12 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
  * rubygems.org rejects one from any other push. A user push used that user's API key.
  * No pusher and no attestation: the version predates pusher tracking, so unknown.
  */
-function identityFor(pusher: Pusher | null, attestation: string | null): ExtractedSignal {
-  if (pusher?.kind === "trusted_publisher") return signal("identity_publish", "true", `trusted publisher: ${pusher.name}`, PUSHER_SRC);
-  if (attestation) return signal("identity_publish", "true", attestation, `${ATT_SRC} (accepted only from trusted-publishing pushes)`);
-  if (pusher?.kind === "user") return signal("identity_publish", "false", "pushed with a user API key", PUSHER_SRC);
-  return signal("identity_publish", "unknown", null, `${PUSHER_SRC} (absent: pushed before rubygems.org recorded pushers)`);
+function identityFor(page: { html: string | null; res: FetchResult }, att: FetchResult, attestation: string | null): ExtractedSignal {
+  const pusher = pusherOf(page.html);
+  if (pusher?.kind === "trusted_publisher") return signal("identity_publish", "true", `trusted publisher: ${pusher.name}`, PUSHER_SRC, page.res);
+  if (attestation) return signal("identity_publish", "true", attestation, `${ATT_SRC} (accepted only from trusted-publishing pushes)`, att);
+  if (pusher?.kind === "user") return signal("identity_publish", "false", "pushed with a user API key", PUSHER_SRC, page.res);
+  return signal("identity_publish", "unknown", null, `${PUSHER_SRC} (absent: pushed before rubygems.org recorded pushers)`, [page.res, att]);
 }
 
 function primaryBuild(r: GemRecord): GemVersion | undefined {

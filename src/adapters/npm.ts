@@ -91,7 +91,7 @@ interface Packument {
 
 interface NpmRecord extends VersionRecord {
   /** Downloads in the `highImpactWindow` week; null when npm has no count for it. */
-  weekly?: { downloads: number | null; window: string; url: string };
+  weekly?: { downloads: number | null; window: string; res: FetchResult };
 }
 
 interface Raw {
@@ -179,8 +179,8 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
       const window = highImpactWindow(record.publishedAt);
       if (!window) continue;
       const url = windowDownloadsUrl(candidate.name, window);
-      const { data: point } = await src.getJson<{ downloads?: number }>(url, { ecosystem: this.id, package: candidate.name });
-      record.weekly = { downloads: typeof point?.downloads === "number" ? point.downloads : null, window, url };
+      const { data: point, res } = await src.getJson<{ downloads?: number }>(url, { ecosystem: this.id, package: candidate.name });
+      record.weekly = { downloads: typeof point?.downloads === "number" ? point.downloads : null, window, res };
     }
     return { doc: data, res, kept };
   }
@@ -189,7 +189,6 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
     const { doc, kept } = raw;
     const versions = doc.versions ?? {};
     const latest = kept.find((k) => k.isLatest)?.record;
-    const rawRef = { path: raw.res.entry.path, sha256: raw.res.entry.sha256 };
 
     return {
       ecosystem: this.id,
@@ -205,15 +204,14 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
         publishedAt: record.publishedAt,
         isLatest,
         quarterAnchor,
-        signals: [...signalsFor(versions[record.version] ?? {}), mfaFor(record)],
-        raw: rawRef,
+        signals: [...signalsFor(versions[record.version] ?? {}, raw.res), mfaFor(record)],
       })),
       withdrawals: withdrawalsOf(doc, ctx.asOf),
     };
   }
 }
 
-function signalsFor(m: Manifest) {
+function signalsFor(m: Manifest, res: FetchResult) {
   const tp = m._npmUser?.trustedPublisher;
   const att = m.dist?.attestations;
   const predicate = att?.provenance?.predicateType;
@@ -225,23 +223,25 @@ function signalsFor(m: Manifest) {
       "identity_publish",
       tp ? `${tp.id ?? "unknown"} trusted publisher (${tp.oidcConfigId ?? "no config id"})` : null,
       `${SRC}._npmUser.trustedPublisher`,
+      res,
     ),
     // The provenance bundle is a Sigstore signature over the tarball digest, made by the
     // publisher's CI identity. `dist.signatures` does not count here: the registry applies
     // it to every tarball, so a hijacked account's upload is "signed" too.
-    observed("artifact_signature", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, publisher CI identity)`),
+    observed("artifact_signature", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, publisher CI identity)`, res),
     // Registry-applied on serve, including to 2016-era tarballs (docs/registries.md#npm).
     observed(
       "registry_integrity",
       sig ? `registry signature, keyid ${sig.keyid ?? "unknown"}` : null,
       `${SRC}.dist.signatures (registry-applied)`,
+      res,
     ),
-    observed("build_provenance", slsa, `${SRC}.dist.attestations.provenance.predicateType`),
+    observed("build_provenance", slsa, `${SRC}.dist.attestations.provenance.predicateType`, res),
     // SLSA provenance names the source repository and commit, signed by the builder.
-    observed("source_link", slsa, `${SRC}.dist.attestations (SLSA resolvedDependencies)`),
+    observed("source_link", slsa, `${SRC}.dist.attestations (SLSA resolvedDependencies)`, res),
     // npm provenance is only accepted from public repositories, and its statements are
     // logged in the public Rekor instance.
-    observed("transparency_log", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, Rekor-logged)`),
+    observed("transparency_log", att?.url ?? null, `${SRC}.dist.attestations (Sigstore, Rekor-logged)`, res),
   ];
 }
 
@@ -269,10 +269,10 @@ function withdrawalsOf(doc: Packument, asOf: Date) {
  */
 function mfaFor(r: NpmRecord): ExtractedSignal {
   const policy = "npm high-impact rule: 2FA required above 1M weekly downloads or 500 dependents";
-  const source = `policy: ${policy} (effective ${NPM_HIGH_IMPACT_2FA.slice(0, 10)}); weekly downloads ${NOTICE_DAYS} days before publish`;
-  if (!r.weekly) return signal("mfa_enforced", "unknown", null, source);
-  const { downloads, window, url } = r.weekly;
+  const source = `policy: ${policy} (effective ${NPM_HIGH_IMPACT_2FA.slice(0, 10)}); api.npmjs.org/downloads/point/{week ending ${NOTICE_DAYS} days before publish}/{p}`;
+  if (!r.weekly) return signal("mfa_enforced", "unknown", null, source, null);
+  const { downloads, window, res } = r.weekly;
   return downloads != null && downloads > HIGH_IMPACT_WEEKLY
-    ? signal("mfa_enforced", "true", `${downloads} downloads in ${window}`, `${source}: ${url}`)
-    : signal("mfa_enforced", "unknown", downloads != null ? `${downloads} downloads in ${window}` : null, `${source}: ${url}`);
+    ? signal("mfa_enforced", "true", `${downloads} downloads in ${window}`, source, res)
+    : signal("mfa_enforced", "unknown", downloads != null ? `${downloads} downloads in ${window}` : null, source, res);
 }

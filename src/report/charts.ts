@@ -12,8 +12,8 @@
 import * as Plot from "@observablehq/plot";
 import { parseHTML } from "linkedom";
 import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SignalId } from "../types.ts";
-import type { Aggregate, MatrixCell, SeriesPoint } from "../stages/aggregate.ts";
-import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, humanDate, humanMonth, pctSmall, pctText } from "./labels.ts";
+import { CATEGORIES, type Aggregate, type MatrixCell, type SeriesPoint } from "../stages/aggregate.ts";
+import { ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, humanDate, humanMonth, pctSmall, pctText, pointsText } from "./labels.ts";
 import { BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineProperty, type BaselineValue } from "../facts/baseline.ts";
 import { POLICIES_VERIFIED, POLICY_PROPERTIES, policyOf, type PolicyProperty } from "../facts/policies.ts";
 import { SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
@@ -708,11 +708,11 @@ export function adoptionSvg(agg: Aggregate, signal: SignalId): string {
 // Trust summary
 
 /**
- * Per-platform trust summary on one axis (share of the seven properties). The pale track
+ * Per-platform trust summary on one axis (share of the category points). The pale track
  * is capability — the most a package *could* have on that platform. Inside it, the dark
  * bar grows from 0 to the assurance packages are known to reach, and a mid-tone segment
- * continues to what unknowns could add. Both are shares of the same seven properties, so
- * one axis is honest.
+ * continues to what unknowns could add. All three are shares of the same points, so one
+ * axis is honest.
  */
 export function scoresSvg(agg: Aggregate): string {
   const rows = [...agg.scores]
@@ -722,7 +722,7 @@ export function scoresSvg(agg: Aggregate): string {
   const rowH = 40;
   const inset = (h: number) => (rowH - h) / 2;
   const hasRange = (r: Row) => r.hi - r.lo >= 0.01;
-  const tip = (r: Row) => `${r.name}: capability ${r.offered}/${r.total} offered (${r.auditable} auditable); assurance ${pctText(r.lo)}–${pctText(r.hi)} over ${r.n} packages`;
+  const tip = (r: Row) => `${r.name}: capability ${pointsText(r.capability)} offered (${pointsText(r.auditable)} auditable); assurance ${pctText(r.lo)}–${pctText(r.hi)} over ${r.n} packages`;
 
   const panel = plot({
     width: 120 + 400 + 210,
@@ -744,18 +744,21 @@ export function scoresSvg(agg: Aggregate): string {
       // What unknowns could add, after a 2px surface gap.
       Plot.barX(rows.filter(hasRange), { x1: "lo", x2: "hi", y: "name", fill: RAMP[5], rx2: 4, insetLeft: 2, insetTop: inset(BAR), insetBottom: inset(BAR), title: tip }),
       Plot.text(rows, { x: 1, y: "name", dx: 14, textAnchor: "start", fontSize: 11, text: (r: Row) => `${pctText(r.lo)}${r.hi - r.lo >= 0.005 ? `–${pctText(r.hi)}` : ""}` }),
-      Plot.text(rows, { x: 1, y: "name", dx: 84, textAnchor: "start", fontSize: 11, fill: INK_2, text: (r: Row) => `${r.offered}/${r.total} offered` }),
+      Plot.text(rows, { x: 1, y: "name", dx: 84, textAnchor: "start", fontSize: 11, fill: INK_2, text: (r: Row) => `${pointsText(r.capability)} offered` }),
     ],
   });
   return figure({
     title: "Trust summary per platform",
-    subtitle: `Share of the ${agg.scores[0]?.total ?? 7} trust properties · latest release of each sampled package · snapshot ${humanDate(agg.asOf)}`,
+    subtitle: `Share of the ${CATEGORIES.length} score categories · latest release of each sampled package · snapshot ${humanDate(agg.asOf)}`,
     legend: [
       { label: "capability (offered by the platform)", fill: RAMP[1]! },
       { label: "assurance (known)", fill: RAMP[9]! },
       { label: "possible if unknowns hold", fill: RAMP[5]! },
     ],
     panels: [panel],
-    notes: ["Equal weights. Not-exposed properties count as offered but unknown, so they widen the range rather than being guessed."],
+    notes: [
+      "Each category scores its strongest signal: 1 for the strong level, ½ for the weak one. Transparency log is not scored.",
+      "Not-exposed signals count as offered but unknown, so they widen the range rather than being guessed.",
+    ],
   });
 }

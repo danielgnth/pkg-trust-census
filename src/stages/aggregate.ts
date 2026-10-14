@@ -54,21 +54,29 @@ export interface Coverage {
 /**
  * Per-platform trust summary. Two numbers, never one, because "the platform offers it"
  * and "packages use it" are different findings — the same split the matrix makes per cell.
+ * Every number is a share of the score categories (`CATEGORIES`), each worth 0, ½ or 1.
  */
 export interface Score {
   ecosystem: EcosystemId;
-  /** Properties the platform offers at all (availability other than no_mechanism). */
-  offered: number;
-  /** Offered properties whose adoption the public API reveals (observable or inferred). */
-  auditable: number;
-  total: number;
-  /** offered / total, weighted. */
+  /** Mean over categories of the strongest level the platform offers at all (not no_mechanism). */
   capability: number;
-  /** Mean share of properties a package's release has, counting unknown as absent. */
+  /** The same, counting only levels whose adoption the public API reveals (observable or inferred). */
+  auditable: number;
+  /** Mean over packages of the share of category points their release has, counting unknown as absent. */
   assuranceLow: number | null;
   /** The same, counting unknown as present: the ceiling the data cannot rule out. */
   assuranceHigh: number | null;
   n: number;
+  categories: CategoryScore[];
+}
+
+/** One category of a platform's score, on the same 0–1 scale. */
+export interface CategoryScore {
+  category: CategoryId;
+  capability: number;
+  auditable: number;
+  assuranceLow: number | null;
+  assuranceHigh: number | null;
 }
 
 export interface ScorePoint {
@@ -87,7 +95,7 @@ export interface Aggregate {
   coverage: Coverage[];
   matrix: MatrixCell[];
   series: SeriesPoint[];
-  weights: Record<SignalId, number>;
+  categories: typeof CATEGORIES;
   scores: Score[];
   scoreSeries: ScorePoint[];
   /** Start of the window withdrawn versions are counted in (`withdrawalWindowStart`). */
@@ -111,20 +119,46 @@ export interface WithdrawalCell {
 }
 
 /**
- * Equal weights. Each signal is a distinct property a consumer could check; ranking them
- * against each other would need a threat model this study does not make. One mechanism
- * can earn several properties (a Sigstore attestation is a signature, a source link and a
- * log entry) — that is counted, because the consumer does get all three.
+ * The score's categories. Several signals are read from one mechanism (on npm and PyPI the
+ * publisher signature, transparency log and, on npm, SLSA provenance and source link all
+ * come from the same Sigstore bundle), so scoring every signal separately would count one
+ * fact several times. Each category instead asks one question, and a release scores the
+ * strongest signal it has for it: 1 for the strong level, ½ for the weak one. Transparency
+ * log is in no category: every Sigstore signature is logged, so it would count the
+ * signature twice. The matrix still reports it.
  */
-export const WEIGHTS: Record<SignalId, number> = {
-  identity_publish: 1,
-  artifact_signature: 1,
-  registry_integrity: 1,
-  build_provenance: 1,
-  source_link: 1,
-  transparency_log: 1,
-  mfa_enforced: 1,
-};
+export const CATEGORIES = [
+  {
+    id: "publisher_auth",
+    /** Was the upload authenticated by more than a stored secret? */
+    levels: [
+      { signal: "identity_publish", points: 1 },
+      { signal: "mfa_enforced", points: 0.5 },
+    ],
+  },
+  {
+    id: "artifact_authenticity",
+    /** Can a consumer check that the bytes are the publisher's? */
+    levels: [
+      { signal: "artifact_signature", points: 1 },
+      { signal: "registry_integrity", points: 0.5 },
+    ],
+  },
+  {
+    id: "source_provenance",
+    /** Can a consumer tie the artifact to its source? */
+    levels: [
+      { signal: "build_provenance", points: 1 },
+      { signal: "source_link", points: 0.5 },
+    ],
+  },
+] as const satisfies ReadonlyArray<{ id: string; levels: ReadonlyArray<{ signal: SignalId; points: number }> }>;
+export type CategoryId = (typeof CATEGORIES)[number]["id"];
+
+/** The strongest level among the signals that pass `holds`, or 0. */
+function best(category: (typeof CATEGORIES)[number], holds: (s: SignalId) => boolean): number {
+  return Math.max(0, ...category.levels.filter((l) => holds(l.signal)).map((l) => l.points));
+}
 
 export function outDir(snapshotId: string): string {
   return join(dataDir(), "out", snapshotId);
@@ -212,42 +246,42 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
     }
   }
 
-  const totalWeight = SIGNALS.reduce((a, s) => a + WEIGHTS[s], 0);
+  const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+  /** Per category, the mean over packages of the level known (low) and possible (high). */
   const assurance = (scope: string, ecosystem: EcosystemId) => {
     const prefix = `${scope}/${ecosystem}/`;
-    const lows: number[] = [];
-    const highs: number[] = [];
-    for (const [key, values] of perPackage) {
-      if (!key.startsWith(prefix)) continue;
-      let low = 0;
-      let high = 0;
-      for (const s of SIGNALS) {
-        const v = values.get(s);
-        if (v === "true") (low += WEIGHTS[s]), (high += WEIGHTS[s]);
-        else if (v === "unknown" || v === undefined) high += WEIGHTS[s];
-      }
-      lows.push(low / totalWeight);
-      highs.push(high / totalWeight);
-    }
-    const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
-    return { low: mean(lows), high: mean(highs), n: lows.length };
+    const releases = [...perPackage].filter(([key]) => key.startsWith(prefix)).map(([, values]) => values);
+    const categories = CATEGORIES.map((c) => ({
+      category: c.id,
+      low: mean(releases.map((v) => best(c, (s) => v.get(s) === "true"))),
+      high: mean(releases.map((v) => best(c, (s) => v.get(s) !== "false"))),
+    }));
+    return {
+      categories,
+      low: releases.length ? mean(categories.map((c) => c.low!)) : null,
+      high: releases.length ? mean(categories.map((c) => c.high!)) : null,
+      n: releases.length,
+    };
   };
 
   const scores: Score[] = present.map((ecosystem) => {
-    const cells = matrix.filter((c) => c.ecosystem === ecosystem);
-    const weightOf = (pred: (c: MatrixCell) => boolean) =>
-      cells.filter(pred).reduce((a, c) => a + WEIGHTS[c.signal], 0);
-    const offered = cells.filter((c) => c.availability !== "no_mechanism");
+    const av = (s: SignalId) => matrix.find((c) => c.ecosystem === ecosystem && c.signal === s)!.availability;
     const a = assurance("latest", ecosystem);
+    const categories: CategoryScore[] = CATEGORIES.map((c, i) => ({
+      category: c.id,
+      capability: best(c, (s) => av(s) !== "no_mechanism"),
+      auditable: best(c, (s) => av(s) === "observable" || av(s) === "inferred"),
+      assuranceLow: a.categories[i]!.low,
+      assuranceHigh: a.categories[i]!.high,
+    }));
     return {
       ecosystem,
-      offered: offered.length,
-      auditable: offered.filter((c) => c.availability !== "not_exposed").length,
-      total: SIGNALS.length,
-      capability: weightOf((c) => c.availability !== "no_mechanism") / totalWeight,
+      capability: mean(categories.map((c) => c.capability))!,
+      auditable: mean(categories.map((c) => c.auditable))!,
       assuranceLow: a.low,
       assuranceHigh: a.high,
       n: a.n,
+      categories,
     };
   });
 
@@ -267,7 +301,7 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
     coverage: coverage(db, snapshotId),
     matrix,
     series,
-    weights: WEIGHTS,
+    categories: CATEGORIES,
     scores,
     scoreSeries,
     withdrawalWindowStart: withdrawalWindowStart(asOf).toISOString(),

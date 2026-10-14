@@ -74,7 +74,7 @@ Results land in `data/out/<snapshot>/`:
 |---|---|
 | `summary.md` | Coverage, error rate, headline numbers |
 | `matrix.md` / `matrix.csv` | Ecosystem × signal adoption table (paste-ready) |
-| `scores.csv`, `score_series.csv` | Trust summary score per ecosystem, and over time |
+| `scores.csv`, `score_series.csv` | Trust summary score per ecosystem (overall and per category), and over time |
 | `timeseries.csv` | Signal adoption per quarter |
 | `baseline.md` / `baseline.csv` | Registry baseline (ecosystem-level properties) |
 | `sigstore.md` / `sigstore.csv` | Which registries accept Sigstore bundles, who verifies them, nearest equivalents |
@@ -82,7 +82,7 @@ Results land in `data/out/<snapshot>/`:
 | `policies.md` / `policies.csv` | Governance (namespaces, confusable names, upload scanning) and containment (yank, deletion, advisories) |
 | `withdrawals.csv` | Per package: versions yanked, unpublished, deprecated or retracted, with the version numbers |
 | `packages.csv` | The sampled packages |
-| `signals.csv` | Every signal with its evidence and source |
+| `signals.csv` | Every signal with its evidence, rule (`signal_source`) and the responses it was read from |
 | `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, governance and containment, withdrawals, Sigstore, post-quantum exposure, adoption per signal |
 
 ## Configuration

@@ -90,16 +90,6 @@ describe("packageVersionInsert", () => {
     expect(packageVersionInsert.safeParse({ ...base, quarterAnchor }).success).toBe(valid);
   });
 
-  test("rejects a malformed sha256", () => {
-    expect(packageVersionInsert.safeParse({ ...base, rawSha256: "deadbeef" }).success).toBe(false);
-  });
-
-  test("accepts a real sha256", () => {
-    expect(
-      packageVersionInsert.safeParse({ ...base, rawSha256: "a".repeat(64) }).success,
-    ).toBe(true);
-  });
-
   test("allows a null publish date, which several registries omit", () => {
     expect(packageVersionInsert.safeParse({ ...base, publishedAt: null }).success).toBe(true);
   });
@@ -115,6 +105,7 @@ describe("versionSignalInsert", () => {
     value: "true",
     evidence: "elastio/bon",
     signalSource: "GET /api/v1/crates/{c}/versions -> versions[].trustpub_data",
+    responses: [{ url: "https://crates.io/api/v1/crates/bon/versions?per_page=100&sort=date", sha256: "a".repeat(64) }],
   };
 
   test("accepts a well-formed signal", () => {
@@ -143,6 +134,23 @@ describe("versionSignalInsert", () => {
   test("allows unknown and false without evidence", () => {
     expect(versionSignalInsert.safeParse({ ...base, value: "unknown", evidence: null }).success).toBe(true);
     expect(versionSignalInsert.safeParse({ ...base, value: "false", evidence: null }).success).toBe(true);
+  });
+
+  /** A matrix cell must trace back to the bytes each of its rows was read from. */
+  test("requires the responses a registry-read value rests on", () => {
+    const r = versionSignalInsert.safeParse({ ...base, responses: [] });
+    expect(r.success).toBe(false);
+    expect(r.error?.issues[0]?.message).toContain("must name the response");
+  });
+
+  test("allows no response for policy and no-mechanism rows", () => {
+    for (const signalSource of ["policy: PyPI requires 2FA for all accounts (effective 2024-01-01)", "no_mechanism: none"]) {
+      expect(versionSignalInsert.safeParse({ ...base, value: "false", evidence: null, signalSource, responses: [] }).success).toBe(true);
+    }
+  });
+
+  test("rejects a malformed response sha256", () => {
+    expect(versionSignalInsert.safeParse({ ...base, responses: [{ url: base.responses[0]!.url, sha256: "deadbeef" }] }).success).toBe(false);
   });
 });
 

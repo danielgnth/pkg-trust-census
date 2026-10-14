@@ -100,8 +100,16 @@ export interface ExtractedSignal {
   value: SignalValue;
   /** The raw observed value, e.g. a provenance URL or a trustpub repository. */
   evidence: string | null;
-  /** Endpoint + JSON path the value came from. Required for reproducibility. */
+  /** The rule: endpoint + JSON path the value is read from, the same for every release. */
   signalSource: string;
+  /** The cached responses this release's value was read from; empty for policy and no-mechanism rows. */
+  responses: ResponseRef[];
+}
+
+/** A cached response: its URL, and the sha256 of its body as recorded in the cache manifest. */
+export interface ResponseRef {
+  url: string;
+  sha256: string;
 }
 
 export interface ExtractedVersion {
@@ -111,8 +119,6 @@ export interface ExtractedVersion {
   /** e.g. "2024Q1" when this version is the anchor for that quarter, else null. */
   quarterAnchor: string | null;
   signals: ExtractedSignal[];
-  /** The cached response the signals were primarily read from, for byte-exact tracing. */
-  raw: { path: string; sha256: string } | null;
 }
 
 /**

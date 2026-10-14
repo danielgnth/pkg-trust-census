@@ -6,7 +6,7 @@
  */
 
 import hostedGitInfo from "hosted-git-info";
-import type { ExtractedSignal, SignalId, SignalValue, Withdrawal, WithdrawalKind } from "../types.ts";
+import type { ExtractedSignal, FetchResult, ResponseRef, SignalId, SignalValue, Withdrawal, WithdrawalKind } from "../types.ts";
 import { anchorLabelsByVersion, selectQuarterAnchors } from "./quarters.ts";
 
 export interface VersionRecord {
@@ -65,26 +65,39 @@ function dateValue(iso: string | null): number {
   return Number.isFinite(t) ? t : Number.POSITIVE_INFINITY;
 }
 
+/** The cached responses a value was read from. A `false` can rest on several (all of them 404). */
+export type ReadFrom = FetchResult | null | undefined | ReadonlyArray<FetchResult | null | undefined>;
+
+function refs(from: ReadFrom): ResponseRef[] {
+  const list = Array.isArray(from) ? from : [from];
+  const out = new Map<string, ResponseRef>();
+  for (const r of list as Array<FetchResult | null | undefined>) {
+    if (r) out.set(r.url, { url: r.url, sha256: r.entry.sha256 });
+  }
+  return [...out.values()];
+}
+
 export function signal(
   id: SignalId,
   value: SignalValue,
   evidence: string | null,
   signalSource: string,
+  from: ReadFrom,
 ): ExtractedSignal {
-  return { signal: id, value, evidence, signalSource };
+  return { signal: id, value, evidence, signalSource, responses: refs(from) };
 }
 
 /** `true` when evidence was observed, otherwise `false`: for signals whose absence is a real negative. */
-export function observed(id: SignalId, evidence: string | null, signalSource: string): ExtractedSignal {
-  return signal(id, evidence != null ? "true" : "false", evidence, signalSource);
+export function observed(id: SignalId, evidence: string | null, signalSource: string, from: ReadFrom): ExtractedSignal {
+  return signal(id, evidence != null ? "true" : "false", evidence, signalSource, from);
 }
 
 /**
  * `true` when evidence was observed, otherwise `unknown`: for inferred signals, where the
  * evidence implies the signal but its absence does not imply the opposite.
  */
-export function impliedBy(id: SignalId, evidence: string | null, signalSource: string): ExtractedSignal {
-  return signal(id, evidence != null ? "true" : "unknown", evidence, signalSource);
+export function impliedBy(id: SignalId, evidence: string | null, signalSource: string, from: ReadFrom): ExtractedSignal {
+  return signal(id, evidence != null ? "true" : "unknown", evidence, signalSource, from);
 }
 
 /**
@@ -93,12 +106,12 @@ export function impliedBy(id: SignalId, evidence: string | null, signalSource: s
  * render the cell as "no mechanism" rather than as 0% adoption.
  */
 export function noMechanism(id: SignalId, why: string): ExtractedSignal {
-  return signal(id, "false", null, `no_mechanism: ${why}`);
+  return signal(id, "false", null, `no_mechanism: ${why}`, null);
 }
 
 /** The mechanism exists but the registry does not reveal who uses it. */
 export function notExposed(id: SignalId, why: string): ExtractedSignal {
-  return signal(id, "unknown", null, `not_exposed: ${why}`);
+  return signal(id, "unknown", null, `not_exposed: ${why}`, null);
 }
 
 /**
@@ -113,10 +126,10 @@ export function policySince(
   policy: string,
 ): ExtractedSignal {
   const source = `policy: ${policy} (effective ${effective.slice(0, 10)})`;
-  if (!publishedAt) return signal(id, "unknown", null, source);
+  if (!publishedAt) return signal(id, "unknown", null, source, null);
   return Date.parse(publishedAt) >= Date.parse(effective)
-    ? signal(id, "true", policy, source)
-    : signal(id, "unknown", null, source);
+    ? signal(id, "true", policy, source, null)
+    : signal(id, "unknown", null, source, null);
 }
 
 /**

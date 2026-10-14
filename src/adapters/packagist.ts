@@ -106,11 +106,11 @@ export class PackagistAdapter extends GatheringAdapter<Raw> {
               "source_link",
               src?.reference ? `${src.url ?? "vcs"}@${src.reference}` : null,
               "packagist.org /packages/{p}.json versions[v].source.reference",
+              raw.res,
             ),
             noMechanism("transparency_log", "Packagist publishes to no transparency log"),
             noMechanism("mfa_enforced", "Packagist MFA is optional and not enforced"),
           ],
-          raw: { path: raw.res.entry.path, sha256: raw.res.entry.sha256 },
         };
       }),
     };

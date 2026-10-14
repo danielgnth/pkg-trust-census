@@ -89,8 +89,6 @@ function persist(db: Db, snapshotId: string, pkg: ExtractedPackage): { versions:
       publishedAt: v.publishedAt,
       isLatest: v.isLatest,
       quarterAnchor: v.quarterAnchor,
-      rawResponsePath: v.raw?.path ?? null,
-      rawSha256: v.raw?.sha256 ?? null,
     })),
     "package_versions",
   );
@@ -104,6 +102,7 @@ function persist(db: Db, snapshotId: string, pkg: ExtractedPackage): { versions:
         value: s.value,
         evidence: s.evidence,
         signalSource: s.signalSource,
+        responses: s.responses,
       })),
     ),
     "version_signals",

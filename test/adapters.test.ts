@@ -77,6 +77,9 @@ function assertConsistentWithFacts(pkg: ExtractedPackage): void {
       if (fact.availability === "not_exposed") expect([where, s.value, s.signalSource.startsWith("not_exposed")]).toEqual([where, "unknown", true]);
       if (fact.availability === "observable") expect([where, s.value === "unknown"]).toEqual([where, false]);
       if (s.value === "true") expect([where, s.evidence != null]).toEqual([where, true]);
+      // Every value read from the registry names the cached responses it was read from.
+      if (!/^(policy|no_mechanism|not_exposed):/.test(s.signalSource)) expect([where, s.responses.length > 0]).toEqual([where, true]);
+      for (const r of s.responses) expect([where, r.sha256]).toEqual([where, expect.stringMatching(/^[0-9a-f]{64}$/)]);
     }
   }
 }
@@ -201,7 +204,8 @@ describe("PyPI extract", () => {
     expect(sig(pkg, "0.16.3", "build_provenance")!.value).toBe("false");
     expect(sig(pkg, "0.16.3", "identity_publish")!.value).toBe("unknown");
     expect(pkg.withdrawals).toEqual([{ kind: "yanked", versionsInWindow: expect.any(Number), withdrawn: expect.any(Array) }]);
-    expect(pkg.versions.find((v) => v.isLatest)?.raw?.sha256).toMatch(/^[0-9a-f]{64}$/);
+    // Without a provenance URL there is no provenance object, so the negative rests on the index.
+    expect(sig(pkg, "0.16.3", "build_provenance")!.responses.map((r) => r.url)).toEqual([simpleUrl("ruff")]);
     assertConsistentWithFacts(pkg);
   });
 
@@ -307,7 +311,9 @@ describe("npm extract", () => {
     const pkg = await new NpmAdapter().extract(candidate("npm", "sigstore"), src, CTX);
 
     expect(sig(pkg, "5.0.0", "mfa_enforced")).toMatchObject({ value: "true", evidence: "4200000 downloads in 2026-05-11:2026-05-17" });
-    expect(sig(pkg, "5.0.0", "mfa_enforced")!.signalSource).toContain("downloads/point/2026-05-11:2026-05-17/sigstore");
+    expect(sig(pkg, "5.0.0", "mfa_enforced")!.responses.map((r) => r.url)).toEqual([
+      "https://api.npmjs.org/downloads/point/2026-05-11:2026-05-17/sigstore",
+    ]);
     expect(sig(pkg, "4.0.0", "mfa_enforced")).toMatchObject({ value: "unknown", evidence: "1000000 downloads in 2025-07-08:2025-07-14" });
     expect(sig(pkg, "4.1.0", "mfa_enforced")).toMatchObject({ value: "unknown", evidence: null });
     assertConsistentWithFacts(pkg);

@@ -156,23 +156,25 @@ export class MavenAdapter extends GatheringAdapter<Raw> {
               "artifact_signature",
               asc ?? sigstore,
               "repo1.maven.org HEAD {artifact}-{v}.pom.asc / .pom.sigstore.json (HTTP 200 = present)",
+              [p.asc, p.sigstore],
             ),
             noMechanism("registry_integrity", "Central serves publisher-uploaded checksums and signs nothing itself"),
             // Not validated or indexed by Central; found by slsa-github-generator's file name.
-            observed("build_provenance", slsa, "repo1.maven.org HEAD {artifact}-{v}.jar.build.slsa (HTTP 200 = present)"),
+            observed("build_provenance", slsa, "repo1.maven.org HEAD {artifact}-{v}.jar.build.slsa (HTTP 200 = present)", p.slsa),
             observed(
               "source_link",
               cert ? `${cert.repository ?? "unknown repository"}@${cert.digest}` : slsa,
               "repo1.maven.org .pom.sigstore.json Fulcio certificate, or .jar.build.slsa",
+              [p.sigstore, p.slsa],
             ),
             observed(
               "transparency_log",
               sigstore,
               "repo1.maven.org HEAD {artifact}-{v}.pom.sigstore.json (Sigstore bundles are Rekor-logged)",
+              p.sigstore,
             ),
             noMechanism("mfa_enforced", "deployments authenticate with user tokens; account MFA is never required"),
           ],
-          raw: { path: p.asc.entry.path, sha256: p.asc.entry.sha256 },
         };
       }),
     };

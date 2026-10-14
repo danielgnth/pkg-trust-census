@@ -54,7 +54,7 @@ after a newer line (a `1.2.9` after `1.3.0`) can shift an anchor by one release.
 
 ## Signals
 
-Each stored version is scored on seven signals. Each signal takes one of three values: `true`, `false` or
+Each stored version is measured on seven signals. Each signal takes one of three values: `true`, `false` or
 `unknown`. `unknown` means the registry's data does not settle the question. It is never converted to
 `false`.
 
@@ -150,27 +150,64 @@ false)` is reported alongside it as `pct_known`. Inferred cells with unknowns ar
 
 ### Trust summary score
 
+The seven signals are not independent measurements. Several are read from one mechanism, so they move
+together:
+
+| Registry | Signals read from one mechanism | Mechanism |
+|---|---|---|
+| npm | publisher signature, SLSA provenance, source link, transparency log | `dist.attestations`, which npm accepts only with an SLSA predicate: the four columns are identical |
+| PyPI | identity-bound publish, publisher signature, transparency log | a PEP 740 attestation on any file of the release |
+| RubyGems | publisher signature, transparency log | a non-empty attestation list |
+| Go | registry integrity, transparency log | the sum.golang.org lookup |
+
+Averaging the seven signals would count one fact up to four times, and would favour registries whose one
+mechanism happens to answer several questions. The matrix still reports every signal on its own (with this
+table as a note). The score instead groups the signals into three categories, each asking one question:
+
+| Category | Question | Strong level (1) | Weak level (½) |
+|---|---|---|---|
+| Publisher authentication | Did the upload take more than a stored secret? | Identity-bound publish | MFA enforced |
+| Artifact authenticity | Can a consumer check that the bytes are the publisher's? | Publisher signature | Registry integrity |
+| Source provenance | Can a consumer tie the artifact to its source? | SLSA provenance | Source link |
+
+For each category, a release scores its strongest signal: 1 for the strong level, ½ if it has only the
+weak one, 0 if it has neither. Within a category, the order follows from what each signal can detect:
+
+- **Publisher signature over registry integrity**: only a publisher signature detects an upload made with
+  a stolen token, because the registry signs that upload too (see *Signals* above).
+- **SLSA provenance over source link**: SLSA provenance is the builder's signed statement about how the artifact was built. It names the
+  workflow and builder as well as the commit. A source link names only the commit.
+- **Identity-bound publish over enforced MFA**: identity-bound publishing leaves no publish secret to
+  steal and names the workflow that published. Enforced MFA makes the account harder to take over, but
+  does not bind the upload to a build.
+
+**The value ½ is a convention, not a measurement.** It says only that the weak level is worth something
+and less than the strong one. It is a constant (`CATEGORIES` in `src/stages/aggregate.ts`), so other values
+can be reported as a sensitivity check. On the pilot snapshot, with ¼ or ¾ instead of ½, PyPI stays first
+and crates.io and Packagist stay last, but npm, Maven Central, Go and RubyGems change places. Their order
+should not be read off the score. The three categories weigh equally, because ranking them against each other
+would need a threat model this study does not make.
+
+Transparency log is in no category. Every Sigstore signature is logged, so scoring the log separately would
+count the signature twice. Go's checksum database still counts, as registry integrity: both signals are read
+from the same lookup.
+
 Each platform gets two numbers, never one, because "the platform offers it" and "packages use it" are
 different findings:
 
-- **Capability**: how many of the seven properties the platform offers at all (any availability other than
-  *no mechanism*). **Auditable** is the subset whose adoption the public API reveals.
-- **Assurance**: for each sampled package, the share of the seven properties its release has. This is
-  averaged over packages and reported as a range. The low end counts `unknown` as absent; the high end
-  counts it as present. A *not exposed* property therefore widens the range instead of being guessed. The
-  same score is computed for every quarter anchor.
-
-All seven properties weigh equally. Each is a distinct thing a consumer could check, and ranking them
-against each other would need a threat model this study does not make. One mechanism can earn several
-properties: a Sigstore attestation is a publisher signature, a source link and a transparency-log entry.
-That is counted, because the consumer does get all three. Weights are a single constant (`WEIGHTS` in
-`src/stages/aggregate.ts`), so a threat-weighted variant can be reported as a sensitivity check.
+- **Capability**: per category, the strongest level the platform offers at all (any availability other
+  than *no mechanism*), summed over the three categories (reported as points out of 3). **Auditable** counts
+  only levels whose adoption the public API reveals.
+- **Assurance**: for each sampled package, the share of the three points its release has. This is averaged
+  over packages and reported as a range. The low end counts `unknown` as absent; the high end counts it as
+  present. A *not exposed* signal therefore widens the range instead of being guessed. The same score is
+  computed for every quarter anchor, and per category (`scores.csv`).
 
 ### Registry baseline
 
 The trust score measures whether an outsider can verify who published a release and from what source.
 It says nothing about the protections most ecosystems rely on day to day, and on those a low scorer can
-be strong: crates.io scores 6% but pins and checks hashes, never changes a published version, and
+be strong: crates.io scores near the bottom, but it pins and checks hashes, never changes a published version, and
 offers scoped, expiring tokens. A separate, curated table therefore records, per ecosystem, what the
 *default toolchain* does:
 
@@ -263,8 +300,11 @@ their access dates in [sources.md](sources.md).
 ## Reproducibility
 
 Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP status and fetch time are
-appended to the committed `data/cache/manifest.jsonl`. Every stored version references the sha256 of the
-response its signals were read from, and every signal row names its endpoint and field (`signal_source`).
+appended to the committed `data/cache/manifest.jsonl`. Every signal row names its rule, the endpoint and
+field it is read from (`signal_source`, the same for every release), and the URL and sha256 of each cached
+response this release's value was actually read from (`version_signals.responses`; `response_urls` and
+`response_sha256s` in `signals.csv`). A value can rest on several responses, for example Maven's `.asc` and
+`.sigstore.json`, and on none when it follows from a policy or from the absence of a mechanism.
 `extract` reads only from the cache and makes exactly the requests `fetch` made, so the dataset can be
 rebuilt offline from the cached payloads. The sources of the curated facts are archived and committed
 (see above).
@@ -296,6 +336,7 @@ rebuilt offline from the cached payloads. The sources of the curated facts are a
 8. **Mandates are not retroactive.** "Mandatory" describes current policy. Releases from before a mandate
    can lack the signal: in the pilot, `javax.servlet:servlet-api` 2.5 (2006) has no `.asc` on Maven Central,
    and Go modules last released before the proxy recorded `Origin` have an unknown source link.
-9. **Equal weights flatten different strengths.** Packagist's tag-derived source link and Maven's mandatory
-   GPG signature each earn one of seven points, so both platforms score 14%. The matrix, not the score,
-   shows which property each one has.
+9. **Levels are coarse.** A level says which kind of signal a release has, not how strong that instance is.
+   A Sigstore signature from CI and a GPG signature made on a developer's machine both score 1 for artifact
+   authenticity. Go's logged checksum database and npm's registry signature both score ½. The ½ itself is a
+   convention (see *Trust summary score*). The matrix, not the score, shows which signal each platform has.
