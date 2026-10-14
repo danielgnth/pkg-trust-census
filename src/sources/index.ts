@@ -5,7 +5,7 @@
  * still being online.
  */
 
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import manifestJson from "../../sources/manifest.json" with { type: "json" };
 import { SOURCES, type SourceId } from "./registry.ts";
 
@@ -82,12 +82,16 @@ function bySource(cites: Cite[]): Array<{ id: SourceId; quotes: string[] }> {
   return [...out].map(([id, quotes]) => ({ id, quotes }));
 }
 
-/** Numbered Markdown links; hovering one shows the quoted passages and the access date. */
-export function citeLinks(cites: Cite[]): string {
+/**
+ * Numbered Markdown links; hovering one shows the quoted passages and the access date. `from` is
+ * the directory the Markdown is written to, so a source in this repository links relatively.
+ */
+export function citeLinks(cites: Cite[], from: string): string {
   return bySource(cites)
     .map(({ id, quotes }, i) => {
       const title = `${quotes.map((q) => `“${q}”`).join(" … ")} (${accessedLabel(id)})`.replace(/"/g, "'");
-      return `[${i + 1}](${sourceUrl(id)} "${title}")`;
+      const url = sourceUrl(id);
+      return `[${i + 1}](${/^https?:/.test(url) ? url : relative(from, url)} "${title}")`;
     })
     .join(" ");
 }

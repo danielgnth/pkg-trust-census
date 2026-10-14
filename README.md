@@ -9,6 +9,8 @@ quarterly to 2024.
 Built for the seminar *Software Supply Chain Security* (WiSe 26/27): *"How can I trust my software
 package managers?"*
 
+**Latest results: <https://danielgnth.github.io/pkg-trust-census/>**
+
 > [!NOTE]
 > This project was developed with AI assistance (Claude Code) under the author's direction. Every
 > detection rule is documented in the [methodology](docs/methodology.md) and traceable to the registry
@@ -39,7 +41,7 @@ bun test                  # unit tests, no network
 bun run cli run --n 50    # all seven ecosystems, end to end
 ```
 
-Results land in `data/out/<snapshot>/`. Start with `summary.md`. Runs are rate-limited and take a while.
+Results land in `data/out/<snapshot>/`. Start with its `README.md`. Runs are rate-limited and take a while.
 If a run is interrupted, re-running it continues from the cache.
 
 See [docs/development.md](docs/development.md) for running stage by stage, the output files and the

@@ -1,8 +1,9 @@
 /**
  * Report stage: renders `aggregate.json` plus the raw tables into the files a reader uses —
- * a paste-ready Markdown matrix, an at-a-glance run summary, CSVs, and SVG charts.
+ * a landing page with every chart, a paste-ready Markdown matrix, an at-a-glance run summary,
+ * CSVs, and SVG charts.
  *
- * Output goes to data/out/{snapshot}/ and is fully regenerable, so it is git-ignored.
+ * Output goes to data/out/{snapshot}/ and is committed: the results site is built from it.
  */
 
 import { citeLinks, citeUrls } from "../sources/index.ts";
@@ -35,6 +36,7 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
   const dir = outDir(snapshotId);
   await mkdir(join(dir, "charts"), { recursive: true });
   const files: Array<[string, string]> = [
+    ["README.md", readmeMarkdown(agg)],
     ["matrix.md", matrixMarkdown(agg)],
     ["summary.md", summaryMarkdown(agg)],
     ["matrix.csv", matrixCsv(agg)],
@@ -65,6 +67,73 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
 
   for (const [name, body] of files) await Bun.write(join(dir, name), body);
   return { dir, files: files.map(([name]) => name) };
+}
+
+/**
+ * The snapshot's landing page: every chart in reading order, linking to the detailed tables.
+ * Named README.md so GitHub renders it below the folder listing; the results site serves it as
+ * its home page, with the charts inlined.
+ */
+export function readmeMarkdown(agg: Aggregate): string {
+  const chart = (name: string, alt: string) => [`![${alt}](charts/${name}.svg)`, ""];
+  return [
+    `# Results — snapshot ${agg.snapshotId}`,
+    "",
+    `As of ${agg.asOf}. Coverage, error rate and headline numbers are in the [run summary](summary.md).`,
+    "",
+    "## Trust summary",
+    "",
+    ...chart("scores", "Trust summary per platform"),
+    "## Signal adoption",
+    "",
+    ...chart("matrix", "Trust-signal adoption matrix"),
+    "The [adoption matrix](matrix.md) as a table, with what each inferred cell is inferred from.",
+    "",
+    "## How releases were published",
+    "",
+    ...chart("publish-auth", "Publish authentication"),
+    "## Adoption over time",
+    "",
+    ...SIGNALS.flatMap((s) => chart(`adoption-${s}`, `${SIGNAL_LABEL[s]} adoption per quarter`)),
+    "## Registry baseline",
+    "",
+    ...chart("baseline", "Registry baseline"),
+    "Notes and sources for every cell: [registry baseline](baseline.md).",
+    "",
+    "## Governance and containment",
+    "",
+    ...chart("policies", "Governance and containment"),
+    "Notes and sources for every cell: [governance and containment](policies.md).",
+    "",
+    "## Withdrawals",
+    "",
+    ...chart("withdrawals", "Withdrawn versions"),
+    "Per package, with the version numbers: [withdrawals.csv](withdrawals.csv).",
+    "",
+    "## Sigstore",
+    "",
+    ...chart("sigstore", "Sigstore support"),
+    "Notes and sources for every cell: [Sigstore](sigstore.md).",
+    "",
+    "## Post-quantum exposure",
+    "",
+    ...chart("pqc", "Post-quantum exposure"),
+    "Notes and sources for every cell: [post-quantum exposure](pqc.md).",
+    "",
+    "## Data",
+    "",
+    "| File | Contents |",
+    "|---|---|",
+    "| [packages.csv](packages.csv) | The sampled packages |",
+    "| [signals.csv](signals.csv) | Every signal with its evidence, rule and the responses it was read from |",
+    "| [matrix.csv](matrix.csv) | Ecosystem × signal adoption |",
+    "| [timeseries.csv](timeseries.csv) | Signal adoption per quarter |",
+    "| [scores.csv](scores.csv), [score_series.csv](score_series.csv) | Trust summary per ecosystem, overall and per quarter |",
+    "| [baseline.csv](baseline.csv), [policies.csv](policies.csv), [sigstore.csv](sigstore.csv), [pqc.csv](pqc.csv) | The curated tables, with their sources |",
+    "| [withdrawals.csv](withdrawals.csv) | Versions yanked, unpublished, deprecated or retracted, per package |",
+    "| [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |",
+    "",
+  ].join("\n");
 }
 
 export function matrixMarkdown(agg: Aggregate): string {
@@ -258,7 +327,7 @@ export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = baselineOf(e, p.id);
-      const links = citeLinks(b.sources);
+      const links = citeLinks(b.sources, outDir(agg.snapshotId));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}. ${b.note} ${links}`);
     }
     lines.push("");
@@ -301,13 +370,13 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
   lines.push("#### What is signed, and sources", "");
   for (const e of ecosystems) {
     const f = sigstoreOf(e);
-    const links = citeLinks(f.sources);
+    const links = citeLinks(f.sources, outDir(agg.snapshotId));
     lines.push(`- **${ECOSYSTEM_LABEL[e]}**: ${f.signs} ${links}`);
   }
   lines.push("", "#### Install clients", "", "| Ecosystem | Client | Checks bundles | Note |", "|---|---|---|---|");
   for (const e of ecosystems) {
     for (const c of sigstoreOf(e).clients) {
-      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} ${citeLinks(c.sources)} |`);
+      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} ${citeLinks(c.sources, outDir(agg.snapshotId))} |`);
     }
   }
   lines.push("");
@@ -348,7 +417,7 @@ export function pqcMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${l.label}**: ${l.question}`, "");
     for (const e of ecosystems) {
       const p = pqcOf(e, l.id);
-      const links = citeLinks(p.sources);
+      const links = citeLinks(p.sources, outDir(agg.snapshotId));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${p.primitive} (${p.status}). ${p.note} ${links}`);
     }
     lines.push("");
@@ -400,7 +469,7 @@ export function policiesMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = policyOf(e, p.id);
-      const links = citeLinks(b.sources);
+      const links = citeLinks(b.sources, outDir(agg.snapshotId));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}${b.since ? ` (since ${b.since})` : ""}. ${b.note} ${links}`);
     }
     lines.push("");

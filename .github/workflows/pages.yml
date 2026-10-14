@@ -1,0 +1,109 @@
+# Publishes the newest committed snapshot in data/out/ and the docs to GitHub Pages. Nothing here
+# fetches from a registry: results are produced locally and committed (see docs/development.md).
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["data/out/**", "docs/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - run: pip install mkdocs-material==9.7.7
+
+      # Flattens the newest snapshot and docs/*.md into one folder, pastes each chart's SVG in place
+      # of its image link (so the marks keep their hover titles), and points links that leave the
+      # site (../src/..., ../sources/archive/...) at the files on GitHub for this commit.
+      - name: Stage pages
+        shell: python
+        run: |
+          import os, re, shutil
+          from pathlib import Path
+
+          snapshot = max(p for p in Path("data/out").iterdir() if p.is_dir())
+          site = Path("_pages")
+          shutil.copytree(snapshot, site)
+          (site / "README.md").rename(site / "index.md")
+          for doc in Path("docs").glob("*.md"):
+              shutil.copy(doc, site / doc.name)
+
+          blob = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_SHA']}/"
+
+          def inline(m):
+              svg = (site / m[2]).read_text().replace("<svg ", f'<svg role="img" aria-label="{m[1]}" ', 1)
+              return f'<div class="chart">{svg}</div>'
+
+          for page in site.glob("*.md"):
+              text = re.sub(r"^!\[([^\]]*)\]\((charts/[^)]+\.svg)\)$", inline, page.read_text(), flags=re.M)
+              text = re.sub(r"\]\((?:\.\./)+([^)\s]+)", lambda m: f"]({blob}{m[1]}", text)
+              page.write_text(text)
+
+          (site / "site.css").write_text(
+              ".md-grid { max-width: 90rem; }\n"
+              ".chart svg { max-width: 100%; height: auto; }\n"
+          )
+          Path("mkdocs.yml").write_text(f"""
+          site_name: pkg-trust-census
+          site_description: Trust-signal adoption across seven package registries
+          site_url: https://{os.environ['GITHUB_REPOSITORY_OWNER']}.github.io/{os.environ['GITHUB_REPOSITORY'].split('/')[1]}/
+          repo_url: {os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}
+          docs_dir: _pages
+          site_dir: _site
+          theme:
+            name: material
+            features: [navigation.sections, navigation.top, toc.follow]
+            palette:
+              - media: "(prefers-color-scheme: light)"
+                scheme: default
+                toggle: {{ icon: material/brightness-4, name: Dark mode }}
+              - media: "(prefers-color-scheme: dark)"
+                scheme: slate
+                toggle: {{ icon: material/brightness-7, name: Light mode }}
+          extra_css: [site.css]
+          markdown_extensions: [tables, attr_list, toc: {{ permalink: true }}]
+          nav:
+            - Results ({snapshot.name}):
+                - Overview: index.md
+                - Run summary: summary.md
+                - Adoption matrix: matrix.md
+                - Registry baseline: baseline.md
+                - Governance and containment: policies.md
+                - Sigstore: sigstore.md
+                - Post-quantum exposure: pqc.md
+            - Documentation:
+                - Methodology: methodology.md
+                - Registry reference: registries.md
+                - Sources: sources.md
+                - Development: development.md
+          """)
+
+      - run: mkdocs build
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

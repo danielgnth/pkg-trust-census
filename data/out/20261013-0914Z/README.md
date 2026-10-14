@@ -1,0 +1,76 @@
+# Results — snapshot 20261013-0914Z
+
+As of 2026-10-13T09:14:26.098Z. Coverage, error rate and headline numbers are in the [run summary](summary.md).
+
+## Trust summary
+
+![Trust summary per platform](charts/scores.svg)
+
+## Signal adoption
+
+![Trust-signal adoption matrix](charts/matrix.svg)
+
+The [adoption matrix](matrix.md) as a table, with what each inferred cell is inferred from.
+
+## How releases were published
+
+![Publish authentication](charts/publish-auth.svg)
+
+## Adoption over time
+
+![Identity-bound publish adoption per quarter](charts/adoption-identity_publish.svg)
+
+![Publisher signature adoption per quarter](charts/adoption-artifact_signature.svg)
+
+![Registry integrity adoption per quarter](charts/adoption-registry_integrity.svg)
+
+![SLSA provenance adoption per quarter](charts/adoption-build_provenance.svg)
+
+![Source link adoption per quarter](charts/adoption-source_link.svg)
+
+![Transparency log adoption per quarter](charts/adoption-transparency_log.svg)
+
+![MFA enforced adoption per quarter](charts/adoption-mfa_enforced.svg)
+
+## Registry baseline
+
+![Registry baseline](charts/baseline.svg)
+
+Notes and sources for every cell: [registry baseline](baseline.md).
+
+## Governance and containment
+
+![Governance and containment](charts/policies.svg)
+
+Notes and sources for every cell: [governance and containment](policies.md).
+
+## Withdrawals
+
+![Withdrawn versions](charts/withdrawals.svg)
+
+Per package, with the version numbers: [withdrawals.csv](withdrawals.csv).
+
+## Sigstore
+
+![Sigstore support](charts/sigstore.svg)
+
+Notes and sources for every cell: [Sigstore](sigstore.md).
+
+## Post-quantum exposure
+
+![Post-quantum exposure](charts/pqc.svg)
+
+Notes and sources for every cell: [post-quantum exposure](pqc.md).
+
+## Data
+
+| File | Contents |
+|---|---|
+| [packages.csv](packages.csv) | The sampled packages |
+| [signals.csv](signals.csv) | Every signal with its evidence, rule and the responses it was read from |
+| [matrix.csv](matrix.csv) | Ecosystem × signal adoption |
+| [timeseries.csv](timeseries.csv) | Signal adoption per quarter |
+| [scores.csv](scores.csv), [score_series.csv](score_series.csv) | Trust summary per ecosystem, overall and per quarter |
+| [baseline.csv](baseline.csv), [policies.csv](policies.csv), [sigstore.csv](sigstore.csv), [pqc.csv](pqc.csv) | The curated tables, with their sources |
+| [withdrawals.csv](withdrawals.csv) | Versions yanked, unpublished, deprecated or retracted, per package |
+| [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |

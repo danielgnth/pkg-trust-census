@@ -6,5 +6,4 @@ data/trust.sqlite-shm
 .DS_Store
 data/trust.sqlite
 data/rankings/
-data/out/
 .env

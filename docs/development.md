@@ -29,6 +29,8 @@ bun run cli --help
 | `src/report/` | labels and the SVG charts (Observable Plot, rendered headlessly through linkedom) |
 | `src/db/` | Drizzle schema, migrations runner, zod validation |
 | `sources/` | archived sources and their manifest (committed) |
+| `data/out/` | report output per snapshot (committed; the results site is built from it) |
+| `.github/workflows/pages.yml` | builds and deploys the results site |
 | `docs/` | methodology, registry reference, this file, and the generated source list |
 
 ## Running the pipeline
@@ -72,6 +74,7 @@ Results land in `data/out/<snapshot>/`:
 
 | File | Contents |
 |---|---|
+| `README.md` | Landing page: every chart in reading order, linking to the tables and CSVs |
 | `summary.md` | Coverage, error rate, headline numbers |
 | `matrix.md` / `matrix.csv` | Ecosystem × signal adoption table (paste-ready) |
 | `scores.csv`, `score_series.csv` | Trust summary score per ecosystem (overall and per category), and over time |
@@ -84,6 +87,26 @@ Results land in `data/out/<snapshot>/`:
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence, rule (`signal_source`) and the responses it was read from |
 | `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, governance and containment, withdrawals, Sigstore, post-quantum exposure, adoption per signal |
+
+## Results site
+
+The newest snapshot is published to GitHub Pages at <https://danielgnth.github.io/pkg-trust-census/>,
+together with the docs. Registries would rate-limit or block a CI runner, so the pipeline runs locally and
+its output is committed; CI only renders it. To publish a run:
+
+```sh
+bun run cli run --n 50
+git add data/out/<snapshot> && git commit
+```
+
+Keep only the latest snapshot in `data/out/`; git history has the older ones. On every push that touches
+`data/out/` or `docs/`, [`pages.yml`](../.github/workflows/pages.yml) copies the snapshot with the
+highest id and `docs/*.md` into one folder and builds it with Material for MkDocs. The site's config and
+styles are written by the workflow, so the repository holds no site files. While staging, it pastes each
+chart's SVG in place of its `![](charts/….svg)` link, so the marks keep their hover titles. Links out of
+the site, such as `../src/…` or the source archives, point at the files on GitHub for that commit.
+
+In the repository settings, Pages must be set to deploy from GitHub Actions.
 
 ## Configuration
 
@@ -159,7 +182,7 @@ its exact numbers.
 
 ## Cache
 
-Raw responses are gzipped under `data/cache/` and git-ignored, because npm packuments alone run to
+Raw responses are gzipped under `data/cache/` and git-ignored (as is `data/trust.sqlite`), because npm packuments alone run to
 hundreds of megabytes per snapshot. `data/cache/manifest.jsonl` *is* committed. It records the URL,
 sha256, byte size, HTTP status and fetch time of every response, so integrity can be verified without
 the payloads.

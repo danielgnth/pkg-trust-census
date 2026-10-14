@@ -1,0 +1,8 @@
+ecosystem,capability,auditable,assurance_low,assurance_high,n,publisher_auth_low,publisher_auth_high,artifact_authenticity_low,artifact_authenticity_high,source_provenance_low,source_provenance_high
+pypi,1,1,0.5933,0.6533,50,0.8200,1,0.6400,0.6400,0.3200,0.3200
+npm,1,1,0.4433,0.4667,50,0.5300,0.6000,0.6000,0.6000,0.2000,0.2000
+crates,0.5000,0.5000,0.1100,0.1100,50,0.2200,0.2200,0,0,0.1100,0.1100
+rubygems,1,1,0.2800,0.5267,50,0.4500,0.4500,0.2600,1,0.1300,0.1300
+go,0.3333,0.3333,0.2933,0.3333,50,0,0,0.5000,0.5000,0.3800,0.5000
+maven,0.6667,0.6667,0.3267,0.3267,50,0,0,0.9800,0.9800,0,0
+packagist,0.1667,0.1667,0.1667,0.1667,50,0,0,0,0,0.5000,0.5000
