@@ -2,6 +2,11 @@
 
 As of 2026-10-13T09:14:26.098Z. Coverage, error rate and headline numbers are in the [run summary](summary.md).
 
+> **Note:** This project was developed with AI assistance (Claude Code) under the author's direction.
+> Every detection rule is documented in the methodology and traceable to the registry response it was
+> read from, and every curated claim quotes an archived source, so results can be checked independently.
+> Please verify findings before relying on them.
+
 ## Trust summary
 
 ![Trust summary per platform](charts/scores.svg)

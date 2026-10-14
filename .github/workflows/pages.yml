@@ -63,6 +63,7 @@ jobs:
           site_description: Trust-signal adoption across seven package registries
           site_url: https://{os.environ['GITHUB_REPOSITORY_OWNER']}.github.io/{os.environ['GITHUB_REPOSITORY'].split('/')[1]}/
           repo_url: {os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}
+          copyright: Developed with AI assistance (Claude Code) under the author's direction. Please verify findings before relying on them.
           docs_dir: _pages
           site_dir: _site
           theme:
