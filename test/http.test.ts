@@ -8,8 +8,7 @@ const TMP = mkdtempSync(join(tmpdir(), "pkg-trust-test-"));
 process.env.PKG_TRUST_DATA_DIR = TMP;
 
 const { ResponseCache, slug, sha256 } = await import("../src/http/cache.ts");
-const { HttpClient, backoffMs } = await import("../src/http/client.ts");
-const { RateLimiter } = await import("../src/http/ratelimit.ts");
+const { HttpClient } = await import("../src/http/client.ts");
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
 
@@ -309,49 +308,39 @@ describe("HttpClient", () => {
   });
 });
 
-describe("RateLimiter", () => {
+describe("per-host pacing", () => {
   test("spaces requests to the configured rate", async () => {
-    const rl = new RateLimiter({ "slow.test": { rps: 10, concurrency: 4 } });
-    const t0 = Date.now();
-    for (let i = 0; i < 5; i++) (await rl.acquire("slow.test"))();
-    // 5 slots at 100ms spacing: the first is immediate, so >= 400ms.
-    expect(Date.now() - t0).toBeGreaterThanOrEqual(380);
+    const srv = serve(() => Response.json({}));
+    try {
+      const http = new HttpClient({ policies: { [`localhost:${srv.port}`]: { rps: 10, concurrency: 4 } } });
+      const t0 = Date.now();
+      await Promise.all(
+        Array.from({ length: 5 }, (_, i) => http.get(`http://localhost:${srv.port}/s/${i}`, { ecosystem: "pypi", package: "p" })),
+      );
+      // 5 starts at 100ms spacing: the first is immediate, so >= 400ms.
+      expect(Date.now() - t0).toBeGreaterThanOrEqual(380);
+    } finally {
+      srv.stop(true);
+    }
   });
 
   test("caps concurrency", async () => {
-    const rl = new RateLimiter({ "c.test": { rps: 1000, concurrency: 2 } });
     let active = 0;
     let peak = 0;
-    await Promise.all(
-      Array.from({ length: 8 }, async () => {
-        const release = await rl.acquire("c.test");
-        peak = Math.max(peak, ++active);
-        await Bun.sleep(15);
-        active--;
-        release();
-      }),
-    );
-    expect(peak).toBeLessThanOrEqual(2);
-  });
-
-  test("release is idempotent", async () => {
-    const rl = new RateLimiter({ "i.test": { rps: 1000, concurrency: 1 } });
-    const release = await rl.acquire("i.test");
-    release();
-    release();
-    // A double release must not free a slot that was never taken, which would let the
-    // next acquire exceed the concurrency cap.
-    const t0 = Date.now();
-    (await rl.acquire("i.test"))();
-    expect(Date.now() - t0).toBeLessThan(1000);
-  });
-});
-
-describe("backoffMs", () => {
-  test("grows exponentially and stays capped", () => {
-    expect(backoffMs(0)).toBeGreaterThanOrEqual(1000);
-    expect(backoffMs(0)).toBeLessThan(1300);
-    expect(backoffMs(3)).toBeGreaterThanOrEqual(8000);
-    expect(backoffMs(20)).toBeLessThanOrEqual(30_300);
+    const srv = serve(async () => {
+      peak = Math.max(peak, ++active);
+      await Bun.sleep(15);
+      active--;
+      return Response.json({});
+    });
+    try {
+      const http = new HttpClient({ policies: { [`localhost:${srv.port}`]: { rps: 1000, concurrency: 2 } } });
+      await Promise.all(
+        Array.from({ length: 8 }, (_, i) => http.get(`http://localhost:${srv.port}/c/${i}`, { ecosystem: "pypi", package: "p" })),
+      );
+      expect(peak).toBeLessThanOrEqual(2);
+    } finally {
+      srv.stop(true);
+    }
   });
 });

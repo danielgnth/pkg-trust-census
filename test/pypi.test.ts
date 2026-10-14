@@ -16,7 +16,7 @@ const { packages } = await import("../src/db/schema.ts");
 const { runRank, loadCandidates } = await import("../src/stages/rank.ts");
 const { runFetch } = await import("../src/stages/fetch.ts");
 import { eq, isNotNull } from "drizzle-orm";
-import type { Transport, TransportRequest, TransportResponse } from "../src/http/transport.ts";
+import type { Transport } from "../src/http/transport.ts";
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
 
@@ -25,14 +25,13 @@ const CTX = { asOf: new Date("2026-10-01T00:00:00Z") };
 /** Records every request so tests can assert on exact URLs and headers. */
 class MockTransport implements Transport {
   readonly name = "mock";
-  calls: Array<{ url: string; req: TransportRequest }> = [];
+  calls: Array<{ url: string; req: Request }> = [];
   constructor(private routes: Record<string, string>) {}
 
-  async request(url: string, req: TransportRequest): Promise<TransportResponse> {
-    this.calls.push({ url, req });
-    const body = this.routes[url];
-    if (body === undefined) return { status: 404, body: "", headers: new Map() };
-    return { status: 200, body, headers: new Map() };
+  async fetch(req: Request): Promise<Response> {
+    this.calls.push({ url: req.url, req });
+    const body = this.routes[req.url];
+    return body === undefined ? new Response(null, { status: 404 }) : new Response(body);
   }
 }
 
@@ -127,8 +126,8 @@ describe("PypiAdapter.fetch", () => {
     );
     const simple = transport.calls.find((c) => c.url === simpleUrl("requests"))!;
     // Without this header PyPI serves HTML and `provenance` is unavailable entirely.
-    expect(simple.req.headers.Accept).toBe(SIMPLE_ACCEPT);
-    expect(simple.req.headers["User-Agent"]).toContain("pkg-trust-census");
+    expect(simple.req.headers.get("accept")).toBe(SIMPLE_ACCEPT);
+    expect(simple.req.headers.get("user-agent")).toContain("pkg-trust-census");
   });
 
   test("re-fetching a cached package makes no further requests", async () => {
@@ -210,9 +209,9 @@ describe("rank + fetch stages", () => {
     // treat repeated failure as an error rather than a cacheable 404.
     const transport: Transport = {
       name: "flaky",
-      async request(url) {
-        if (url.includes("/requests/")) throw new Error("connection reset");
-        return { status: 200, body: "{}", headers: new Map() };
+      async fetch(req) {
+        if (req.url.includes("/requests/")) throw new Error("connection reset");
+        return new Response("{}");
       },
     };
     const http = new HttpClient({

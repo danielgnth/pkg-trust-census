@@ -1,6 +1,6 @@
 /**
- * The shared fetch path for every adapter: identifies the project, paces itself per host,
- * retries transient failures, and writes every response through the cache.
+ * The shared fetch path for every adapter: identifies the project, paces itself per host
+ * (p-queue), retries transient failures (ky), and writes every response through the cache.
  *
  * Two behaviours matter for data integrity:
  *  - A 404 is a *fact* (the package or file does not exist) and is cached and returned.
@@ -9,9 +9,10 @@
  *  - Resumability comes from the cache, not from bookkeeping: a warm URL is never re-fetched.
  */
 
+import ky, { HTTPError } from "ky";
+import PQueue from "p-queue";
 import type { EcosystemId, FetchResult } from "../types.ts";
 import { ResponseCache } from "./cache.ts";
-import { RateLimiter } from "./ratelimit.ts";
 import { defaultTransport, type Transport } from "./transport.ts";
 
 export const TOOL_VERSION = "0.1.0";
@@ -29,7 +30,39 @@ export const USER_AGENT =
     ")";
 
 /** Retried: transient by nature. Anything else is returned to the caller as-is. */
-const RETRYABLE = new Set([408, 425, 429, 500, 502, 503, 504]);
+const RETRYABLE = [408, 425, 429, 500, 502, 503, 504];
+
+export interface HostPolicy {
+  /** Requests per second. */
+  rps: number;
+  /** Max in-flight requests to this host. */
+  concurrency: number;
+}
+
+export const DEFAULT_POLICY: HostPolicy = { rps: 4, concurrency: 4 };
+
+/**
+ * Per-host pacing. crates.io publishes a crawler policy asking for a descriptive
+ * User-Agent with contact info and roughly one request per second; the others are
+ * CDN-backed but still get throttled deliberately.
+ */
+export const HOST_POLICIES: Record<string, HostPolicy> = {
+  // Explicit crawler policy: identify yourself, ~1 req/s.
+  "crates.io": { rps: 1, concurrency: 1 },
+  "rubygems.org": { rps: 2, concurrency: 2 },
+  // Community aggregator, not a first-party registry — be gentle.
+  "packages.ecosyste.ms": { rps: 2, concurrency: 2 },
+  "packagist.org": { rps: 2, concurrency: 2 },
+  "search.maven.org": { rps: 2, concurrency: 2 },
+  "repo1.maven.org": { rps: 4, concurrency: 4 },
+  "sum.golang.org": { rps: 4, concurrency: 4 },
+  "proxy.golang.org": { rps: 4, concurrency: 4 },
+  "pypi.org": { rps: 5, concurrency: 5 },
+  "registry.npmjs.org": { rps: 5, concurrency: 5 },
+  // The downloads API answered 5 req/s with HTTP 429 on two thirds of requests (2026-10-13).
+  "api.npmjs.org": { rps: 1, concurrency: 1 },
+  "raw.githubusercontent.com": { rps: 4, concurrency: 4 },
+};
 
 export interface RequestOptions {
   ecosystem: EcosystemId;
@@ -46,23 +79,65 @@ export interface RequestOptions {
 export class HttpClient {
   readonly cache: ResponseCache;
   readonly transport: Transport;
-  #limiter: RateLimiter;
-  #maxRetries: number;
+  #ky: typeof ky;
+  #policies: Record<string, HostPolicy>;
+  #queues = new Map<string, PQueue>();
 
   stats = { fetched: 0, cacheHits: 0, retries: 0, errors: 0 };
 
   constructor(
     opts: {
       cache?: ResponseCache;
-      limiter?: RateLimiter;
       maxRetries?: number;
       transport?: Transport;
+      /** Per-host overrides of HOST_POLICIES. */
+      policies?: Record<string, HostPolicy>;
     } = {},
   ) {
     this.cache = opts.cache ?? new ResponseCache();
     this.transport = opts.transport ?? defaultTransport();
-    this.#limiter = opts.limiter ?? new RateLimiter();
-    this.#maxRetries = opts.maxRetries ?? 4;
+    this.#policies = { ...HOST_POLICIES, ...opts.policies };
+    this.#ky = ky.create({
+      // Every attempt, retries included, waits for its host's next slot.
+      fetch: (request) => this.#paced(request),
+      headers: { "User-Agent": USER_AGENT },
+      timeout: 120_000,
+      retry: {
+        limit: opts.maxRetries ?? 4,
+        statusCodes: RETRYABLE,
+        // Exponential with jitter, capped so a long run cannot stall for minutes.
+        delay: (attempt) => 1000 * 2 ** (attempt - 1),
+        backoffLimit: 30_000,
+        jitter: (d) => d + Math.random() * 250,
+        retryOnTimeout: true,
+        // A transport failure (connection reset, curl exit) is as transient as a 503.
+        shouldRetry: ({ error }) => (error instanceof HTTPError ? undefined : true),
+      },
+    });
+  }
+
+  /** One queue per host: at most `concurrency` in flight, starts spaced 1/rps apart. */
+  #queue(host: string): PQueue {
+    let q = this.#queues.get(host);
+    if (!q) {
+      const { rps, concurrency } = this.#policies[host] ?? DEFAULT_POLICY;
+      q = new PQueue({ concurrency, intervalCap: 1, interval: 1000 / rps, strict: true });
+      this.#queues.set(host, q);
+    }
+    return q;
+  }
+
+  async #paced(request: Request): Promise<Response> {
+    const q = this.#queue(new URL(request.url).host);
+    const res = await q.add(() => this.transport.fetch(request));
+    // ky waits out Retry-After for this request; pausing the queue holds back the rest of
+    // the host's traffic too, which is what the header asks for.
+    const retryAfter = Number(res.headers.get("retry-after"));
+    if (RETRYABLE.includes(res.status) && retryAfter > 0) {
+      q.pause();
+      setTimeout(() => q.start(), retryAfter * 1000);
+    }
+    return res;
   }
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
@@ -75,66 +150,44 @@ export class HttpClient {
       }
     }
 
-    const host = new URL(url).host;
     const accept = new Set([200, 404, ...(opts.acceptStatuses ?? [])]);
-    let lastError = "";
-
-    for (let attempt = 0; attempt <= this.#maxRetries; attempt++) {
-      const release = await this.#limiter.acquire(host);
-      let status = 0;
-      let body = "";
-      try {
-        const res = await this.transport.request(url, {
-          method: opts.method ?? "GET",
-          headers: { "User-Agent": USER_AGENT, ...opts.headers },
-        });
-        status = res.status;
-        // A HEAD has no body, so the headers worth keeping become the cached body. The
-        // status is the signal (Maven .asc probing); Last-Modified dates the release.
-        body = opts.method === "HEAD" ? headBody(res.headers) : res.body;
-
-        if (RETRYABLE.has(status)) {
-          const retryAfter = Number(res.headers.get("retry-after"));
-          const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
-            ? retryAfter * 1000
-            : backoffMs(attempt);
-          this.#limiter.penalise(host, waitMs);
-          lastError = `HTTP ${status}`;
-          throw new RetryableError(lastError, waitMs);
-        }
-      } catch (err) {
-        release();
-        const retryable = err instanceof RetryableError;
-        const waitMs = retryable ? err.waitMs : backoffMs(attempt);
-        lastError = err instanceof Error ? err.message : String(err);
-        if (attempt === this.#maxRetries) {
-          this.stats.errors++;
-          throw new Error(`fetch failed after ${attempt + 1} attempts: ${url}: ${lastError}`);
-        }
-        this.stats.retries++;
-        await Bun.sleep(waitMs);
-        continue;
-      }
-      release();
-
-      if (!accept.has(status)) {
-        this.stats.errors++;
-        throw new Error(`unexpected HTTP ${status} for ${url}`);
-      }
-
-      this.stats.fetched++;
-      const entry = await this.cache.put({
-        url: key,
-        body,
-        httpStatus: status,
-        ecosystem: opts.ecosystem,
-        package: opts.package,
+    let attempts = 1;
+    let res: Response;
+    try {
+      res = await this.#ky(url, {
+        method: opts.method ?? "GET",
+        headers: opts.headers,
+        throwHttpErrors: (status) => !accept.has(status),
+        hooks: {
+          beforeRetry: [
+            () => {
+              attempts++;
+              this.stats.retries++;
+            },
+          ],
+        },
       });
-      return { url, status, body, fromCache: false, entry };
+    } catch (err) {
+      this.stats.errors++;
+      if (err instanceof HTTPError && !RETRYABLE.includes(err.response.status)) {
+        throw new Error(`unexpected HTTP ${err.response.status} for ${url}`);
+      }
+      const reason = err instanceof HTTPError ? `HTTP ${err.response.status}` : err instanceof Error ? err.message : String(err);
+      throw new Error(`fetch failed after ${attempts} attempts: ${url}: ${reason}`);
     }
 
-    // Unreachable: the loop either returns or throws on the final attempt.
-    throw new Error(`fetch failed: ${url}: ${lastError}`);
+    // A HEAD has no body, so the headers worth keeping become the cached body. The
+    // status is the signal (Maven .asc probing); Last-Modified dates the release.
+    const body = opts.method === "HEAD" ? headBody(res.headers) : await res.text();
+    this.stats.fetched++;
+    const entry = await this.cache.put({
+      url: key,
+      body,
+      httpStatus: res.status,
+      ecosystem: opts.ecosystem,
+      package: opts.package,
+    });
+    return { url, status: res.status, body, fromCache: false, entry };
   }
 
   async getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
@@ -196,24 +249,11 @@ function parseJsonResult<T>(res: FetchResult): { data: T | null; res: FetchResul
 /** Response headers kept for a HEAD request; everything else is transport noise. */
 const HEAD_HEADERS = ["last-modified", "content-length", "etag"];
 
-function headBody(headers: Map<string, string>): string {
+function headBody(headers: Headers): string {
   const kept: Record<string, string> = {};
   for (const h of HEAD_HEADERS) {
     const v = headers.get(h);
-    if (v !== undefined) kept[h] = v;
+    if (v !== null) kept[h] = v;
   }
   return JSON.stringify(kept);
-}
-
-class RetryableError extends Error {
-  constructor(message: string, readonly waitMs: number) {
-    super(message);
-    this.name = "RetryableError";
-  }
-}
-
-/** Exponential backoff with jitter, capped so a long run cannot stall for minutes. */
-export function backoffMs(attempt: number): number {
-  const base = Math.min(2 ** attempt * 1000, 30_000);
-  return base + Math.random() * 250;
 }

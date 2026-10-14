@@ -5,6 +5,7 @@
  * so "latest plus one anchor per quarter" means the same thing in all seven ecosystems.
  */
 
+import hostedGitInfo from "hosted-git-info";
 import type { ExtractedSignal, SignalId, SignalValue, Withdrawal, WithdrawalKind } from "../types.ts";
 import { anchorLabelsByVersion, selectQuarterAnchors } from "./quarters.ts";
 
@@ -122,21 +123,19 @@ export function policySince(
  * Normalises the many spellings of a repository URL (`git+https://…/x.git`, `git://…`,
  * `github:owner/repo`) to a plain https URL, or null when it is not a URL at all.
  * The `packages.repository_url` column is validated as a URL, so garbage must not reach it.
+ *
+ * GitHub, GitLab, Bitbucket and Gist go through npm's hosted-git-info, which also drops a
+ * `#committish` or `/tree/<ref>` suffix. Bare `owner/repo` is npm's GitHub shorthand and
+ * means nothing elsewhere, so a scheme or `host:` prefix is required.
  */
 export function cleanRepoUrl(raw: unknown): string | null {
   if (typeof raw !== "string" || !raw.trim()) return null;
-  let s = raw.trim();
-  const shorthand = /^(github|gitlab|bitbucket):([\w.-]+\/[\w.-]+)$/.exec(s);
-  if (shorthand) s = `https://${shorthand[1]}.${shorthand[1] === "bitbucket" ? "org" : "com"}/${shorthand[2]}`;
-  s = s
-    .replace(/^git\+/, "")
-    .replace(/^git:\/\//, "https://")
-    .replace(/^ssh:\/\/git@/, "https://")
-    .replace(/^git@([^:]+):/, "https://$1/")
-    .replace(/\.git$/, "")
-    .replace(/#.*$/, "");
+  const s = raw.trim();
+  const hosted = s.includes(":") ? hostedGitInfo.fromUrl(s) : undefined;
+  if (hosted) return hosted.browse({ noCommittish: true });
   try {
-    const u = new URL(s);
+    const u = new URL(s.replace(/^git\+/, "").replace(/^(git|ssh):\/\/(git@)?/, "https://").replace(/\.git$/, ""));
+    u.hash = "";
     return u.protocol === "https:" || u.protocol === "http:" ? u.toString().replace(/\/$/, "") : null;
   } catch {
     return null;

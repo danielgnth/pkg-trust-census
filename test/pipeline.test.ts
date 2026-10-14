@@ -22,7 +22,7 @@ const { runAggregate } = await import("../src/stages/aggregate.ts");
 const { runReport } = await import("../src/stages/report.ts");
 const { simpleUrl, jsonUrl } = await import("../src/adapters/pypi.ts");
 import { eq, isNotNull } from "drizzle-orm";
-import type { Transport, TransportResponse } from "../src/http/transport.ts";
+import type { Transport } from "../src/http/transport.ts";
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
 beforeEach(() => rmSync(join(TMP, "cache"), { recursive: true, force: true }));
@@ -70,9 +70,9 @@ const ROUTES: Record<string, string> = {
 
 const transport: Transport = {
   name: "mock",
-  async request(url): Promise<TransportResponse> {
-    const body = ROUTES[url];
-    return body === undefined ? { status: 404, body: "", headers: new Map() } : { status: 200, body, headers: new Map() };
+  async fetch(req) {
+    const body = ROUTES[req.url];
+    return body === undefined ? new Response(null, { status: 404 }) : new Response(body);
   },
 };
 

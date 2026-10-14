@@ -5,6 +5,7 @@
  * Output goes to data/out/{snapshot}/ and is fully regenerable, so it is git-ignored.
  */
 
+import { stringify } from "csv-stringify/sync";
 import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
@@ -527,12 +528,12 @@ function signalsCsv(db: Db, snapshotId: string): string {
   );
 }
 
-/** RFC 4180: quote fields containing a comma, quote or newline; double embedded quotes. */
+/** RFC 4180 CSV. Non-integers keep four decimals; booleans stay `true`/`false`. */
 export function csv(header: string[], rows: unknown[][]): string {
-  const cell = (v: unknown) => {
-    if (v == null) return "";
-    const s = typeof v === "number" ? (Number.isInteger(v) ? String(v) : v.toFixed(4)) : String(v);
-    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  return [header, ...rows].map((r) => r.map(cell).join(",")).join("\n") + "\n";
+  return stringify([header, ...rows], {
+    cast: {
+      number: (v) => (Number.isInteger(v) ? String(v) : v.toFixed(4)),
+      boolean: (v) => String(v),
+    },
+  });
 }

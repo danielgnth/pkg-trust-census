@@ -16,7 +16,8 @@ import { GatheringAdapter, type RunContext } from "./types.ts";
 import { rankFromEcosystems } from "./ecosystems.ts";
 import { impliedBy, noMechanism, observed, selectKeptVersions, type KeptVersion, type VersionRecord } from "../extract/signals.ts";
 import { probeAnchorDates } from "../extract/probe.ts";
-import { compareSemver, isSemverPrerelease } from "../extract/versions.ts";
+import semver from "semver";
+import { isSemverPrerelease } from "../extract/versions.ts";
 
 const PROXY = "https://proxy.golang.org";
 const SUMDB = "https://sum.golang.org";
@@ -95,7 +96,7 @@ export class GoAdapter extends GatheringAdapter<Raw> {
     };
 
     const tags = list.status === 200 ? list.body.split("\n").map((s) => s.trim()).filter(Boolean) : [];
-    const stable = tags.filter((t) => !isSemverPrerelease(t)).sort(compareSemver);
+    const stable = tags.filter((t) => semver.valid(t) && !isSemverPrerelease(t)).sort(semver.compare);
     const probed = await probeAnchorDates(stable, async (v) => (await infoOf(v))?.Time ?? null, ctx.asOf);
 
     const records: Kept[] = [...probed].map(([version, publishedAt]) => ({
@@ -213,8 +214,8 @@ export function parseRetractions(gomod: string): Retraction[] {
 
 /** The listed tags that fall inside any retraction, by semver precedence. */
 export function retractedVersions(gomod: string, tags: string[]): string[] {
-  const rs = parseRetractions(gomod);
-  return tags.filter((t) => rs.some((r) => compareSemver(t, r.low) >= 0 && compareSemver(t, r.high) <= 0));
+  const rs = parseRetractions(gomod).filter((r) => semver.valid(r.low) && semver.valid(r.high));
+  return tags.filter((t) => semver.valid(t) && rs.some((r) => semver.gte(t, r.low) && semver.lte(t, r.high)));
 }
 
 /** Best-effort repository for forge-hosted module paths, when the proxy recorded no Origin. */

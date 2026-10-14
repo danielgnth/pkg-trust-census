@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { cleanRepoUrl, earliest, policySince, selectKeptVersions } from "../src/extract/signals.ts";
 import { probeAnchorDates } from "../src/extract/probe.ts";
 import {
-  compareSemver,
   isComposerPrerelease,
   isMavenPrerelease,
   isPep440Prerelease,
@@ -102,10 +101,6 @@ describe("version conventions", () => {
     ["v3.0.2", false], ["3.0.0-beta1", true], ["2.0.0-RC2", true], ["dev-main", true], ["2.x-dev", true], ["1.0.0-p1", false],
   ])("Composer %s pre-release=%p", (v, expected) => expect(isComposerPrerelease(v)).toBe(expected));
 
-  test("SemVer ordering follows the spec, not string order", () => {
-    const sorted = ["v1.10.0", "v1.2.0", "v1.2.0-rc.1", "v1.2.0-beta.11", "v1.2.0-beta.2", "v1.9.9"].sort(compareSemver);
-    expect(sorted).toEqual(["v1.2.0-beta.2", "v1.2.0-beta.11", "v1.2.0-rc.1", "v1.2.0", "v1.9.9", "v1.10.0"]);
-  });
 });
 
 describe("PyPI fileVersion", () => {
@@ -176,6 +171,8 @@ describe("human-readable dates", () => {
     expect(humanDate("2026-10-13", true)).toBe("13 Oct 2026");
     expect(humanDate("not a date")).toBe("not a date");
     expect(humanMonth("2026-07")).toBe("Jul 2026");
+    // Some ICU versions abbreviate September as "Sept" in en-GB.
+    expect(humanDate("2026-09-03T00:00:00Z", true)).toBe("3 Sep 2026");
   });
 });
 

@@ -1,5 +1,5 @@
 /**
- * Pluggable HTTP transport.
+ * Pluggable HTTP transport, shaped like `fetch` so ky can use it directly.
  *
  * `fetch` is the default and is what runs on a normal developer machine. A curl-backed
  * transport exists because Bun's `fetch` cannot traverse an HTTPS CONNECT proxy (its
@@ -10,40 +10,15 @@
  * Keeping this behind an interface also makes the client testable without a network.
  */
 
-export interface TransportResponse {
-  status: number;
-  body: string;
-  headers: Map<string, string>;
-}
-
-export interface TransportRequest {
-  method: "GET" | "HEAD";
-  headers: Record<string, string>;
-}
-
 export interface Transport {
   readonly name: string;
-  request(url: string, req: TransportRequest): Promise<TransportResponse>;
+  fetch(request: Request): Promise<Response>;
 }
 
-export class FetchTransport implements Transport {
-  readonly name = "fetch";
-
-  async request(url: string, req: TransportRequest): Promise<TransportResponse> {
-    const res = await fetch(url, {
-      method: req.method,
-      headers: req.headers,
-      redirect: "follow",
-    });
-    const headers = new Map<string, string>();
-    res.headers.forEach((v, k) => headers.set(k.toLowerCase(), v));
-    return {
-      status: res.status,
-      body: req.method === "HEAD" ? "" : await res.text(),
-      headers,
-    };
-  }
-}
+export const fetchTransport: Transport = {
+  name: "fetch",
+  fetch: (request) => fetch(request, { redirect: "follow" }),
+};
 
 /**
  * Delimits the response body from the trailing status/header metadata that `-w` appends.
@@ -63,7 +38,8 @@ export class CurlTransport implements Transport {
   /** Long enough for a multi-megabyte npm packument, short enough to fail a hung host. */
   constructor(private readonly timeoutSec = 120) {}
 
-  async request(url: string, req: TransportRequest): Promise<TransportResponse> {
+  async fetch(request: Request): Promise<Response> {
+    const url = request.url;
     const args = [
       "-sS",
       "--compressed",
@@ -75,8 +51,8 @@ export class CurlTransport implements Transport {
       "-w",
       String.raw`\n` + SENTINEL + String.raw`\n%{http_code}\n%{header_json}`,
     ];
-    if (req.method === "HEAD") args.push("--head", "-o", "/dev/null");
-    for (const [k, v] of Object.entries(req.headers)) args.push("-H", `${k}: ${v}`);
+    if (request.method === "HEAD") args.push("--head", "-o", "/dev/null");
+    request.headers.forEach((v, k) => args.push("-H", `${k}: ${v}`));
     args.push("--url", url);
 
     const proc = Bun.spawn(["curl", ...args], { stdout: "pipe", stderr: "pipe" });
@@ -96,17 +72,17 @@ export class CurlTransport implements Transport {
     const status = Number(statusLine);
     if (!Number.isInteger(status)) throw new Error(`curl returned no status for ${url}`);
 
-    return { status, body, headers: parseHeaderJson(rest.join("\n")) };
+    return new Response(body || null, { status, headers: parseHeaderJson(rest.join("\n")) });
   }
 }
 
-function parseHeaderJson(raw: string): Map<string, string> {
-  const headers = new Map<string, string>();
+function parseHeaderJson(raw: string): Headers {
+  const headers = new Headers();
   if (!raw.trim()) return headers;
   try {
     const parsed = JSON.parse(raw) as Record<string, string[]>;
     for (const [k, v] of Object.entries(parsed)) {
-      if (Array.isArray(v) && v.length > 0) headers.set(k.toLowerCase(), v[v.length - 1]!);
+      if (Array.isArray(v) && v.length > 0) headers.set(k, v[v.length - 1]!);
     }
   } catch {
     // Headers are a convenience (Retry-After); a parse failure must not fail the request.
@@ -122,9 +98,9 @@ function parseHeaderJson(raw: string): Map<string, string> {
  */
 export function defaultTransport(): Transport {
   const forced = process.env.PKG_TRUST_TRANSPORT;
-  if (forced === "fetch") return new FetchTransport();
+  if (forced === "fetch") return fetchTransport;
   if (forced === "curl") return new CurlTransport();
 
   const proxied = Boolean(process.env.HTTPS_PROXY ?? process.env.https_proxy);
-  return proxied ? new CurlTransport() : new FetchTransport();
+  return proxied ? new CurlTransport() : fetchTransport;
 }

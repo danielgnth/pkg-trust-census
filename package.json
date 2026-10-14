@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "description": "Census of trust-signal adoption across seven package registries — Seminar Software Supply Chain Security WiSe 26/27",
+  "description": "Census of trust-signal adoption across seven package registries \u2014 Seminar Software Supply Chain Security WiSe 26/27",
   "module": "src/cli.ts",
   "scripts": {
     "cli": "bun run src/cli.ts",
@@ -18,14 +18,27 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/hosted-git-info": "^3.0.5",
+    "@types/semver": "^7.8.0",
+    "@types/turndown": "^5.0.6",
     "drizzle-kit": "^0.31.10",
     "typescript": "^5"
   },
   "dependencies": {
     "@clack/prompts": "^1.7.0",
+    "@mozilla/readability": "^0.6.0",
+    "@observablehq/plot": "^0.6.17",
+    "@renovatebot/pep440": "^5.0.1",
     "citty": "^0.2.2",
+    "csv-stringify": "^6.9.0",
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
+    "hosted-git-info": "^10.1.1",
+    "ky": "^2.2.0",
+    "linkedom": "^0.18.13",
+    "p-queue": "^10.0.0",
+    "semver": "^7.8.5",
+    "turndown": "^7.2.4",
     "zod": "^4.4.3"
   }
 }
