@@ -1,0 +1,131 @@
+_RubyGems.org API keys, their scopes, and CLI usage_
+
+You can create multiple API keys based on your requirements. API keys have varying scopes that grant specific privileges. Using API keys with the least amount of privilege makes your RubyGems.org account more secure by limiting the impact a compromised key may have.
+
+## Create a new API key
+
+Visit your RubyGems.org account [settings page](https://rubygems.org/settings/edit) and click on **API KEYS**. You will be prompted for your account password to confirm your identity.
+
+![Settings API key](/images/settings-api-key.png)
+
+If you have never visited this page before, you should see at least one key with the name _legacy-key_. The _legacy-key_ is relic of the time when RubyGems.org used to have a single API key per account with full access. We recommend that you [migrate away from _legacy-key_](#migration-from-legacy-api-key) as soon as possible.
+
+Click on **New API Key** to create a new API key for your account.
+
+![Settings API key](/images/api-keys-index.png)
+
+Enter a name to help you identify the environment the API key may be used in (eg: ci-push-key, mirror-webhook-key, etc.). Check all the scopes you may want to enable. You can also optionally set an [expiration date](#set-an-expiration-date) for the key. Click create when done.
+
+**Note:** _Show dashboard_ is an exclusive scope, and it can’t be enabled in combination with any other scope.
+
+![New API key](/images/new-api-key.png)
+
+On the following page, you should see the new API key.
+
+![API key created](/images/api-key-created.png)
+
+The _Age_ column shows how old the key is, the _Expiration_ column shows when the key will expire (if an expiration was set), and the _Last access_ column shows the last time (in UTC) the key was used in a successful authentication. You can use the **Edit** button to update the scopes of the key. You can use the **Reset** button in the last row to delete _all_ the API keys associated with your account.
+
+## Usage with gem CLI
+
+An API key created as outlined above can be used in the `gem` CLI directly by setting it in an environment variable called `GEM_HOST_API_KEY`, e.g.
+
+```
+$ GEM_HOST_API_KEY=rubygems_123456 gem push example-1.2.3.gem
+```
+
+This approach is suitable for non-interactive situations, e.g. for CI/CD-based gem publishing processes. On a personal development machine that you can directly access, the interactive sign-in using `gem signin` (see below) is usually preferrable.
+
+## Creating from gem CLI
+
+**Note:** You need rubygems 3.2.0 or newer if you like to create API keys with scopes from the gem CLI.
+
+Running `gem signin` will prompt you for your RubyGems.org credentials, key name, and scopes to enable for the key. The default choice for all scopes is not to enable them.
+
+```
+$ gem signin
+Enter your RubyGems.org credentials.
+Don't have an account yet? Create one at https://rubygems.org/sign_up
+   Email:   john@doe.com
+Password:
+
+API Key name [4458ffe32b0c-unknown-user-20201231104303]:   docker-push-key
+Please select scopes you want to enable for the API key (y/n)
+index_rubygems [y/N]:
+push_rubygem [y/N]:   Y
+yank_rubygem [y/N]:
+add_owner [y/N]:
+remove_owner [y/N]:
+access_webhooks [y/N]:
+show_dashboard [y/N]:
+
+Signed in with API key: docker-push-key.
+```
+
+An API key will automatically be created (default key name: _hostname-whoami-timestamp_) with the required scope when we couldn’t find any API key on your host. Similarly, the scope of the existing API key on the host will be updated with the required scope if the key didn’t have the correct scope.
+
+```
+$ gem yank begone -v 4.1.48
+Yanking gem from https://rubygems.org...
+The existing key doesn't have access of yank_rubygem on https://rubygems.org. Please sign in to update access.
+   Email:   john@doe.com
+Password:
+Added yank_rubygem scope to the existing API key
+Successfully deleted gem: begone (4.1.48)
+```
+
+## API key scopes
+
+-   [Index rubygems](/rubygems-org-api/#get---apiv1gemsjsonyaml): List all RubyGems of your account
+-   [Push rubygems](/rubygems-org-api/#post---apiv1gems): Create a new RubyGem or publish a new version of any RubyGem you own
+-   [Yank rubygems](/rubygems-org-api/#delete---apiv1gemsyank): Remove a published version of any RubyGem you own
+-   [Add owner](/rubygems-org-api/#post---apiv1gemsgem-nameowners): Add a user to owners of any RubyGem you own
+-   [Remove owner](/rubygems-org-api/#delete---apiv1gemsgem-nameowners): Remove a user from owners of any RubyGem you own
+-   [Access webhooks](/rubygems-org-api/#webhook-methods): List, create, delete or fire webhooks associated with your account
+-   [Show dashboard](https://rubygems.org/dashboard): Access to atom feed of your RubyGems.org dashboard. It is an exclusive scope and can’t be enabled with any other scope.
+
+## Scope an API key to a gem
+
+Enabling one or more of the key scopes related to creating or updating a gem ([Push rubygems](/rubygems-org-api/#post---apiv1gems), [Yank rubygems](/rubygems-org-api/#delete---apiv1gemsyank), [Add owner](/rubygems-org-api/#post---apiv1gemsgem-nameowners), and [Remove owner](/rubygems-org-api/#delete---apiv1gemsgem-nameowners)) will allow you to scope one of your gems to the API key. The operations corresponding to these scopes will only be valid on the selected gem.
+
+![New API key with gem scope](/images/new-api-key-gem-scope.png)
+
+If you are using a key to modify only one of your gems, please consider gem scoping your keys.
+
+**Note:** When your ownership to a gem is removed, API keys scoped to that gem will become invalid and cannot be used.
+
+## Set an expiration date
+
+When creating an API key, we highly recommend you set an **expiration date** using the expiration field on the form. Once the expiration date passes, the key becomes invalid and can no longer be used for authentication.
+
+![New API key with expiration](/images/new-api-key-expiration.png)
+
+Setting an expiration is useful for temporary access to make changes, such as pushing a gem, adding or removing ownership, or other one-off operations.
+
+The expiration must be set to at least 5 minutes in the future. If no expiration is set, the key will remain valid indefinitely (until manually deleted or reset).
+
+**Note:** The expiration date cannot be changed after the key is created. If you need a key with a different expiration, create a new one.
+
+## Enable MFA on specific API keys
+
+If your account has MFA enabled on the **UI and gem signin** [authentication level](/setting-up-multifactor-authentication/#authentication-levels), you have the option to enable MFA on a specific API key. This will require an OTP code for `gem push`, `yank`, `owner --add/--remove` commands.
+
+You can toggle this option when creating or editing an API key on the UI. ![New API key with MFA enabled](/images/new-mfa-api-key.png)
+
+## Migration from legacy-api key
+
+The legacy API key of your account has been migrated to one with all scopes enabled. We strongly recommend that you delete this key and replace it with a new API key with minimum scopes enabled.
+
+-   Visit [API keys page](https://rubygems.org/profile/api_keys) of your account and click on **delete** button for the key named _legacy-key_.
+-   Run `gem signout` on all hosts where you have used the legacy API key
+-   Make sure you have rubygems 3.2.0 or newer installed. Run `gem update --system` to update your rubygem to the latest release.
+-   Run `gem signin` to create a new API key.
+
+If it is not possible for you to update your rubygems, you can still use the new API key by creating a new key using the web UI and replacing the key in `~/.gem/credentials` or `~/.local/share/gem/credentials` file.
+
+```
+$ cat ~/.local/share/gem/credentials
+:rubygems_api_key: rubygems_cec9db9373ea171daaaa0bf2337edce187f09558cb19c1b2
+```
+
+**Note:** The legacy endpoint to fetch API keys, `GET /api/v1/api_key`, has been retired and now responds `410 Gone`. Use [`POST /api/v1/api_key`](/rubygems-org-api#post---apiv1api_keyjsonyaml) to create a key instead. As a security precaution, API keys are stored in our database after one-way encryption. It is no longer possible for us to fetch the same API key in plain text.

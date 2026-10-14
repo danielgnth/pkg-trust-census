@@ -1,0 +1,21 @@
+# 2026-10-14T07:20:31.443Z · OpenSSL 3.6.4 25 Aug 2026 (Library: OpenSSL 3.6.4 25 Aug 2026)
+ecosystem,host,protocol,group,certificate,hybrid_pq
+npm,registry.npmjs.org,TLSv1.2,X25519,ECDSA-256,false
+npm,api.npmjs.org,TLSv1.2,X25519,ECDSA-256,false
+pypi,pypi.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+pypi,files.pythonhosted.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+pypi,upload.pypi.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+crates,crates.io,TLSv1.3,X25519MLKEM768,RSA-2048,true
+crates,index.crates.io,TLSv1.3,X25519MLKEM768,RSA-2048,true
+crates,static.crates.io,TLSv1.3,X25519MLKEM768,RSA-2048,true
+rubygems,rubygems.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+rubygems,index.rubygems.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+go,proxy.golang.org,TLSv1.3,X25519MLKEM768,ECDSA-256,true
+go,sum.golang.org,TLSv1.3,X25519MLKEM768,ECDSA-256,true
+maven,repo1.maven.org,TLSv1.3,X25519MLKEM768,ECDSA-256,true
+maven,repo.maven.apache.org,TLSv1.3,X25519MLKEM768,ECDSA-256,true
+maven,central.sonatype.com,TLSv1.3,X25519MLKEM768,ECDSA-256,true
+packagist,packagist.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+packagist,repo.packagist.org,TLSv1.3,X25519MLKEM768,RSA-2048,true
+packagist,api.github.com,TLSv1.3,X25519,ECDSA-256,false
+packagist,codeload.github.com,TLSv1.3,X25519,ECDSA-256,false

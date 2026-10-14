@@ -5,6 +5,7 @@
  * Output goes to data/out/{snapshot}/ and is fully regenerable, so it is git-ignored.
  */
 
+import { citeLinks, citeUrls } from "../sources/index.ts";
 import { stringify } from "csv-stringify/sync";
 import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
@@ -243,7 +244,7 @@ export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = baselineOf(e, p.id);
-      const links = b.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      const links = citeLinks(b.sources);
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}. ${b.note} ${links}`);
     }
     lines.push("");
@@ -286,13 +287,13 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
   lines.push("#### What is signed, and sources", "");
   for (const e of ecosystems) {
     const f = sigstoreOf(e);
-    const links = f.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+    const links = citeLinks(f.sources);
     lines.push(`- **${ECOSYSTEM_LABEL[e]}**: ${f.signs} ${links}`);
   }
   lines.push("", "#### Install clients", "", "| Ecosystem | Client | Checks bundles | Note |", "|---|---|---|---|");
   for (const e of ecosystems) {
     for (const c of sigstoreOf(e).clients) {
-      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} [source](${c.source}) |`);
+      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} ${citeLinks(c.sources)} |`);
     }
   }
   lines.push("");
@@ -333,7 +334,7 @@ export function pqcMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${l.label}**: ${l.question}`, "");
     for (const e of ecosystems) {
       const p = pqcOf(e, l.id);
-      const links = p.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      const links = citeLinks(p.sources);
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${p.primitive} (${p.status}). ${p.note} ${links}`);
     }
     lines.push("");
@@ -344,7 +345,7 @@ export function pqcMarkdown(agg: Aggregate, withNotes: boolean): string {
 function pqcCsv(): string {
   return csv(
     ["ecosystem", "layer", "primitive", "status", "note", "sources"],
-    PQC.map((p) => [p.ecosystem, p.layer, p.primitive, p.status, p.note, p.sources.join(" ")]),
+    PQC.map((p) => [p.ecosystem, p.layer, p.primitive, p.status, p.note, citeUrls(p.sources)]),
   );
 }
 
@@ -354,7 +355,7 @@ function sigstoreCsv(): string {
     SIGSTORE.map((s) => {
       const best = bestClient(s);
       const clients = s.clients.map((c) => `${c.client}: ${c.verifies}`).join("; ");
-      return [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, best.client, best.verifies, clients, s.signs, s.similar, s.sources.join(" ")];
+      return [s.ecosystem, s.status, s.since ?? null, s.registryVerifies, best.client, best.verifies, clients, s.signs, s.similar, citeUrls(s.sources)];
     }),
   );
 }
@@ -385,7 +386,7 @@ export function policiesMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = policyOf(e, p.id);
-      const links = b.sources.map((u, i) => `[${i + 1}](${u})`).join(" ");
+      const links = citeLinks(b.sources);
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}${b.since ? ` (since ${b.since})` : ""}. ${b.note} ${links}`);
     }
     lines.push("");
@@ -436,14 +437,14 @@ function withdrawalsCsv(db: Db, snapshotId: string): string {
 function policiesCsv(): string {
   return csv(
     ["ecosystem", "property", "group", "value", "since", "note", "sources"],
-    POLICIES.map((b) => [b.ecosystem, b.property, POLICY_PROPERTIES.find((p) => p.id === b.property)!.group, b.value, b.since ?? null, b.note, b.sources.join(" ")]),
+    POLICIES.map((b) => [b.ecosystem, b.property, POLICY_PROPERTIES.find((p) => p.id === b.property)!.group, b.value, b.since ?? null, b.note, citeUrls(b.sources)]),
   );
 }
 
 function baselineCsv(): string {
   return csv(
     ["ecosystem", "property", "value", "since", "note", "sources"],
-    BASELINE.map((b) => [b.ecosystem, b.property, b.value, b.since ?? null, b.note, b.sources.join(" ")]),
+    BASELINE.map((b) => [b.ecosystem, b.property, b.value, b.since ?? null, b.note, citeUrls(b.sources)]),
   );
 }
 

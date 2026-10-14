@@ -92,7 +92,7 @@ describe("facts", () => {
     for (const e of ECOSYSTEMS) for (const p of BASELINE_PROPERTIES) expect(() => baselineOf(e, p.id)).not.toThrow();
     for (const b of BASELINE) {
       expect(b.sources.length).toBeGreaterThan(0);
-      for (const u of b.sources) expect(u).toStartWith("https://");
+      for (const c of b.sources) expect(c.quote.length).toBeGreaterThan(0);
       expect(b.note.length).toBeGreaterThan(10);
       if (b.since) expect(b.since).toMatch(/^\d{4}-\d{2}$/);
     }
@@ -103,12 +103,12 @@ describe("facts", () => {
     for (const e of ECOSYSTEMS) expect(() => sigstoreOf(e)).not.toThrow();
     for (const s of SIGSTORE) {
       expect(s.sources.length).toBeGreaterThan(0);
-      for (const u of s.sources) expect(u).toStartWith("https://");
+      for (const c of s.sources) expect(c.quote.length).toBeGreaterThan(0);
       // A registry that accepts bundles has a start date and says who checks them.
       if (s.status === "yes") expect([s.since, s.registryVerifies]).toEqual([expect.stringMatching(/^\d{4}-\d{2}$/), expect.any(String)]);
       else expect([s.since, s.registryVerifies, s.clients.every((c) => c.verifies === "n/a")]).toEqual([undefined, "n/a", true]);
       expect(s.clients.length).toBeGreaterThan(0);
-      for (const c of s.clients) expect(c.source).toStartWith("https://");
+      for (const c of s.clients) expect(c.sources.length).toBeGreaterThan(0);
     }
   });
 
@@ -117,7 +117,7 @@ describe("facts", () => {
     for (const e of ECOSYSTEMS) for (const l of PQC_LAYERS) expect(() => pqcOf(e, l.id)).not.toThrow();
     for (const p of PQC) {
       expect(p.sources.length).toBeGreaterThan(0);
-      for (const u of p.sources) expect(u).toStartWith("https://");
+      for (const c of p.sources) expect(c.quote.length).toBeGreaterThan(0);
       expect(p.note.length).toBeGreaterThan(5);
     }
   });
@@ -127,7 +127,7 @@ describe("facts", () => {
     for (const e of ECOSYSTEMS) for (const p of POLICY_PROPERTIES) expect(() => policyOf(e, p.id)).not.toThrow();
     for (const b of POLICIES) {
       expect(b.sources.length).toBeGreaterThan(0);
-      for (const u of b.sources) expect(u).toStartWith("https://");
+      for (const c of b.sources) expect(c.quote.length).toBeGreaterThan(0);
       expect(b.note.length).toBeGreaterThan(10);
       if (b.since) expect(b.since).toMatch(/^\d{4}-\d{2}$/);
     }

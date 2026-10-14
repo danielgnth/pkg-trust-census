@@ -1,0 +1,1319 @@
+{
+  "pypi2faEnforced": {
+    "fetched": "https://blog.pypi.org/posts/2024-01-01-2fa-enforced/",
+    "finalUrl": "https://blog.pypi.org/posts/2024-01-01-2fa-enforced/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.428Z",
+    "title": "2FA Required for PyPI - The Python Package Index Blog",
+    "sha256": "ab11e421e2cc19db81109198e9e5a3184eec74a90818fda4343c830b31cc447f",
+    "archive": "sources/archive/blog.pypi.org_posts_2024-01-01-2fa-enforced.md"
+  },
+  "pypiTrustedPublishersLaunch": {
+    "fetched": "https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/",
+    "finalUrl": "https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.905Z",
+    "title": "Introducing 'Trusted Publishers' - The Python Package Index Blog",
+    "sha256": "e22ad0096a38f5b4b92ca07e3094d3ba254368f55673896f71d5751c594fa678",
+    "archive": "sources/archive/blog.pypi.org_posts_2023-04-20-introducing-trusted-publishers.md"
+  },
+  "pypiAttestationsGa": {
+    "fetched": "https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-digital-attestations/",
+    "finalUrl": "https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-digital-attestations/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.906Z",
+    "title": "PyPI now supports digital attestations - The Python Package Index Blog",
+    "sha256": "5effc90a67fc82fb7b54c2cef79be2dbd0301c89b370aaba93df12a8bd018244",
+    "archive": "sources/archive/blog.pypi.org_posts_2024-11-14-pypi-now-supports-digital-attestations.md"
+  },
+  "pypiPgpRemoved": {
+    "fetched": "https://blog.pypi.org/posts/2023-05-23-removing-pgp/",
+    "finalUrl": "https://blog.pypi.org/posts/2023-05-23-removing-pgp/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.079Z",
+    "title": "Removing PGP from PyPI - The Python Package Index Blog",
+    "sha256": "0d3b782f125d1cc83bc276e9d559d9169e62a836962b80aede63924e67c07b80",
+    "archive": "sources/archive/blog.pypi.org_posts_2023-05-23-removing-pgp.md"
+  },
+  "pypiQuarantine": {
+    "fetched": "https://blog.pypi.org/posts/2024-12-30-quarantine/",
+    "finalUrl": "https://blog.pypi.org/posts/2024-12-30-quarantine/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.080Z",
+    "title": "Project Quarantine - The Python Package Index Blog",
+    "sha256": "4f04c0264944430cda4427ab185ba6d5f126d5d1922789819a1d1000ebd040e6",
+    "archive": "sources/archive/blog.pypi.org_posts_2024-12-30-quarantine.md"
+  },
+  "pypi14Days": {
+    "fetched": "https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/",
+    "finalUrl": "https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:37.081Z",
+    "title": "Releases now reject new files after 14 days - The Python Package Index Blog",
+    "sha256": "fd32b68325a30403b51a827a5cbb10410d5f0afa7d4380e196800ed25e8f0c00",
+    "archive": "sources/archive/blog.pypi.org_posts_2026-07-22-releases-now-reject-new-files-after-14-days.md"
+  },
+  "pypiHelpApiToken": {
+    "fetched": "https://pypi.org/help/",
+    "finalUrl": "https://pypi.org/help/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.429Z",
+    "title": "Help",
+    "sha256": "b9e1b868b04f91471d7e680d1ad5f18f1f6d405eee22176d5ed0e6a9731d06ae",
+    "archive": "sources/archive/pypi.org_help.md"
+  },
+  "pypiHelpFilenameReuse": {
+    "fetched": "https://pypi.org/help/",
+    "finalUrl": "https://pypi.org/help/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.429Z",
+    "title": "Help",
+    "sha256": "b9e1b868b04f91471d7e680d1ad5f18f1f6d405eee22176d5ed0e6a9731d06ae",
+    "archive": "sources/archive/pypi.org_help.md"
+  },
+  "pypiHelp2fa": {
+    "fetched": "https://pypi.org/help/",
+    "finalUrl": "https://pypi.org/help/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.429Z",
+    "title": "Help",
+    "sha256": "b9e1b868b04f91471d7e680d1ad5f18f1f6d405eee22176d5ed0e6a9731d06ae",
+    "archive": "sources/archive/pypi.org_help.md"
+  },
+  "pypiTrustedPublishersDocs": {
+    "fetched": "https://docs.pypi.org/trusted-publishers/",
+    "finalUrl": "https://docs.pypi.org/trusted-publishers/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "Getting Started - PyPI Docs",
+    "sha256": "9296eddc77c056ced876d8f676b4edaf742fe67016f8d4741d0b191c8142c927",
+    "archive": "sources/archive/docs.pypi.org_trusted-publishers.md"
+  },
+  "pypiTrustedPublishersAdding": {
+    "fetched": "https://docs.pypi.org/trusted-publishers/adding-a-publisher/",
+    "finalUrl": "https://docs.pypi.org/trusted-publishers/adding-a-publisher/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:31:09.092Z",
+    "title": "Adding a Trusted Publisher to an Existing PyPI Project",
+    "sha256": "5d6667b1cb20db4286e835c070ea795fc19fb826c65442d96fc8fcd6dedc9167",
+    "archive": "sources/archive/docs.pypi.org_trusted-publishers_adding-a-publisher.md"
+  },
+  "pypiUltranormalize": {
+    "fetched": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/migrations/versions/d18d443f89f0_ultranormalize_name_function.py",
+    "finalUrl": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/migrations/versions/d18d443f89f0_ultranormalize_name_function.py",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "d18d443f89f0_ultranormalize_name_function.py",
+    "sha256": "ce089a6dd5faaad31ecea995ed082280ef4cfb434bdfdef0cfcc658811afa8de",
+    "archive": "sources/archive/raw.githubusercontent.com_pypi_warehouse_main_warehouse_migrations_versions_d18d443f89f0_ultranormalize_name_function.py"
+  },
+  "pypiMacaroonService": {
+    "fetched": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/macaroons/services.py",
+    "finalUrl": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/macaroons/services.py",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:28:40.440Z",
+    "title": "services.py",
+    "sha256": "2b6e6c8042a6ae56573657f4f119688f7abd3524de9819a7cfdfb648354587aa",
+    "archive": "sources/archive/raw.githubusercontent.com_pypi_warehouse_main_warehouse_macaroons_services.py"
+  },
+  "pypiNameCheck": {
+    "fetched": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/packaging/services.py",
+    "finalUrl": "https://raw.githubusercontent.com/pypi/warehouse/main/warehouse/packaging/services.py",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "services.py",
+    "sha256": "7186ba46555fca0163d60e15b0b94427bb705fac74cd330e77acd61257a8fe79",
+    "archive": "sources/archive/raw.githubusercontent.com_pypi_warehouse_main_warehouse_packaging_services.py"
+  },
+  "pep458": {
+    "fetched": "https://peps.python.org/pep-0458/",
+    "finalUrl": "https://peps.python.org/pep-0458/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "PEP 458 – Secure PyPI downloads with signed repository metadata | peps.python.org",
+    "sha256": "46bb44c774d9c3f7e7f25062a4fdbb59cd1f91832e5f2c7fd29da8643a88ae9a",
+    "archive": "sources/archive/peps.python.org_pep-0458.md"
+  },
+  "pep592": {
+    "fetched": "https://peps.python.org/pep-0592/",
+    "finalUrl": "https://peps.python.org/pep-0592/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "PEP 592 – Adding “Yank” Support to the Simple API | peps.python.org",
+    "sha256": "a92bc6c6e94f917d74378c8e0e893c17edb2fa0e3d3f60035242cdf7226545db",
+    "archive": "sources/archive/peps.python.org_pep-0592.md"
+  },
+  "pep740": {
+    "fetched": "https://peps.python.org/pep-0740/",
+    "finalUrl": "https://peps.python.org/pep-0740/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "PEP 740 – Index support for digital attestations | peps.python.org",
+    "sha256": "9e83c9ad6c294f7d5180edeceb9e71dc7111a8e6ec02d43e49e8974fbc074648",
+    "archive": "sources/archive/peps.python.org_pep-0740.md"
+  },
+  "pep751": {
+    "fetched": "https://peps.python.org/pep-0751/",
+    "finalUrl": "https://peps.python.org/pep-0751/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "PEP 751 – A file format to record Python dependencies for installation reproducibility | peps.python.org",
+    "sha256": "a73937a1e942c22f3a4c623dd59d3a7008b7f85f1bbf293c50a966e7a1257ce0",
+    "archive": "sources/archive/peps.python.org_pep-0751.md"
+  },
+  "pep752": {
+    "fetched": "https://peps.python.org/pep-0752/",
+    "finalUrl": "https://peps.python.org/pep-0752/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "PEP 752 – Implicit namespaces for package repositories | peps.python.org",
+    "sha256": "d5535380b430f8f192915f128b743f42b891d646691f2697dc62b74854b1a081",
+    "archive": "sources/archive/peps.python.org_pep-0752.md"
+  },
+  "pipPrepare": {
+    "fetched": "https://raw.githubusercontent.com/pypa/pip/main/src/pip/_internal/operations/prepare.py",
+    "finalUrl": "https://raw.githubusercontent.com/pypa/pip/main/src/pip/_internal/operations/prepare.py",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.906Z",
+    "title": "prepare.py",
+    "sha256": "6a07fec409b34195f68c17d107fc3006349cf01556ecb06ad217179813c9b59e",
+    "archive": "sources/archive/raw.githubusercontent.com_pypa_pip_main_src_pip__internal_operations_prepare.py"
+  },
+  "pipSecureInstalls": {
+    "fetched": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+    "finalUrl": "https://pip.pypa.io/en/stable/topics/secure-installs/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "Secure installs - pip documentation v26.2.1",
+    "sha256": "c04452b5593e8d8d5b1f57c70e02c7349b02c3defe1e4080b48020becafacebe",
+    "archive": "sources/archive/pip.pypa.io_en_stable_topics_secure-installs.md"
+  },
+  "pipAudit": {
+    "fetched": "https://pypi.org/project/pip-audit/",
+    "finalUrl": "https://pypi.org/project/pip-audit/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "pip-audit",
+    "sha256": "996b89324f86bb49075d37f47c9c3369aa2fec2b42c254846c7de94c22497ae2",
+    "archive": "sources/archive/pypi.org_project_pip-audit.md"
+  },
+  "uvPublish": {
+    "fetched": "https://docs.astral.sh/uv/reference/cli/",
+    "finalUrl": "https://docs.astral.sh/uv/reference/cli/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "Commands | uv",
+    "sha256": "5206c02d2a45634dc8cd9a1aa101384f62f95790f69f057794cb86a1675131ef",
+    "archive": "sources/archive/docs.astral.sh_uv_reference_cli.md"
+  },
+  "npmTrustedPublishingGa": {
+    "fetched": "https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/",
+    "finalUrl": "https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "npm trusted publishing with OIDC is generally available",
+    "sha256": "61959d46d3e70727d8378bc3adee8fccc4b12a08a231116c179e02d8c033f73f",
+    "archive": "sources/archive/github.blog_changelog_2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available.md"
+  },
+  "npmTop100Require2fa": {
+    "fetched": "https://github.blog/2022-02-01-top-100-npm-package-maintainers-require-2fa-additional-security",
+    "finalUrl": "https://github.blog/security/supply-chain-security/top-100-npm-package-maintainers-require-2fa-additional-security/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Top-100 npm package maintainers now require 2FA, and additional security-focused improvements to npm",
+    "sha256": "f5013417c53f43801073e9dafc483152c1606b32212ca39ed91ce0177df579f0",
+    "archive": "sources/archive/github.blog_2022-02-01-top-100-npm-package-maintainers-require-2fa-additional-security.md"
+  },
+  "npmTop500Require2fa": {
+    "fetched": "https://github.blog/2022-05-10-enhanced-2fa-experience-for-your-npm-account/",
+    "finalUrl": "https://github.blog/news-insights/product-news/enhanced-2fa-experience-for-your-npm-account/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:31:09.093Z",
+    "title": "Enhanced 2FA experience for your npm account",
+    "sha256": "bc9f8a00ccf8560ec50e958b65b0e198134223d579b0164524196ce3ebccaf8f",
+    "archive": "sources/archive/github.blog_2022-05-10-enhanced-2fa-experience-for-your-npm-account.md"
+  },
+  "npmHighImpact2fa": {
+    "fetched": "https://github.blog/changelog/2022-11-01-high-impact-package-maintainers-now-require-2fa/",
+    "finalUrl": "https://github.blog/changelog/2022-11-01-high-impact-package-maintainers-now-require-2fa/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "High-impact package maintainers now require 2FA",
+    "sha256": "f01e69bfe069feb489b1c669556ce95c5fa676e1ac08fb86cf57144bb9eed7c1",
+    "archive": "sources/archive/github.blog_changelog_2022-11-01-high-impact-package-maintainers-now-require-2fa.md"
+  },
+  "npmSecureSupplyChainPlan": {
+    "fetched": "https://github.blog/security/supply-chain-security/our-plan-for-a-more-secure-npm-supply-chain/",
+    "finalUrl": "https://github.blog/security/supply-chain-security/our-plan-for-a-more-secure-npm-supply-chain/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "Our plan for a more secure npm supply chain",
+    "sha256": "1c4579ea906f6e4c09a50f71908449ecc00e36b34183e40e32428c84ae1fd75d",
+    "archive": "sources/archive/github.blog_security_supply-chain-security_our-plan-for-a-more-secure-npm-supply-chain.md"
+  },
+  "npmBypass2faRestricted": {
+    "fetched": "https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/",
+    "finalUrl": "https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Restricting npm bypass-2FA granular access tokens",
+    "sha256": "4f75b2cde6b60cd81182f6d51a7b0e7ce35c16cfe90795ba9a9c9ef1f991d693",
+    "archive": "sources/archive/github.blog_changelog_2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens.md"
+  },
+  "npmClassicTokensDisabled": {
+    "fetched": "https://github.blog/changelog/2025-11-05-npm-security-update-classic-token-creation-disabled-and-granular-token-changes/",
+    "finalUrl": "https://github.blog/changelog/2025-11-05-npm-security-update-classic-token-creation-disabled-and-granular-token-changes/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:37.084Z",
+    "title": "npm security update: Classic token creation disabled and granular token changes",
+    "sha256": "ca1be3b12c583d1c9e98c99e9989c9bb7bb508e77d4b5c41fe9bd79e5cf7fde5",
+    "archive": "sources/archive/github.blog_changelog_2025-11-05-npm-security-update-classic-token-creation-disabled-and-granular-token-changes.md"
+  },
+  "npmProvenanceGa": {
+    "fetched": "https://github.blog/changelog/2023-09-26-npm-provenance-general-availability/",
+    "finalUrl": "https://github.blog/changelog/2023-09-26-npm-provenance-general-availability/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:38.219Z",
+    "title": "npm provenance general availability",
+    "sha256": "906dc80360e46f43d14a0b0df818fde076990e28fd0ffa2da085eb43c25c9181",
+    "archive": "sources/archive/github.blog_changelog_2023-09-26-npm-provenance-general-availability.md"
+  },
+  "npmTrustedPublishersDocs": {
+    "fetched": "https://docs.npmjs.com/trusted-publishers",
+    "finalUrl": "https://docs.npmjs.com/trusted-publishers/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:31:09.093Z",
+    "title": "Trusted publishing for npm packages | npm Docs",
+    "sha256": "64892e0175bff40b9fb243c6124e6b92862731985654c5525671e57ae89c17a0",
+    "archive": "sources/archive/docs.npmjs.com_trusted-publishers.md"
+  },
+  "npmGeneratingProvenance": {
+    "fetched": "https://docs.npmjs.com/generating-provenance-statements",
+    "finalUrl": "https://docs.npmjs.com/generating-provenance-statements/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "Generating provenance statements | npm Docs",
+    "sha256": "9414ae727bac0150a0ab2288024df5c9bce858eac5d3436830ef6bb0c34fd044",
+    "archive": "sources/archive/docs.npmjs.com_generating-provenance-statements.md"
+  },
+  "npmProvenanceRepo": {
+    "fetched": "https://github.com/npm/provenance",
+    "finalUrl": "https://github.com/npm/provenance",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "GitHub - npm/provenance: Details on npm provenance",
+    "sha256": "b6a8a45f2a77611e5473c46f3a4e4b4c39a3c27b75c2efc22b1bb6f0861b1637",
+    "archive": "sources/archive/github.com_npm_provenance.md"
+  },
+  "npmVerifyingSignatures": {
+    "fetched": "https://docs.npmjs.com/verifying-registry-signatures",
+    "finalUrl": "https://docs.npmjs.com/verifying-registry-signatures/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Verifying ECDSA registry signatures | npm Docs",
+    "sha256": "b8916316a2deb4149c907cf391b6fe2f2f3f83631d0655a9fb039a6a83f1e074",
+    "archive": "sources/archive/docs.npmjs.com_verifying-registry-signatures.md"
+  },
+  "npmRegistryKeys": {
+    "fetched": "https://registry.npmjs.org/-/npm/v1/keys",
+    "finalUrl": "https://registry.npmjs.org/-/npm/v1/keys",
+    "status": 200,
+    "contentType": "application/json",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "keys",
+    "sha256": "faf23d8753d5bb79df250f10391ac89b63ecf7743e48487a544a99c847f9c8df",
+    "archive": "sources/archive/registry.npmjs.org_-_npm_v1_keys.json"
+  },
+  "npmPackageLock": {
+    "fetched": "https://docs.npmjs.com/cli/configuring-npm/package-lock-json",
+    "finalUrl": "https://docs.npmjs.com/cli/v12/configuring-npm/package-lock-json/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "package-lock.json | npm Docs",
+    "sha256": "5d496bfbb8db0e1bfd40427502eae5f71af96e1b2510abf2933a1c77bada58ee",
+    "archive": "sources/archive/docs.npmjs.com_cli_configuring-npm_package-lock-json.md"
+  },
+  "npmAccessTokens": {
+    "fetched": "https://docs.npmjs.com/about-access-tokens",
+    "finalUrl": "https://docs.npmjs.com/about-access-tokens/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "About access tokens | npm Docs",
+    "sha256": "f32c0863db6d7e5bd3dd0ab6efd54871d7abcf56091a0e3d487915b09ac8828d",
+    "archive": "sources/archive/docs.npmjs.com_about-access-tokens.md"
+  },
+  "npm2fa": {
+    "fetched": "https://docs.npmjs.com/configuring-two-factor-authentication",
+    "finalUrl": "https://docs.npmjs.com/configuring-two-factor-authentication/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Configuring two-factor authentication | npm Docs",
+    "sha256": "f9b2d94d031df1df8f4f15f020b3e79c7fc5212b5f72114270406976622acc81",
+    "archive": "sources/archive/docs.npmjs.com_configuring-two-factor-authentication.md"
+  },
+  "npmScopes": {
+    "fetched": "https://docs.npmjs.com/about-scopes",
+    "finalUrl": "https://docs.npmjs.com/about-scopes/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:37.084Z",
+    "title": "About scopes | npm Docs",
+    "sha256": "c0c41579eddfe45caf7c6e0723805e8332bdcaf70a3eee85b6e3a737fd3eee8c",
+    "archive": "sources/archive/docs.npmjs.com_about-scopes.md"
+  },
+  "npmUnpublishPolicy": {
+    "fetched": "https://docs.npmjs.com/policies/unpublish",
+    "finalUrl": "https://docs.npmjs.com/policies/unpublish/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:38.219Z",
+    "title": "npm Unpublish Policy | npm Docs",
+    "sha256": "e4154eff46719b8425d91bed800566e3e100ab9b675cf3828928d71de38726f7",
+    "archive": "sources/archive/docs.npmjs.com_policies_unpublish.md"
+  },
+  "npmDeprecate": {
+    "fetched": "https://docs.npmjs.com/deprecating-and-undeprecating-packages-or-package-versions",
+    "finalUrl": "https://docs.npmjs.com/deprecating-and-undeprecating-packages-or-package-versions/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:39.219Z",
+    "title": "Deprecating and undeprecating packages or package versions | npm Docs",
+    "sha256": "52b27d03651f7adc507dd74bacc09daaf8288f914a740ab15adfd8aa25a279a6",
+    "archive": "sources/archive/docs.npmjs.com_deprecating-and-undeprecating-packages-or-package-versions.md"
+  },
+  "npmInstallAudit": {
+    "fetched": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+    "finalUrl": "https://docs.npmjs.com/cli/v11/commands/npm-install/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:40.220Z",
+    "title": "npm-install | npm Docs",
+    "sha256": "edd3e97ab549196eb4b030b86a7c204eba13fe4b4374d66af9b2260677865a1b",
+    "archive": "sources/archive/docs.npmjs.com_cli_v11_commands_npm-install.md"
+  },
+  "npmMonikerRules": {
+    "fetched": "https://blog.npmjs.org/post/168978377570/new-package-moniker-rules",
+    "finalUrl": "https://blog.npmjs.org/post/168978377570/new-package-moniker-rules",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "npm Blog Archive: New Package Moniker rules",
+    "sha256": "0e9ff3fc2b8e8b8fbea4f6c98b4ade24cd4935b959df648238c44a5128cb8ca8",
+    "archive": "sources/archive/blog.npmjs.org_post_168978377570_new-package-moniker-rules.md"
+  },
+  "npmSecurityHolding": {
+    "fetched": "https://registry.npmjs.org/wesily",
+    "finalUrl": "https://registry.npmjs.org/wesily",
+    "status": 200,
+    "contentType": "application/json",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "wesily",
+    "sha256": "0225aac64959b2ab9bff0df0b6c967a7c089c82dc2bf2a8661b8a2349dfeafe1",
+    "archive": "sources/archive/registry.npmjs.org_wesily.json"
+  },
+  "npm12InstallScripts": {
+    "fetched": "https://github.com/orgs/community/discussions/198547",
+    "finalUrl": "https://github.com/orgs/community/discussions/198547",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.739Z",
+    "title": "Preparing for npm v12: install scripts and non-registry sources become opt-in · community · Discussion #198547",
+    "sha256": "f16056bd32ec3ae9b5308d3abb718ebaee882de3b515d274c7bd6df5ebe1719c",
+    "archive": "sources/archive/github.com_orgs_community_discussions_198547.md"
+  },
+  "pnpmTrustPolicy": {
+    "fetched": "https://pnpm.io/settings/dependency-resolution",
+    "finalUrl": "https://pnpm.io/settings/dependency-resolution",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.430Z",
+    "title": "Dependency Resolution Settings | pnpm",
+    "sha256": "dc8a62d9344b275758e2c38bea75c749563e65965e584fd135d838e6ca9bbdca",
+    "archive": "sources/archive/pnpm.io_settings_dependency-resolution.md"
+  },
+  "pnpmTrustChecks": {
+    "fetched": "https://raw.githubusercontent.com/pnpm/pnpm/main/pnpm11/resolving/npm-resolver/src/trustChecks.ts",
+    "finalUrl": "https://raw.githubusercontent.com/pnpm/pnpm/main/pnpm11/resolving/npm-resolver/src/trustChecks.ts",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "trustChecks.ts",
+    "sha256": "a37f0d0b2d30cb80d7852a651cb245c9c8a7c83de1dfd86372cfe3c0f652785b",
+    "archive": "sources/archive/raw.githubusercontent.com_pnpm_pnpm_main_pnpm11_resolving_npm-resolver_src_trustChecks.ts"
+  },
+  "pnpmSignatures": {
+    "fetched": "https://raw.githubusercontent.com/pnpm/pnpm/main/pnpm11/deps/security/signatures/README.md",
+    "finalUrl": "https://raw.githubusercontent.com/pnpm/pnpm/main/pnpm11/deps/security/signatures/README.md",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.083Z",
+    "title": "README.md",
+    "sha256": "7ee23810a926deffc539822e482cb8c9bce508881ba764523b9de321d85582bd",
+    "archive": "sources/archive/raw.githubusercontent.com_pnpm_pnpm_main_pnpm11_deps_security_signatures_README.md"
+  },
+  "yarnProvenance": {
+    "fetched": "https://raw.githubusercontent.com/yarnpkg/berry/master/packages/plugin-npm/sources/npmProvenance.ts",
+    "finalUrl": "https://raw.githubusercontent.com/yarnpkg/berry/master/packages/plugin-npm/sources/npmProvenance.ts",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:37.084Z",
+    "title": "npmProvenance.ts",
+    "sha256": "2aed375bcc4dca4208d6b25e577e8ddede71e144d1151bb75c177e18b02edc34",
+    "archive": "sources/archive/raw.githubusercontent.com_yarnpkg_berry_master_packages_plugin-npm_sources_npmProvenance.ts"
+  },
+  "bunInstall": {
+    "fetched": "https://bun.sh/docs/cli/install",
+    "finalUrl": "https://bun.sh/docs/pm/cli/install",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "bun install",
+    "sha256": "6d24d9f80dc6dfdd033a7add06bd00330d61283fc1a3009ca6f706891b9a1fd8",
+    "archive": "sources/archive/bun.sh_docs_cli_install.md"
+  },
+  "cratesUpdate202507": {
+    "fetched": "https://blog.rust-lang.org/2025/07/11/crates-io-development-update-2025-07",
+    "finalUrl": "https://blog.rust-lang.org/2025/07/11/crates-io-development-update-2025-07/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "crates.io: development update | Rust Blog",
+    "sha256": "17ca33b964e2b874ec36f7fcbab06e9a823bfad14aa390635dc3ff1136e0e59e",
+    "archive": "sources/archive/blog.rust-lang.org_2025_07_11_crates-io-development-update-2025-07.md"
+  },
+  "cratesUpdate202601": {
+    "fetched": "https://blog.rust-lang.org/2026/01/21/crates-io-development-update",
+    "finalUrl": "https://blog.rust-lang.org/2026/01/21/crates-io-development-update/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "crates.io: development update | Rust Blog",
+    "sha256": "6e751c97704ba625214b097a0d04c10ce62c93f01b875fc860149a24ab63f982",
+    "archive": "sources/archive/blog.rust-lang.org_2026_01_21_crates-io-development-update.md"
+  },
+  "cratesTokens": {
+    "fetched": "https://blog.rust-lang.org/2023/06/23/improved-api-tokens-for-crates-io/",
+    "finalUrl": "https://blog.rust-lang.org/2023/06/23/improved-api-tokens-for-crates-io/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Improved API tokens for crates.io | Rust Blog",
+    "sha256": "56d5952013b5886ac7c92076f5abe7e730946787fe7bbf7d5ba1b1d12cfb84f5",
+    "archive": "sources/archive/blog.rust-lang.org_2023_06_23_improved-api-tokens-for-crates-io.md"
+  },
+  "cratesMalware": {
+    "fetched": "https://blog.rust-lang.org/2026/02/13/crates.io-malicious-crate-update",
+    "finalUrl": "https://blog.rust-lang.org/2026/02/13/crates.io-malicious-crate-update/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "crates.io: an update to the malicious crate notification policy | Rust Blog",
+    "sha256": "fe8b5940769ed6b57747edbb20bfc265e58948a65780dbaa26f56e295ef9c995",
+    "archive": "sources/archive/blog.rust-lang.org_2026_02_13_crates.io-malicious-crate-update.md"
+  },
+  "cratesTrustedPublishingRfc": {
+    "fetched": "https://rust-lang.github.io/rfcs/3691-trusted-publishing-cratesio.html",
+    "finalUrl": "https://rust-lang.github.io/rfcs/3691-trusted-publishing-cratesio.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "trusted-publishing-cratesio - The Rust RFC Book",
+    "sha256": "9f1dd92f0d1b83380a3939adfab77f4551a9cfec5919792252344a4e30cfb036",
+    "archive": "sources/archive/rust-lang.github.io_rfcs_3691-trusted-publishing-cratesio.md"
+  },
+  "cratesDeletionRfc": {
+    "fetched": "https://rust-lang.github.io/rfcs/3660-crates-io-crate-deletions.html",
+    "finalUrl": "https://rust-lang.github.io/rfcs/3660-crates-io-crate-deletions.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "crates-io-crate-deletions - The Rust RFC Book",
+    "sha256": "1c86a57bf33a10d3c0a5d500e5e0bcb3b27f33f57724b29ac41c9fe3e705b766",
+    "archive": "sources/archive/rust-lang.github.io_rfcs_3660-crates-io-crate-deletions.md"
+  },
+  "cratesCanonName": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/crates.io/main/migrations/20150319224700_dumped_migration_93/up.sql",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/crates.io/main/migrations/20150319224700_dumped_migration_93/up.sql",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:25:29.978Z",
+    "title": "up.sql",
+    "sha256": "1c3a58f274d452e954c4f93e629474317e4ca1b6b59baad3be1271b7a1526ea1",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_crates.io_main_migrations_20150319224700_dumped_migration_93_up.sql"
+  },
+  "cratesCanonIndex": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/crates.io/main/migrations/20150319224701_dumped_migration_94/up.sql",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/crates.io/main/migrations/20150319224701_dumped_migration_94/up.sql",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:25:30.980Z",
+    "title": "up.sql",
+    "sha256": "795031f3f2cf6d908ba928f690ac90cebd56a290728ad2c947b3cf8f082ef174",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_crates.io_main_migrations_20150319224701_dumped_migration_94_up.sql"
+  },
+  "cratesTyposquat": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/crates.io/main/src/worker/jobs/typosquat.rs",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/crates.io/main/src/worker/jobs/typosquat.rs",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:39.213Z",
+    "title": "typosquat.rs",
+    "sha256": "b12e5e8b444f433e4ac7aa190d4c2673dd417fa05175cec891501c4399cf9a07",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_crates.io_main_src_worker_jobs_typosquat.rs"
+  },
+  "cargoIndex": {
+    "fetched": "https://doc.rust-lang.org/cargo/reference/registry-index.html",
+    "finalUrl": "https://doc.rust-lang.org/cargo/reference/registry-index.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Registry Index - The Cargo Book",
+    "sha256": "9e458427827df353c5e4f311fe066731489d89aa4a87f09bc5e92794b6ad76fa",
+    "archive": "sources/archive/doc.rust-lang.org_cargo_reference_registry-index.md"
+  },
+  "cargoDownloadVerify": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/cargo/master/src/sources/registry/download.rs",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/cargo/master/src/sources/registry/download.rs",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:23:49.187Z",
+    "title": "download.rs",
+    "sha256": "5e6a5834bf7b7730de648c2dbc41c9a90ac32a1a861c45e61147df0aace38335",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_cargo_master_src_sources_registry_download.rs"
+  },
+  "cargoLockExample": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/rustlings/main/Cargo.lock",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/rustlings/main/Cargo.lock",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:23:50.189Z",
+    "title": "Cargo.lock",
+    "sha256": "edb7f7b51e6581b4e5dff73b475496b53edc8e2f0076f974f31df4dd58e8bd92",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_rustlings_main_Cargo.lock"
+  },
+  "cargoBuildScripts": {
+    "fetched": "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
+    "finalUrl": "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Build Scripts - The Cargo Book",
+    "sha256": "d336fa3b31bb4874cb4ffc64c46ce70ab36806c99f69b954f7f342f1005d4cd1",
+    "archive": "sources/archive/doc.rust-lang.org_cargo_reference_build-scripts.md"
+  },
+  "cargoYank": {
+    "fetched": "https://doc.rust-lang.org/cargo/commands/cargo-yank.html",
+    "finalUrl": "https://doc.rust-lang.org/cargo/commands/cargo-yank.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "cargo yank - The Cargo Book",
+    "sha256": "489b8f39fa1889728d2738b0f1caceffc1ad0479c3cfd15aab141f9cf314c35b",
+    "archive": "sources/archive/doc.rust-lang.org_cargo_commands_cargo-yank.md"
+  },
+  "cargoSigstoreRfc": {
+    "fetched": "https://github.com/rust-lang/rfcs/pull/3403",
+    "finalUrl": "https://github.com/rust-lang/rfcs/pull/3403",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.079Z",
+    "title": "RFC: sigstore and cargo/crates.io by lulf · Pull Request #3403 · rust-lang/rfcs",
+    "sha256": "e57a33f084bb0aa5ac58f2118c311fdad7aa363986cfadc73cfc4678a677aa70",
+    "archive": "sources/archive/github.com_rust-lang_rfcs_pull_3403.md"
+  },
+  "rustTufGoal": {
+    "fetched": "https://rust-lang.github.io/goals/2025h1/verification-and-mirroring.html",
+    "finalUrl": "https://goals.rust-lang.org/2025h1/verification-and-mirroring.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Secure quorum-based cryptographic verification and mirroring for crates.io",
+    "sha256": "0efaba6ae03b86dae7938a8c990eb9ce45b8018def3c6a48181e10bb0dd51086",
+    "archive": "sources/archive/rust-lang.github.io_goals_2025h1_verification-and-mirroring.md"
+  },
+  "rustNamespacesGoal": {
+    "fetched": "https://rust-lang.github.io/goals/2026/open-namespaces.html",
+    "finalUrl": "https://goals.rust-lang.org/2026/open-namespaces.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "Implement Open Rust Namespace Support",
+    "sha256": "968b5061a505121c70c207b125cb6ee9b84ecc53a2ee95be1fe6742d5c8cc9b7",
+    "archive": "sources/archive/rust-lang.github.io_goals_2026_open-namespaces.md"
+  },
+  "rustsec": {
+    "fetched": "https://rustsec.org/",
+    "finalUrl": "https://rustsec.org/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "About RustSec › RustSec Advisory Database",
+    "sha256": "040d0df7a20a03b2eadaeff43544790a2d3b01abd3bcf7d824805e17f32ac683",
+    "archive": "sources/archive/rustsec.org.md"
+  },
+  "rubygemsTrustedPublishing": {
+    "fetched": "https://guides.rubygems.org/trusted-publishing/",
+    "finalUrl": "https://guides.rubygems.org/trusted-publishing/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Trusted Publishing - RubyGems Guides",
+    "sha256": "48a71d950bd42119510c7d094ef70c13b12a717f985a82930c393e7463a956f4",
+    "archive": "sources/archive/guides.rubygems.org_trusted-publishing.md"
+  },
+  "rubygemsMfaPopular": {
+    "fetched": "https://blog.rubygems.org/2022/08/15/requiring-mfa-on-popular-gems.html",
+    "finalUrl": "https://blog.rubygems.org/2022/08/15/requiring-mfa-on-popular-gems.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Requiring MFA on popular gem maintainers",
+    "sha256": "47753e438bf31db4620b84ae76925e9bb49bbd1ca1ae9c5a44d06050bd2d9487",
+    "archive": "sources/archive/blog.rubygems.org_2022_08_15_requiring-mfa-on-popular-gems.md"
+  },
+  "rubygemsMfaOptIn": {
+    "fetched": "https://guides.rubygems.org/mfa-requirement-opt-in/",
+    "finalUrl": "https://guides.rubygems.org/setting-up-multifactor-authentication/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Setting up multi-factor authentication - RubyGems Guides",
+    "sha256": "ec476cde0f8ad6c415607f0e766fe4a0fcfcd30ef36c3cb10ab5aab53488543c",
+    "archive": "sources/archive/guides.rubygems.org_mfa-requirement-opt-in.md"
+  },
+  "rubygemsMfaSetup": {
+    "fetched": "https://guides.rubygems.org/setting-up-multifactor-authentication/",
+    "finalUrl": "https://guides.rubygems.org/setting-up-multifactor-authentication/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Setting up multi-factor authentication - RubyGems Guides",
+    "sha256": "ec476cde0f8ad6c415607f0e766fe4a0fcfcd30ef36c3cb10ab5aab53488543c",
+    "archive": "sources/archive/guides.rubygems.org_setting-up-multifactor-authentication.md"
+  },
+  "rubygemsApiKeyScopes": {
+    "fetched": "https://guides.rubygems.org/api-key-scopes/",
+    "finalUrl": "https://guides.rubygems.org/api-key-scopes/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "API key scopes - RubyGems Guides",
+    "sha256": "9bfb188bd8dd37cfc4d3f26c11ee60ceba3386f91f7bb17a2a30d951c75b9c4e",
+    "archive": "sources/archive/guides.rubygems.org_api-key-scopes.md"
+  },
+  "rubygemsSecurityGuide": {
+    "fetched": "https://guides.rubygems.org/security/",
+    "finalUrl": "https://guides.rubygems.org/security/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Security - RubyGems Guides",
+    "sha256": "aed77c0c3d330ff3b66fa8771a81b64a2485e44aa137636174672daed48675fa",
+    "archive": "sources/archive/guides.rubygems.org_security.md"
+  },
+  "rubygemsExtensions": {
+    "fetched": "https://guides.rubygems.org/gems-with-extensions/",
+    "finalUrl": "https://guides.rubygems.org/gems-with-extensions/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:37.084Z",
+    "title": "Gems with Extensions - RubyGems Guides",
+    "sha256": "401a33139d2c6f303a17913b4bc8a6c76773c06aaf5daff3655ae56271133d2b",
+    "archive": "sources/archive/guides.rubygems.org_gems-with-extensions.md"
+  },
+  "rubygemsNameYourGem": {
+    "fetched": "https://guides.rubygems.org/name-your-gem/",
+    "finalUrl": "https://guides.rubygems.org/name-your-gem/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:38.219Z",
+    "title": "Name your gem - RubyGems Guides",
+    "sha256": "9e5aac6d286def0a2567683cb4801153c378f8771efddfcbd9f06922b0493876",
+    "archive": "sources/archive/guides.rubygems.org_name-your-gem.md"
+  },
+  "rubygemsPermadelete": {
+    "fetched": "https://blog.rubygems.org/2015/04/13/permadelete-on-yank.html",
+    "finalUrl": "https://blog.rubygems.org/2015/04/13/permadelete-on-yank.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Policy change about gem yank",
+    "sha256": "0103c01f97e8731e2ab9385ce53528ad13a3b40384cccd1523f9bfc638b43d7d",
+    "archive": "sources/archive/blog.rubygems.org_2015_04_13_permadelete-on-yank.md"
+  },
+  "rubygemsDec2024": {
+    "fetched": "https://blog.rubygems.org/2025/01/24/december-rubygems-updates.html",
+    "finalUrl": "https://blog.rubygems.org/2025/01/24/december-rubygems-updates.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "December 2024 RubyGems Updates",
+    "sha256": "e28eb3616be0858c0ce64d9d5fec4ec662287fcafcdddc110491f04b3a4ceaed",
+    "archive": "sources/archive/blog.rubygems.org_2025_01_24_december-rubygems-updates.md"
+  },
+  "rubygemsSecurityResponse": {
+    "fetched": "https://blog.rubygems.org/2025/08/25/rubygems-security-response.html",
+    "finalUrl": "https://blog.rubygems.org/2025/08/25/rubygems-security-response.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "How RubyGems.org Protects Our Community’s Critical OSS Infrastructure",
+    "sha256": "f97bc0a26167b6a42240f6c0329a7904e1d95976e88595f4196c281e308067fe",
+    "archive": "sources/archive/blog.rubygems.org_2025_08_25_rubygems-security-response.md"
+  },
+  "rubygemsPusher": {
+    "fetched": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/pusher.rb",
+    "finalUrl": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/pusher.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:40.215Z",
+    "title": "pusher.rb",
+    "sha256": "e61ac6869fdda8a12005c3903a11d6b48bea89f421aa76bddc68a6a6b0d7704c",
+    "archive": "sources/archive/raw.githubusercontent.com_rubygems_rubygems.org_master_app_models_pusher.rb"
+  },
+  "rubygemsGemTypo": {
+    "fetched": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/gem_typo.rb",
+    "finalUrl": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/gem_typo.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:41.215Z",
+    "title": "gem_typo.rb",
+    "sha256": "ba990a8b497149870c582d3310c9e5eaedf98871143c1ed4b504adc5ecc365fc",
+    "archive": "sources/archive/raw.githubusercontent.com_rubygems_rubygems.org_master_app_models_gem_typo.rb"
+  },
+  "gemPushCommand": {
+    "fetched": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/rubygems/commands/push_command.rb",
+    "finalUrl": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/rubygems/commands/push_command.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:42.216Z",
+    "title": "push_command.rb",
+    "sha256": "79d71f60f0f5a697eaa8f1e70b4a34491a7920d0d42f157ca28118fdf0ccfdd8",
+    "archive": "sources/archive/raw.githubusercontent.com_ruby_rubygems_master_lib_rubygems_commands_push_command.rb"
+  },
+  "bundler26": {
+    "fetched": "https://blog.rubygems.org/2024/12/19/bundler-v2-6",
+    "finalUrl": "https://blog.rubygems.org/2024/12/19/bundler-v2-6",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Bundler v2.6: lockfile checksums are finally there",
+    "sha256": "fd7e12c54cdab54100bce191d7a269f54cf8425fcbfbb815a0f180daeca42254",
+    "archive": "sources/archive/blog.rubygems.org_2024_12_19_bundler-v2-6.md"
+  },
+  "bundlerEndpointChecksum": {
+    "fetched": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/bundler/endpoint_specification.rb",
+    "finalUrl": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/bundler/endpoint_specification.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:23:51.190Z",
+    "title": "endpoint_specification.rb",
+    "sha256": "81017735b3b39e54fa690d7b530e826d8ad9933eb2785c19faf83956c57be94b",
+    "archive": "sources/archive/raw.githubusercontent.com_ruby_rubygems_master_lib_bundler_endpoint_specification.rb"
+  },
+  "bundlerChecksumMismatch": {
+    "fetched": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/bundler/checksum.rb",
+    "finalUrl": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/bundler/checksum.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:23:52.192Z",
+    "title": "checksum.rb",
+    "sha256": "ed746dc502a478de133d1b65abc21258353101048cb4a521fb3e98a7976160cd",
+    "archive": "sources/archive/raw.githubusercontent.com_ruby_rubygems_master_lib_bundler_checksum.rb"
+  },
+  "bundlerAudit": {
+    "fetched": "https://github.com/rubysec/bundler-audit",
+    "finalUrl": "https://github.com/rubysec/bundler-audit",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:38.212Z",
+    "title": "GitHub - rubysec/bundler-audit: Patch-level verification for Bundler",
+    "sha256": "72ad687880b8ddda3f9c6be000a8c0ca7875223db59086b751c6bb164cdaec8a",
+    "archive": "sources/archive/github.com_rubysec_bundler-audit.md"
+  },
+  "goSupplyChain": {
+    "fetched": "https://go.dev/blog/supply-chain",
+    "finalUrl": "https://go.dev/blog/supply-chain",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "How Go Mitigates Supply Chain Attacks - The Go Programming Language",
+    "sha256": "5e55f643365480c978379fa404acfaef6684a4da2c9ca71d8620709841509666",
+    "archive": "sources/archive/go.dev_blog_supply-chain.md"
+  },
+  "goModuleMirrorLaunch": {
+    "fetched": "https://go.dev/blog/module-mirror-launch",
+    "finalUrl": "https://go.dev/blog/module-mirror-launch",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Module Mirror and Checksum Database Launched - The Go Programming Language",
+    "sha256": "6a4cefd44ab3a4e46ea59a11ab18288dfc189f9f28049d2d4e6b8fec4b4df9b5",
+    "archive": "sources/archive/go.dev_blog_module-mirror-launch.md"
+  },
+  "goChecksumDb": {
+    "fetched": "https://go.dev/ref/mod",
+    "finalUrl": "https://go.dev/ref/mod",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Go Modules Reference - The Go Programming Language",
+    "sha256": "6a0728103e2bdd14e84d76ea7446ba9b9d427af36c40e0206967253247e8967f",
+    "archive": "sources/archive/go.dev_ref_mod.md"
+  },
+  "goRetract": {
+    "fetched": "https://go.dev/ref/mod",
+    "finalUrl": "https://go.dev/ref/mod",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Go Modules Reference - The Go Programming Language",
+    "sha256": "6a0728103e2bdd14e84d76ea7446ba9b9d427af36c40e0206967253247e8967f",
+    "archive": "sources/archive/go.dev_ref_mod.md"
+  },
+  "goModulePath": {
+    "fetched": "https://go.dev/ref/mod",
+    "finalUrl": "https://go.dev/ref/mod",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Go Modules Reference - The Go Programming Language",
+    "sha256": "6a0728103e2bdd14e84d76ea7446ba9b9d427af36c40e0206967253247e8967f",
+    "archive": "sources/archive/go.dev_ref_mod.md"
+  },
+  "goVcs": {
+    "fetched": "https://go.dev/ref/mod",
+    "finalUrl": "https://go.dev/ref/mod",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Go Modules Reference - The Go Programming Language",
+    "sha256": "6a0728103e2bdd14e84d76ea7446ba9b9d427af36c40e0206967253247e8967f",
+    "archive": "sources/archive/go.dev_ref_mod.md"
+  },
+  "goSignedNote": {
+    "fetched": "https://pkg.go.dev/golang.org/x/mod/sumdb/note",
+    "finalUrl": "https://pkg.go.dev/golang.org/x/mod/sumdb/note",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "note package - golang.org/x/mod/sumdb/note - Go Packages",
+    "sha256": "41cd5a2c91deb8e987a9d6a56ccab4438601c6d2ee36efe933b3f930218a63f4",
+    "archive": "sources/archive/pkg.go.dev_golang.org_x_mod_sumdb_note.md"
+  },
+  "goProxy": {
+    "fetched": "https://proxy.golang.org/",
+    "finalUrl": "https://proxy.golang.org/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:36:17.568Z",
+    "title": "Go modules services",
+    "sha256": "b120e51510a24ee1dee038f1f2af56cc6921420f9221ebdb6be534b70eaa37ad",
+    "archive": "sources/archive/proxy.golang.org.md"
+  },
+  "govulncheck": {
+    "fetched": "https://go.dev/doc/security/vuln/",
+    "finalUrl": "https://go.dev/doc/security/vuln/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "Go Vulnerability Management - The Go Programming Language",
+    "sha256": "63b96f3b84155736a6908753a58117a4e999cdbad59cb3242b25ab134d32a152",
+    "archive": "sources/archive/go.dev_doc_security_vuln.md"
+  },
+  "mavenGpgRequirement": {
+    "fetched": "https://central.sonatype.org/publish/requirements/gpg/",
+    "finalUrl": "https://central.sonatype.org/publish/requirements/gpg/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Working with PGP Signatures",
+    "sha256": "ac3de1769090f0353fd7d8da660fcb2cd264b43819da10d5804d4b565ce9d10a",
+    "archive": "sources/archive/central.sonatype.org_publish_requirements_gpg.md"
+  },
+  "mavenSigstoreValidation": {
+    "fetched": "https://central.sonatype.org/news/20250128_sigstore_signature_validation_via_portal/",
+    "finalUrl": "https://central.sonatype.org/news/20250128_sigstore_signature_validation_via_portal/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Sigstore Signature Validation Is Now Available Via The Central Publisher Portal",
+    "sha256": "7288c88df5bbd506769c1d65d3b055cffb3a07f401bd8fd75e7e773de44c328c",
+    "archive": "sources/archive/central.sonatype.org_news_20250128_sigstore_signature_validation_via_portal.md"
+  },
+  "mavenPortalApi": {
+    "fetched": "https://central.sonatype.org/publish/publish-portal-api/",
+    "finalUrl": "https://central.sonatype.org/publish/publish-portal-api/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Publish Portal API",
+    "sha256": "aadb17ba5615d3a03b343194b6738c38563ae1b5904b7ac839f09a0a79aaacc1",
+    "archive": "sources/archive/central.sonatype.org_publish_publish-portal-api.md"
+  },
+  "mavenPortalToken": {
+    "fetched": "https://central.sonatype.org/publish/generate-portal-token/",
+    "finalUrl": "https://central.sonatype.org/publish/generate-portal-token/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:35.083Z",
+    "title": "Generating a Portal Token for Publishing",
+    "sha256": "2bf34c8cfb6739a0d8dd0f38afa529c08a098d4bd8f64c10ee69f0d902021f36",
+    "archive": "sources/archive/central.sonatype.org_publish_generate-portal-token.md"
+  },
+  "mavenImmutable": {
+    "fetched": "https://central.sonatype.org/faq/can-i-change-a-component/",
+    "finalUrl": "https://central.sonatype.org/faq/can-i-change-a-component/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Can I change, modify, delete, remove, or update a component on Central?",
+    "sha256": "39647354de30519f5cd20a8cea3c5ef7586169b373ca12de4e84a10880df302b",
+    "archive": "sources/archive/central.sonatype.org_faq_can-i-change-a-component.md"
+  },
+  "mavenNamespace": {
+    "fetched": "https://central.sonatype.org/register/namespace/",
+    "finalUrl": "https://central.sonatype.org/register/namespace/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:37.084Z",
+    "title": "Register a Namespace",
+    "sha256": "938097f11e9f864ce633e688246b9eff747a2f3d1aa32cdde0ca7502a09a40fc",
+    "archive": "sources/archive/central.sonatype.org_register_namespace.md"
+  },
+  "sonatypeMfa": {
+    "fetched": "https://help.sonatype.com/en/authentication-with-sonatype-cloud.html",
+    "finalUrl": "https://help.sonatype.com/en/authentication-with-sonatype-cloud.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Authentication with Sonatype Cloud",
+    "sha256": "ce72459e386445d264ed6d4e73512334df8416800fe5e17fa604375c6a1dcc16",
+    "archive": "sources/archive/help.sonatype.com_en_authentication-with-sonatype-cloud.md"
+  },
+  "mavenMalwareRemoved": {
+    "fetched": "https://www.sonatype.com/blog/malware-removed-from-maven-central",
+    "finalUrl": "https://www.sonatype.com/blog/malware-removed-from-maven-central",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Sonatype Thwarts Major Software Supply Chain Attack",
+    "sha256": "bd2bb600ce7fc4b08a119fc4d34cd87e3fb3193abd5e4d91df051d253777c220",
+    "archive": "sources/archive/www.sonatype.com_blog_malware-removed-from-maven-central.md"
+  },
+  "mavenResolverChecksums": {
+    "fetched": "https://maven.apache.org/resolver/about-checksums.html",
+    "finalUrl": "https://maven.apache.org/resolver/about-checksums.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Checksums – Artifact Resolver",
+    "sha256": "e8c9301379c72728ef797dffa9eae465a4e3fa07b82121d62273183d83834873",
+    "archive": "sources/archive/maven.apache.org_resolver_about-checksums.md"
+  },
+  "mavenChecksumFailJira": {
+    "fetched": "https://issues.apache.org/jira/browse/MNG-5728",
+    "finalUrl": "https://issues.apache.org/jira/browse/MNG-5728",
+    "status": 200,
+    "contentType": "text/html;charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "[MNG-5728] Switch the default checksum policy from \"warn\" to \"fail\"",
+    "sha256": "d40c1f8124921a3caf4832dacab6e4f778bce77ed0b9a21a8fe124c553ab9ebb",
+    "archive": "sources/archive/issues.apache.org_jira_browse_MNG-5728.md"
+  },
+  "mavenLockfile": {
+    "fetched": "https://github.com/chains-project/maven-lockfile",
+    "finalUrl": "https://github.com/chains-project/maven-lockfile",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:39.363Z",
+    "title": "GitHub - chains-project/maven-lockfile: Lockfiles for Maven. Pin your dependencies. Build with integrity.",
+    "sha256": "a73faca15459a38774af9f5a5e48b82862a06aaa8ad20714b4600de99caaa51a",
+    "archive": "sources/archive/github.com_chains-project_maven-lockfile.md"
+  },
+  "pgpverifyMavenPlugin": {
+    "fetched": "https://www.simplify4u.org/pgpverify-maven-plugin/",
+    "finalUrl": "https://www.simplify4u.org/pgpverify-maven-plugin/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Introduction – Verify PGP signatures plugin",
+    "sha256": "8527d35fe2f3235b3ee0fcdc56d40e16561b1910d546c3dcc1bee6ff11ccd73f",
+    "archive": "sources/archive/www.simplify4u.org_pgpverify-maven-plugin.md"
+  },
+  "gradleVerification": {
+    "fetched": "https://docs.gradle.org/current/userguide/dependency_verification.html",
+    "finalUrl": "https://docs.gradle.org/current/userguide/dependency_verification.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Verifying Dependencies",
+    "sha256": "05e4796aa5048e07c09fcfe849e1f31f50af734c9437c261ef4b99f3b1745c50",
+    "archive": "sources/archive/docs.gradle.org_current_userguide_dependency_verification.md"
+  },
+  "jdk23AnnotationProcessing": {
+    "fetched": "https://inside.java/2024/06/18/quality-heads-up/",
+    "finalUrl": "https://inside.java/2024/06/18/quality-heads-up/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Quality Outreach Heads-up - JDK 23: Changes Default Annotation Processing Policy - Inside.java",
+    "sha256": "3cf4ce87a17d96facfa854865f49464dc043c39ed41e632c3f4a52d3a9c16693",
+    "archive": "sources/archive/inside.java_2024_06_18_quality-heads-up.md"
+  },
+  "owaspDependencyCheck": {
+    "fetched": "https://owasp.org/www-project-dependency-check/",
+    "finalUrl": "https://owasp.org/projects/dependency-check",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "OWASP Dependency-Check | OWASP Foundation",
+    "sha256": "ce4fc23d36f5528cb66bae0c2b8d598be3fcf6977a3fed12d295046f6d2989b0",
+    "archive": "sources/archive/owasp.org_www-project-dependency-check.md"
+  },
+  "packagist2026": {
+    "fetched": "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
+    "finalUrl": "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "An update on Composer & Packagist supply chain security",
+    "sha256": "df66a1ff4a913459147aedf2dee1f92619ca829d44762cbb51c0e136d0371348",
+    "archive": "sources/archive/blog.packagist.com_an-update-on-composer-packagist-supply-chain-security.md"
+  },
+  "packagistImmutable": {
+    "fetched": "https://blog.packagist.com/immutable-versions-on-packagist/",
+    "finalUrl": "https://blog.packagist.com/immutable-versions-on-packagist/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Immutable Versions on Packagist",
+    "sha256": "2eeae02e30c7bf22c304335d8e59b0ee84eeb7414de57e7a3c20a022e0621d62",
+    "archive": "sources/archive/blog.packagist.com_immutable-versions-on-packagist.md"
+  },
+  "packagistVendorHijacking": {
+    "fetched": "https://blog.packagist.com/preventing-dependency-hijacking/",
+    "finalUrl": "https://blog.packagist.com/preventing-dependency-hijacking/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Preventing Dependency Confusion in PHP with Composer",
+    "sha256": "43007c3a4b72cc9afc33f7adabee80c224ee0ec35d084f9fef9d60e988fd0e61",
+    "archive": "sources/archive/blog.packagist.com_preventing-dependency-hijacking.md"
+  },
+  "packagist15Years": {
+    "fetched": "https://blog.packagist.com/15-years-of-packagist-over-200-billion-package-installs/",
+    "finalUrl": "https://blog.packagist.com/15-years-of-packagist-over-200-billion-package-installs/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:35.084Z",
+    "title": "15 years of Packagist: Over 200 billion package installs",
+    "sha256": "e35dd4e817ed5679077641ce2a0325e1c8a9b47a80a1a6a50318004bfd956d6d",
+    "archive": "sources/archive/blog.packagist.com_15-years-of-packagist-over-200-billion-package-installs.md"
+  },
+  "privatePackagistAug2026": {
+    "fetched": "https://blog.packagist.com/whats-new-in-private-packagist-august-2026-update/",
+    "finalUrl": "https://blog.packagist.com/whats-new-in-private-packagist-august-2026-update/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "What's new in Private Packagist, August 2026 update",
+    "sha256": "587efa79b82c7cca303d29355ea39b5795dec4adc6e6a93eee0faf08bfbe5a30",
+    "archive": "sources/archive/blog.packagist.com_whats-new-in-private-packagist-august-2026-update.md"
+  },
+  "packagistAbout": {
+    "fetched": "https://packagist.org/about",
+    "finalUrl": "https://packagist.org/about",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.431Z",
+    "title": "Packagist The PHP Package Repository",
+    "sha256": "5863aafdfb3e0aafcfbc18bb8870d382fb827c0c749e7806531dda9c5708346d",
+    "archive": "sources/archive/packagist.org_about.md"
+  },
+  "packagistMonologP2": {
+    "fetched": "https://repo.packagist.org/p2/monolog/monolog.json",
+    "finalUrl": "https://repo.packagist.org/p2/monolog/monolog.json",
+    "status": 200,
+    "contentType": "application/json",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "monolog.json",
+    "sha256": "cd56610dd4a54f6c415c377d362d7007f8b4028cc118d366fd6c8a05d46d2463",
+    "archive": "sources/archive/repo.packagist.org_p2_monolog_monolog.json"
+  },
+  "packagistTypoValidator": {
+    "fetched": "https://raw.githubusercontent.com/composer/packagist/main/src/Validator/TypoSquattersValidator.php",
+    "finalUrl": "https://raw.githubusercontent.com/composer/packagist/main/src/Validator/TypoSquattersValidator.php",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:43.217Z",
+    "title": "TypoSquattersValidator.php",
+    "sha256": "e3efeef3923d1b6c9bb2785313fb0358c855196c8a9f573a70c4199a00561179",
+    "archive": "sources/archive/raw.githubusercontent.com_composer_packagist_main_src_Validator_TypoSquattersValidator.php"
+  },
+  "composerRepositories": {
+    "fetched": "https://getcomposer.org/doc/05-repositories.md",
+    "finalUrl": "https://getcomposer.org/doc/05-repositories.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "Repositories - Composer",
+    "sha256": "8b8532f33d73916aefff95e8117cffc190ead83f052226d9f0e8b61f3024c0c7",
+    "archive": "sources/archive/getcomposer.org_doc_05-repositories.md"
+  },
+  "composerLockfile": {
+    "fetched": "https://getcomposer.org/doc/01-basic-usage.md",
+    "finalUrl": "https://getcomposer.org/doc/01-basic-usage.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "Basic usage - Composer",
+    "sha256": "e4a62229ab5952a9ea04845ad11a6220a7a97cd7c46e613054d730112bbb7e6e",
+    "archive": "sources/archive/getcomposer.org_doc_01-basic-usage.md"
+  },
+  "composerInstall": {
+    "fetched": "https://getcomposer.org/doc/03-cli.md",
+    "finalUrl": "https://getcomposer.org/doc/03-cli.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:33.907Z",
+    "title": "Command-line interface / Commands - Composer",
+    "sha256": "84a564ce49b409fd979a9d824206863cc068bc75a3d8c03516f8afdb982fae69",
+    "archive": "sources/archive/getcomposer.org_doc_03-cli.md"
+  },
+  "composerAllowPlugins": {
+    "fetched": "https://getcomposer.org/doc/06-config.md",
+    "finalUrl": "https://getcomposer.org/doc/06-config.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:35.084Z",
+    "title": "Config - Composer",
+    "sha256": "e48b937b637e7d52b0cefe821192250593f7221f29db42e4c85b6e0da2cb6798",
+    "archive": "sources/archive/getcomposer.org_doc_06-config.md"
+  },
+  "composerPolicy": {
+    "fetched": "https://getcomposer.org/doc/06-config.md",
+    "finalUrl": "https://getcomposer.org/doc/06-config.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:35.084Z",
+    "title": "Config - Composer",
+    "sha256": "e48b937b637e7d52b0cefe821192250593f7221f29db42e4c85b6e0da2cb6798",
+    "archive": "sources/archive/getcomposer.org_doc_06-config.md"
+  },
+  "composerScripts": {
+    "fetched": "https://getcomposer.org/doc/articles/scripts.md",
+    "finalUrl": "https://getcomposer.org/doc/articles/scripts.md",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-14T07:20:36.084Z",
+    "title": "Scripts - Composer",
+    "sha256": "3f29263dae4e3a509e4b9aefa8173fd8b7e40ef5830f1b8690bb5bab1bd0732e",
+    "archive": "sources/archive/getcomposer.org_doc_articles_scripts.md"
+  },
+  "sigstoreTrustedRoot": {
+    "fetched": "https://raw.githubusercontent.com/sigstore/root-signing/main/targets/trusted_root.json",
+    "finalUrl": "https://raw.githubusercontent.com/sigstore/root-signing/main/targets/trusted_root.json",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:44.237Z",
+    "title": "trusted_root.json",
+    "sha256": "6494e21ea73fa7ee769f85f57d5a3e6a08725eae1e38c755fc3517c9e6bc0b66",
+    "archive": "sources/archive/raw.githubusercontent.com_sigstore_root-signing_main_targets_trusted_root.json"
+  },
+  "sigstorePqc": {
+    "fetched": "https://blog.sigstore.dev/pqc-sigstore/",
+    "finalUrl": "https://blog.sigstore.dev/pqc-sigstore/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "Post-Quantum Cryptography for Sigstore - Sigstore Blog",
+    "sha256": "f4a370dadbd2789d23b915f6a3882031485149b5ae4b740694f1bfc67c6d665b",
+    "archive": "sources/archive/blog.sigstore.dev_pqc-sigstore.md"
+  },
+  "githubOidcJwks": {
+    "fetched": "https://token.actions.githubusercontent.com/.well-known/jwks",
+    "finalUrl": "https://token.actions.githubusercontent.com/.well-known/jwks",
+    "status": 200,
+    "contentType": "application/json",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "jwks",
+    "sha256": "5f8164c9696c27837ad18c5fe7c7022a433bd5390183e8ff15c74d82233270f4",
+    "archive": "sources/archive/token.actions.githubusercontent.com_.well-known_jwks.json"
+  },
+  "githubUserKeys": {
+    "fetched": "https://docs.github.com/en/rest/users/keys",
+    "finalUrl": "https://docs.github.com/en/rest/users/keys",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "REST API endpoints for Git SSH keys - GitHub Docs",
+    "sha256": "d35c1497b21e275f138a357dcd8b06379f72b18649812df0e72fac20f631d537",
+    "archive": "sources/archive/docs.github.com_en_rest_users_keys.md"
+  },
+  "github2fa": {
+    "fetched": "https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/about-two-factor-authentication",
+    "finalUrl": "https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/about-two-factor-authentication",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-14T07:20:32.906Z",
+    "title": "About two-factor authentication - GitHub Docs",
+    "sha256": "8580f853828deb3a4601ae5afc57597428bc4b3a863f3665d63ae5c3ea39b989",
+    "archive": "sources/archive/docs.github.com_en_authentication_securing-your-account-with-two-factor-authentication-2fa_about-two-factor-authenticati.md"
+  },
+  "rfc9980": {
+    "fetched": "https://www.rfc-editor.org/rfc/rfc9980.html",
+    "finalUrl": "https://www.rfc-editor.org/rfc/rfc9980.html",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "RFC 9980: Post-Quantum Cryptography in OpenPGP",
+    "sha256": "f58085a1887dcc8eeadbd9c00bd2322b76c93a6af92775cfac7047b75626c30f",
+    "archive": "sources/archive/www.rfc-editor.org_rfc_rfc9980.md"
+  },
+  "probePqTls": {
+    "fetched": "bun run scripts/probe-pq-tls.ts",
+    "accessedAt": "2026-10-14T07:20:31.432Z",
+    "title": "scripts/probe-pq-tls.ts",
+    "sha256": "e8997dbfc5617f987c7f68bde40ae1718163181c969596f0359a97bfb4a3ad17",
+    "archive": "sources/archive/probePqTls.txt"
+  }
+}

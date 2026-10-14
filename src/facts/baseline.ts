@@ -1,6 +1,7 @@
 /**
  * Registry baseline: ecosystem-level protections that the seven per-release signals do not
- * measure, curated from primary sources (verified 2026-10-13).
+ * measure, curated from primary sources
+ * (src/sources/registry.ts; every cited passage is archived under sources/).
  *
  * The trust score asks "can an outsider verify who published this, and from what source?".
  * This table asks the complementary question: "does the default toolchain stop tampering and
@@ -11,6 +12,7 @@
  * sampled packages, and several depend on the client a user happens to run.
  */
 
+import { cite, lastAccessed, type Cite } from "../sources/index.ts";
 import type { EcosystemId } from "../types.ts";
 
 export const BASELINE_PROPERTIES = [
@@ -46,9 +48,6 @@ export const BASELINE_PROPERTIES = [
   },
 ] as const;
 
-/** When every baseline value was last checked against its sources. */
-export const BASELINE_VERIFIED = "2026-10-13";
-
 export type BaselineProperty = (typeof BASELINE_PROPERTIES)[number]["id"];
 export type BaselineValue = "yes" | "partial" | "no" | "n/a";
 
@@ -59,113 +58,176 @@ export interface BaselineFact {
   /** When the current value took effect, if recently — the backfill quarters predate it. */
   since?: string;
   note: string;
-  sources: string[];
+  sources: Cite[];
 }
-
-const S = {
-  goSupplyChain: "https://go.dev/blog/supply-chain",
-  goSumdb: "https://go.dev/ref/mod#checksum-database",
-  pypi14days: "https://blog.pypi.org/posts/2026-07-22-releases-now-reject-new-files-after-14-days/",
-  pypiFilenameReuse: "https://pypi.org/help/#file-name-reuse",
-  pipHashes: "https://github.com/pypa/pip/blob/main/src/pip/_internal/operations/prepare.py",
-  pipSecure: "https://pip.pypa.io/en/stable/topics/secure-installs/",
-  pep751: "https://peps.python.org/pep-0751/",
-  pep458: "https://peps.python.org/pep-0458/",
-  pypiTokens: "https://pypi.org/help/#apitoken",
-  npmUnpublish: "https://docs.npmjs.com/policies/unpublish",
-  npmLock: "https://docs.npmjs.com/cli/configuring-npm/package-lock-json",
-  npmVerify: "https://docs.npmjs.com/verifying-registry-signatures",
-  npmTokens: "https://github.blog/changelog/2025-11-05-npm-security-update-classic-token-creation-disabled-and-granular-token-changes/",
-  npm12: "https://github.com/orgs/community/discussions/198547",
-  cratesDeletion: "https://rust-lang.github.io/rfcs/3660-crates-io-crate-deletions.html",
-  cargoIndex: "https://doc.rust-lang.org/cargo/reference/registry-index.html",
-  cargoBuildScripts: "https://doc.rust-lang.org/cargo/reference/build-scripts.html",
-  rustTuf: "https://rust-lang.github.io/goals/2025h1/verification-and-mirroring.html",
-  cratesTokens: "https://blog.rust-lang.org/2023/06/23/improved-api-tokens-for-crates-io/",
-  rubygemsYank: "https://blog.rubygems.org/2015/04/13/permadelete-on-yank.html",
-  bundler26: "https://bundler.io/blog/2024/12/19/bundler-v2-6.html",
-  rubygemsSecurity: "https://guides.rubygems.org/security/",
-  rubygemsKeys: "https://guides.rubygems.org/api-key-scopes/",
-  rubygemsExtensions: "https://guides.rubygems.org/gems-with-extensions/",
-  mavenImmutable: "https://central.sonatype.org/faq/can-i-change-a-component/",
-  mavenChecksums: "https://maven.apache.org/resolver/about-checksums.html",
-  mavenChecksumFail: "https://issues.apache.org/jira/browse/MNG-5728",
-  mavenLockfile: "https://github.com/chains-project/maven-lockfile",
-  mavenPgpVerify: "https://www.simplify4u.org/pgpverify-maven-plugin/",
-  mavenTokens: "https://central.sonatype.org/publish/generate-portal-token/",
-  jdk23Proc: "https://inside.java/2024/06/18/quality-heads-up/",
-  packagist2026: "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
-  packagistImmutable: "https://blog.packagist.com/immutable-versions-on-packagist/",
-  packagistP2: "https://repo.packagist.org/p2/monolog/monolog.json",
-  composerLock: "https://getcomposer.org/doc/01-basic-usage.md#commit-your-composer-lock-file-to-version-control",
-  composerPlugins: "https://getcomposer.org/doc/06-config.md#allow-plugins",
-  composerScripts: "https://getcomposer.org/doc/articles/scripts.md",
-};
 
 const f = (
   ecosystem: EcosystemId,
   property: BaselineProperty,
   value: BaselineValue,
   note: string,
-  sources: string[],
+  sources: Cite[],
   since?: string,
 ): BaselineFact => ({ ecosystem, property, value, note, sources, ...(since ? { since } : {}) });
 
 export const BASELINE: BaselineFact[] = [
   // Immutable versions
-  f("pypi", "immutable_versions", "yes", "Filenames can never be reused; new files are rejected on releases older than 14 days (before: any release could gain new files).", [S.pypiFilenameReuse, S.pypi14days], "2026-07"),
-  f("npm", "immutable_versions", "yes", "A version number can never be reused, even after unpublishing.", [S.npmUnpublish]),
-  f("crates", "immutable_versions", "yes", "Versions are yanked, not replaced; deletion only within 72 h or for barely-used single-owner crates.", [S.cratesDeletion]),
-  f("rubygems", "immutable_versions", "yes", "A version cannot be pushed twice, even after it is yanked.", [S.rubygemsYank]),
-  f("go", "immutable_versions", "yes", "The proxy and checksum database pin each version's contents; re-tagging upstream changes nothing.", [S.goSupplyChain]),
-  f("maven", "immutable_versions", "yes", "Released components can never be changed or deleted.", [S.mavenImmutable]),
-  f("packagist", "immutable_versions", "yes", "Stable versions keep their original commit when the tag is moved upstream; dev branches stay mutable. Archives are still generated by the forge, so bytes may differ for the same commit.", [S.packagistImmutable, S.packagist2026], "2026-07"),
+  f("pypi", "immutable_versions", "yes", "Filenames can never be reused; new files are rejected on releases older than 14 days (before: any release could gain new files).", [
+    cite("pypiHelpFilenameReuse", "PyPI does not allow for a filename to be reused, even once a project has been deleted and recreated."),
+    cite("pypi14Days", "The Python Package Index (PyPI) now rejects new files being uploaded to releases that are older than 14 days."),
+  ], "2026-07"),
+  f("npm", "immutable_versions", "yes", "A version number can never be reused, even after unpublishing.", [
+    cite("npmUnpublishPolicy", "Once `package@version` has been used, you can never use it again. You must publish a new version even if you unpublished the old one."),
+  ]),
+  f("crates", "immutable_versions", "yes", "Versions are yanked, not replaced; deletion only within 72 h or for barely-used single-owner crates.", [
+    cite("cratesDeletionRfc", "The crate has been published for less than 72 hours"),
+    cite("cratesDeletionRfc", "The crate has a single owner"),
+  ]),
+  f("rubygems", "immutable_versions", "yes", "A version cannot be pushed twice, even after it is yanked.", [
+    cite("rubygemsPermadelete", "A gem version can not be published twice. So if you `gem yank` a version, you cannot quickly fix something then push a new version."),
+  ]),
+  f("go", "immutable_versions", "yes", "The proxy and checksum database pin each version's contents; re-tagging upstream changes nothing.", [
+    cite("goSupplyChain", "Since the Checksum Database guarantees that there can be only one source tree for a given module version, everyone using the proxy will see the same result as everyone bypassing it"),
+  ]),
+  f("maven", "immutable_versions", "yes", "Released components can never be changed or deleted.", [
+    cite("mavenImmutable", "Once a component has been released and published to the Central Repository, it cannot be altered."),
+  ]),
+  f("packagist", "immutable_versions", "yes", "Stable versions keep their original commit when the tag is moved upstream; dev branches stay mutable. Archives are still generated by the forge, so bytes may differ for the same commit.", [
+    cite("packagistImmutable", "Stable version metadata on Packagist.org is now immutable. Once a version has been published, the git reference it points to can no longer change."),
+    cite("packagistImmutable", "Dev versions, which track branches, are unaffected."),
+    cite("packagist2026", "Packagist.org hosting immutable build artifacts directly, with SLSA build provenance and Sigstore attestations verified on the Composer client side."),
+  ], "2026-07"),
 
   // Install checks hash
-  f("pypi", "install_verifies_hash", "yes", "pip checks each file against the sha256 the index lists for it, without needing --require-hashes.", [S.pipHashes]),
-  f("npm", "install_verifies_hash", "yes", "Tarballs are checked against dist.integrity.", [S.npmLock]),
-  f("crates", "install_verifies_hash", "yes", "Cargo checks every .crate against the index's sha256 (cksum).", [S.cargoIndex]),
-  f("rubygems", "install_verifies_hash", "yes", "Bundler validates gems against the compact index's checksums.", [S.bundler26]),
-  f("go", "install_verifies_hash", "yes", "Every module is checked against go.sum and the checksum database.", [S.goSumdb]),
-  f("maven", "install_verifies_hash", "partial", "Maven 3 checks .sha1 files but only warns on mismatch by default; Maven 4 fails. The checksums come from the same server as the artifact.", [S.mavenChecksums, S.mavenChecksumFail]),
-  f("packagist", "install_verifies_hash", "no", "Packagist publishes an empty dist.shasum for forge-hosted archives, so Composer has nothing to check; the commit in the archive URL is the only pin.", [S.packagistP2]),
+  f("pypi", "install_verifies_hash", "yes", "pip checks each file against the sha256 the index lists for it, without needing --require-hashes.", [
+    cite("pipPrepare", "if not self.require_hashes: return req.hashes(trust_internet=True)"),
+  ]),
+  f("npm", "install_verifies_hash", "yes", "Tarballs are checked against dist.integrity.", [
+    cite("npmPackageLock", "integrity: A `sha512` or `sha1` Standard Subresource Integrity string for the artifact that was unpacked in this location."),
+  ]),
+  f("crates", "install_verifies_hash", "yes", "Cargo checks every .crate against the index's sha256 (cksum).", [
+    cite("cargoIndex", "A SHA256 checksum of the `.crate` file."),
+    cite("cargoDownloadVerify", "anyhow::bail!(\"failed to verify the checksum of `{}`\", pkg)"),
+  ]),
+  f("rubygems", "install_verifies_hash", "yes", "Bundler validates gems against the compact index's checksums.", [
+    cite("bundlerEndpointChecksum", "@checksum = Checksum.from_api(checksum, @spec_fetcher.uri)"),
+    cite("bundlerChecksumMismatch", "raise(ChecksumMismatchError.new(display_name, existing, checksum))"),
+  ]),
+  f("go", "install_verifies_hash", "yes", "Every module is checked against go.sum and the checksum database.", [
+    cite("goChecksumDb", "the go command may connect to the checksum database to verify cryptographic hashes of modules not listed in go.sum"),
+  ]),
+  f("maven", "install_verifies_hash", "partial", "Maven 3 checks .sha1 files but only warns on mismatch by default; Maven 4 fails. The checksums come from the same server as the artifact.", [
+    cite("mavenResolverChecksums", "Checksums retrieved alongside an artifact or over the same transport only provide integrity verification."),
+    cite("mavenChecksumFailJira", "The default checksum policy when obtaining artifacts during a build is currently, by default, \"warn\"."),
+    cite("mavenChecksumFailJira", "Fix Version/s: 4.0.0-alpha-2"),
+  ]),
+  f("packagist", "install_verifies_hash", "no", "Packagist publishes an empty dist.shasum for forge-hosted archives, so Composer has nothing to check; the commit in the archive URL is the only pin.", [
+    cite("packagistMonologP2", '"shasum": ""'),
+  ]),
 
   // Lockfile pins hashes
-  f("pypi", "lockfile_pins_hashes", "partial", "pip has no default lockfile; PEP 751 pylock.toml (2025) and tools like uv and Poetry record hashes.", [S.pep751]),
-  f("npm", "lockfile_pins_hashes", "yes", "package-lock.json records each package's integrity hash.", [S.npmLock]),
-  f("crates", "lockfile_pins_hashes", "yes", "Cargo.lock records each crate's checksum.", [S.cargoIndex]),
-  f("rubygems", "lockfile_pins_hashes", "partial", "Gemfile.lock CHECKSUMS since Bundler 2.6, opt-in (bundle lock --add-checksums).", [S.bundler26]),
-  f("go", "lockfile_pins_hashes", "yes", "go.sum records each module's hash.", [S.goSupplyChain]),
-  f("maven", "lockfile_pins_hashes", "no", "Maven has no lockfile; third-party plugins exist.", [S.mavenLockfile]),
-  f("packagist", "lockfile_pins_hashes", "partial", "composer.lock pins the commit, but the archive hash is empty for forge-hosted packages.", [S.composerLock, S.packagistP2]),
+  f("pypi", "lockfile_pins_hashes", "partial", "pip has no default lockfile; PEP 751 pylock.toml (2025) and tools like uv and Poetry record hashes.", [
+    cite("pep751", "Considering there are at least five well-known solutions to this problem in the community (PDM, `pip freeze`, pip-tools, Poetry, and uv)"),
+    cite("pep751", "A lock file MUST be named `pylock.toml`"),
+  ]),
+  f("npm", "lockfile_pins_hashes", "yes", "package-lock.json records each package's integrity hash.", [
+    cite("npmPackageLock", "integrity: A `sha512` or `sha1` Standard Subresource Integrity string for the artifact that was unpacked in this location."),
+  ]),
+  f("crates", "lockfile_pins_hashes", "yes", "Cargo.lock records each crate's checksum.", [
+    cite("cargoLockExample", 'checksum = "'),
+  ]),
+  f("rubygems", "lockfile_pins_hashes", "partial", "Gemfile.lock CHECKSUMS since Bundler 2.6, opt-in (bundle lock --add-checksums).", [
+    cite("bundler26", "For a single lockfile, you can run `bundle lock --add-checksums`. This will add a new `CHECKSUMS` section to the lockfile"),
+  ]),
+  f("go", "lockfile_pins_hashes", "yes", "go.sum records each module's hash.", [
+    cite("goSupplyChain", "It contains a list of cryptographic hashes of each dependency that contributes to the build."),
+  ]),
+  f("maven", "lockfile_pins_hashes", "no", "Maven has no lockfile; third-party plugins exist.", [
+    cite("mavenLockfile", "generating a lock file that contains the checksums of all the artifacts and dependencies"),
+  ]),
+  f("packagist", "lockfile_pins_hashes", "partial", "composer.lock pins the commit, but the archive hash is empty for forge-hosted packages.", [
+    cite("composerLockfile", "writes all of the packages and their exact versions to the `composer.lock` file"),
+    cite("packagistMonologP2", '"shasum": ""'),
+  ]),
 
   // Client checks signature
-  f("pypi", "client_verifies_signature", "no", "PEP 458 (TUF-signed index) is not deployed; PEP 740 attestations are not verified by pip.", [S.pep458]),
-  f("npm", "client_verifies_signature", "no", "Registry signatures are checked only by an explicit `npm audit signatures`.", [S.npmVerify]),
-  f("crates", "client_verifies_signature", "no", "The index is not signed; TUF signing is an open Rust project goal.", [S.rustTuf]),
-  f("rubygems", "client_verifies_signature", "no", "Signed-gem verification is opt-in (gem install -P MediumSecurity); signing is rarely used.", [S.rubygemsSecurity]),
-  f("go", "client_verifies_signature", "yes", "The go command checks every module against the signed sum.golang.org log by default.", [S.goSumdb]),
-  f("maven", "client_verifies_signature", "no", "Maven does not check PGP signatures; a plugin is needed.", [S.mavenPgpVerify]),
-  f("packagist", "client_verifies_signature", "no", "There is nothing signed to check.", [S.packagist2026]),
+  f("pypi", "client_verifies_signature", "no", "PEP 458 (TUF-signed index) is not deployed; PEP 740 attestations are not verified by pip.", [
+    cite("pep458", "should be integrated with the Python Package Index"),
+  ]),
+  f("npm", "client_verifies_signature", "no", "Registry signatures are checked only by an explicit `npm audit signatures`.", [
+    cite("npmVerifyingSignatures", "Registry signatures can be verified using the following `audit` command:"),
+  ]),
+  f("crates", "client_verifies_signature", "no", "The index is not signed; TUF signing is an open Rust project goal.", [
+    cite("rustTufGoal", "We would like to have a experimental out-of-band version of a signing pipeline for the project for releases and crates.io."),
+  ]),
+  f("rubygems", "client_verifies_signature", "no", "Signed-gem verification is opt-in (gem install -P MediumSecurity); signing is rarely used.", [
+    cite("rubygemsSecurityGuide", "users opt into verification with a trust policy, using `gem install -P MediumSecurity`"),
+    cite("rubygemsSecurityGuide", "In practice signing is rarely used"),
+  ]),
+  f("go", "client_verifies_signature", "yes", "The go command checks every module against the signed sum.golang.org log by default.", [
+    cite("goChecksumDb", "The default value of `GOSUMDB` is `sum.golang.org`, the public checksum database operated by Google"),
+  ]),
+  f("maven", "client_verifies_signature", "no", "Maven does not check PGP signatures; a plugin is needed.", [
+    cite("pgpverifyMavenPlugin", "This plugin allows you to automatically verify PGP signature of all project dependencies."),
+  ]),
+  f("packagist", "client_verifies_signature", "no", "There is nothing signed to check.", [
+    cite("packagist2026", "Packagist.org hosting immutable build artifacts directly, with SLSA build provenance and Sigstore attestations verified on the Composer client side."),
+  ]),
 
   // Scoped, expiring tokens
-  f("pypi", "scoped_expiring_tokens", "partial", "API tokens can be scoped to one project but never expire (trusted publishing tokens do).", [S.pypiTokens]),
-  f("npm", "scoped_expiring_tokens", "yes", "Granular tokens only; write tokens expire after at most 90 days, classic tokens were revoked.", [S.npmTokens], "2025-11"),
-  f("crates", "scoped_expiring_tokens", "yes", "Tokens can be scoped by endpoint and crate, with an optional expiry.", [S.cratesTokens]),
-  f("rubygems", "scoped_expiring_tokens", "yes", "API keys have per-action and per-gem scopes, with an optional expiry.", [S.rubygemsKeys]),
-  f("go", "scoped_expiring_tokens", "n/a", "No publish credentials exist.", [S.goSupplyChain]),
-  f("maven", "scoped_expiring_tokens", "partial", "User tokens can be given an expiry; no per-namespace scoping is documented.", [S.mavenTokens]),
-  f("packagist", "scoped_expiring_tokens", "n/a", "Nothing is uploaded; tokens only trigger re-indexing.", [S.packagist2026]),
+  f("pypi", "scoped_expiring_tokens", "partial", "API tokens can be scoped to one project but never expire (trusted publishing tokens do).", [
+    cite("pypiHelpApiToken", "Alternatively, you can limit a token's scope to a specific project."),
+  ]),
+  f("npm", "scoped_expiring_tokens", "yes", "Granular tokens only; write tokens expire after at most 90 days, classic tokens were revoked.", [
+    cite("npmClassicTokensDisabled", "New npm classic tokens can no longer be created"),
+    cite("npmClassicTokensDisabled", "All npm existing granular tokens with write permissions are now capped at 90-day maximum lifetime"),
+  ], "2025-11"),
+  f("crates", "scoped_expiring_tokens", "yes", "Tokens can be scoped by endpoint and crate, with an optional expiry.", [
+    cite("cratesTokens", "our \"New API Token\" page now supports endpoint scopes, crate scopes and expiration dates"),
+  ]),
+  f("rubygems", "scoped_expiring_tokens", "yes", "API keys have per-action and per-gem scopes, with an optional expiry.", [
+    cite("rubygemsApiKeyScopes", "will allow you to scope one of your gems to the API key"),
+    cite("rubygemsApiKeyScopes", "You can also optionally set an expiration date for the key."),
+  ]),
+  f("go", "scoped_expiring_tokens", "n/a", "No publish credentials exist.", [
+    cite("goSupplyChain", "In Go, there is no such thing as a package repository account."),
+  ]),
+  f("maven", "scoped_expiring_tokens", "partial", "User tokens can be given an expiry; no per-namespace scoping is documented.", [
+    cite("mavenPortalToken", "Specify a display name and an expiration for the token"),
+  ]),
+  f("packagist", "scoped_expiring_tokens", "n/a", "Nothing is uploaded; tokens only trigger re-indexing.", [
+    cite("packagistAbout", "New versions of your package are automatically fetched from tags you create in your VCS repository."),
+  ]),
 
   // No code at install
-  f("pypi", "no_install_code_execution", "partial", "Wheels run no code; source distributions run their build backend.", [S.pipSecure]),
-  f("npm", "no_install_code_execution", "yes", "npm 12 runs no dependency install scripts unless allowed (before: all ran).", [S.npm12], "2026-07"),
-  f("crates", "no_install_code_execution", "no", "Dependencies' build scripts and procedural macros run at build time.", [S.cargoBuildScripts]),
-  f("rubygems", "no_install_code_execution", "partial", "Pure-Ruby gems run nothing; native extensions run extconf.rb on install.", [S.rubygemsExtensions]),
-  f("go", "no_install_code_execution", "yes", "An explicit design goal: neither fetching nor building runs dependency code.", [S.goSupplyChain]),
-  f("maven", "no_install_code_execution", "partial", "Dependency jars are not run, but javac ran classpath annotation processors implicitly until JDK 23; build plugins run by the project's choice.", [S.jdk23Proc]),
-  f("packagist", "no_install_code_execution", "yes", "Only the root project's scripts run; dependency plugins need explicit allow-plugins (Composer 2.2+).", [S.composerScripts, S.composerPlugins]),
+  f("pypi", "no_install_code_execution", "partial", "Wheels run no code; source distributions run their build backend.", [
+    cite("pipSecureInstalls", "By default, pip does not perform any checks to protect against remote tampering and involves running arbitrary code from distributions."),
+    cite("pipSecureInstalls", "Disallow source distributions, by passing `--only-binary :all:`"),
+  ]),
+  f("npm", "no_install_code_execution", "yes", "npm 12 runs no dependency install scripts unless allowed (before: all ran).", [
+    cite("npm12InstallScripts", "Every `npm install` runs scripts from every transitive dependency"),
+    cite("npm12InstallScripts", "Making script execution opt-in closes that path"),
+  ], "2026-07"),
+  f("crates", "no_install_code_execution", "no", "Dependencies' build scripts and procedural macros run at build time.", [
+    cite("cargoBuildScripts", "Just before a package is built, Cargo will compile a build script into an executable (if it has not already been built). It will then run the script"),
+  ]),
+  f("rubygems", "no_install_code_execution", "partial", "Pure-Ruby gems run nothing; native extensions run extconf.rb on install.", [
+    cite("rubygemsExtensions", "Creating a gem that includes an extension that is built at install time."),
+  ]),
+  f("go", "no_install_code_execution", "yes", "An explicit design goal: neither fetching nor building runs dependency code.", [
+    cite("goSupplyChain", "It is an explicit security design goal of the Go toolchain that neither fetching nor building code will let that code execute, even if it is untrusted and malicious."),
+  ]),
+  f("maven", "no_install_code_execution", "partial", "Dependency jars are not run, but javac ran classpath annotation processors implicitly until JDK 23; build plugins run by the project's choice.", [
+    cite("jdk23AnnotationProcessing", "starting with JDK 23, javac requires an additional command-line option to enable annotation processing."),
+  ]),
+  f("packagist", "no_install_code_execution", "yes", "Only the root project's scripts run; dependency plugins need explicit allow-plugins (Composer 2.2+).", [
+    cite("composerScripts", "Only scripts defined in the root package's `composer.json` are executed."),
+    cite("composerAllowPlugins", "As of Composer 2.2.0, the `allow-plugins` option adds a layer of security allowing you to restrict which Composer plugins are able to execute code during a Composer run."),
+  ]),
 ];
+
+/** When every value was last checked: the newest access date among its archived sources. */
+export const BASELINE_VERIFIED = lastAccessed(BASELINE.flatMap((f) => f.sources));
 
 export function baselineOf(ecosystem: EcosystemId, property: BaselineProperty): BaselineFact {
   const fact = BASELINE.find((b) => b.ecosystem === ecosystem && b.property === property);

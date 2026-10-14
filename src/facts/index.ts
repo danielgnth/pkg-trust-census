@@ -10,6 +10,7 @@
 import type { Db } from "../db/open.ts";
 import { ecosystemFacts, signalAvailability } from "../db/schema.ts";
 import { ecosystemFactsInsert, signalAvailabilityInsert, validateAll } from "../db/validation.ts";
+import { cite, sourceUrl, type Cite } from "../sources/index.ts";
 import type { Availability, EcosystemId, SignalId } from "../types.ts";
 
 export interface AvailabilityFact {
@@ -83,7 +84,7 @@ export const AVAILABILITY: AvailabilityFact[] = [
 
   // RubyGems
   a("rubygems", "identity_publish", "inferred", "version page \"Pushed by\": trusted publisher ⇒ true, user (API key) ⇒ false; or attestations present ⇒ true", {
-    notes: "The pusher is shown on /gems/{g}/versions/{v} but in no JSON endpoint (preflight §14). Versions pushed before rubygems.org recorded pushers show none and stay unknown, so the share is a lower bound. Attestations are accepted only from trusted-publishing pushes (Pusher#verify_sigstore).",
+    notes: "The pusher is shown on /gems/{g}/versions/{v} but in no JSON endpoint. Versions pushed before rubygems.org recorded pushers show none and stay unknown, so the share is a lower bound. Attestations are accepted only from trusted-publishing pushes (Pusher#verify_sigstore).",
   }),
   a("rubygems", "artifact_signature", "inferred", "/api/v1/attestations/{g}-{v}.json non-empty ⇒ Sigstore signature", {
     notes: "Legacy `gem cert` X.509 signatures are not exposed, so an empty attestation list is unknown, not false.",
@@ -118,7 +119,7 @@ export const AVAILABILITY: AvailabilityFact[] = [
   }),
   a("maven", "artifact_signature", "observable", "HEAD {artifact}-{v}.pom.asc / GET .pom.sigstore.json", {
     mandatory: true,
-    notes: "PGP signatures required for every file since the early 2010s (not retroactive). The search index's ec[] omits them (preflight §3.3).",
+    notes: "PGP signatures required for every file since the early 2010s (not retroactive). The search index's ec[] omits them.",
   }),
   a("maven", "registry_integrity", "no_mechanism", "none", { notes: "Central serves publisher-uploaded checksums and signs nothing itself." }),
   a("maven", "build_provenance", "observable", "HEAD {artifactId}-{v}.jar.build.slsa", {
@@ -157,7 +158,7 @@ export interface EcosystemFact {
   trustedPublishingGaDate: string | null;
   trustedPublishingMechanism: string | null;
   notes: string | null;
-  sources: string[];
+  sources: Cite[];
 }
 
 export const ECOSYSTEM_FACTS: EcosystemFact[] = [
@@ -171,10 +172,11 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingMechanism: "OIDC Trusted Publishers (GitHub Actions, GitLab CI/CD, Google Cloud, ActiveState)",
     notes: "PEP 740 digital attestations generally available from 2024-11-14.",
     sources: [
-      "https://blog.pypi.org/posts/2024-01-01-2fa-enforced/",
-      "https://blog.pypi.org/posts/2023-04-20-introducing-trusted-publishers/",
-      "https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-digital-attestations/",
-      "https://peps.python.org/pep-0740/",
+      cite("pypi2faEnforced", "It's January 1st, 2024, and PyPI now requires Two-factor authentication (2FA) for all users."),
+      cite("pypiTrustedPublishersLaunch", "PyPI currently supports trusted publishing with GitHub Actions"),
+      cite("pypiTrustedPublishersAdding", "GitHub ActionsGoogle CloudActiveStateGitLab CI/CD"),
+      cite("pypiAttestationsGa", "PyPI package maintainers can now publish signed digital attestations when publishing"),
+      cite("pep740", "Each bundle corresponds to a signing identity (such as a Trusted Publishing identity), and contains one or more attestation objects."),
     ],
   },
   {
@@ -185,15 +187,19 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     mfaPolicyNote:
       "Tiered: 2FA required for maintainers of the top 100 packages by dependents from 2022-02-01, the top 500 from 2022-05, and every high-impact package (>1M weekly downloads or >500 dependents) from 2022-11-01. Since 2026-07-31 tokens that bypass 2FA can no longer manage tokens, maintainers, access or trusted publishing; they can still publish until a planned 2027-01 cutoff. The 2025-09-22 plan to remove bypass-2FA local publishing has no date.",
     trustedPublishingGaDate: "2025-07-31",
-    trustedPublishingMechanism: "OIDC trusted publishing (GitHub Actions, GitLab CI/CD; CircleCI from 2026-04)",
+    trustedPublishingMechanism: "OIDC trusted publishing (GitHub Actions, GitLab CI/CD, CircleCI)",
     notes: "Trusted publishing emits provenance attestations by default.",
     sources: [
-      "https://github.blog/changelog/2025-07-31-npm-trusted-publishing-with-oidc-is-generally-available/",
-      "https://github.blog/2022-02-01-top-100-npm-package-maintainers-require-2fa-additional-security",
-      "https://github.blog/changelog/2022-11-01-high-impact-package-maintainers-now-require-2fa/",
-      "https://github.blog/security/supply-chain-security/our-plan-for-a-more-secure-npm-supply-chain/",
-      "https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/",
-      "https://docs.npmjs.com/generating-provenance-statements",
+      cite("npmTrustedPublishingGa", "As of today, npm trusted publishing with OpenID Connect (OIDC) is now generally available."),
+      cite("npmTrustedPublishersDocs", "CircleCI (CircleCI cloud)"),
+      cite("npmTop100Require2fa", "Starting today, we are rolling out mandatory 2FA to our first cohort, all maintainers of top-100 npm packages by dependents."),
+      cite("npmTop500Require2fa", "On May 31, we will enroll the next cohort in mandatory 2FA—maintainers of the top-500 packages."),
+      cite("npmHighImpact2fa", "Starting today, two-factor authentication (2FA) will be enforced for maintainers of all high-impact npm packages."),
+      cite("npmHighImpact2fa", "A package is marked as a high impact package when they have more than 1 million weekly downloads or have more than 500 dependents."),
+      cite("npmSecureSupplyChainPlan", "Remove the option to bypass 2FA for local package publishing."),
+      cite("npmBypass2faRestricted", "npm granular access tokens (GATs) configured to bypass 2FA can no longer perform sensitive account, org, and package management actions."),
+      cite("npmBypass2faRestricted", "We are targeting January 2027 for this update."),
+      cite("npmGeneratingProvenance", "If you use trusted publishing, provenance attestations are automatically generated for your packages without requiring the `--provenance` flag."),
     ],
   },
   {
@@ -206,9 +212,9 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingMechanism: "OIDC trusted publishing (RFC 3691), GitHub Actions",
     notes: "No artifact signing or attestation scheme.",
     sources: [
-      "https://blog.rust-lang.org/2025/07/11/crates-io-development-update-2025-07",
-      "https://rust-lang.github.io/rfcs/3691-trusted-publishing-cratesio.html",
-      "https://blog.rust-lang.org/2026/01/21/crates-io-development-update",
+      cite("cratesUpdate202507", "We are excited to announce that we have implemented \"Trusted Publishing\" support on crates.io, as described in RFC #3691."),
+      cite("cratesTrustedPublishingRfc", "Short-lived access tokens are granted via the OpenID Connect (OIDC) protocol"),
+      cite("cratesUpdate202601", "Trusted Publishing now supports GitLab CI/CD in addition to GitHub Actions."),
     ],
   },
   {
@@ -222,9 +228,9 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingMechanism: "OIDC trusted publishing (GitHub Actions)",
     notes: "Sigstore attestations accepted via `gem push --attestation` and exposed at /api/v1/attestations/{gem}-{version}.json.",
     sources: [
-      "https://guides.rubygems.org/trusted-publishing/",
-      "https://blog.rubygems.org/2022/08/15/requiring-mfa-on-popular-gems.html",
-      "https://guides.rubygems.org/mfa-requirement-opt-in/",
+      cite("rubygemsTrustedPublishing", "Under the hood, Trusted Publishing uses OpenID Connect (OIDC) to exchange short-lived identity tokens between GitHub Actions and RubyGems.org."),
+      cite("rubygemsMfaPopular", "Today (August 15th, 2022), we will begin to enforce MFA on owners of gems with over 180 million total downloads."),
+      cite("rubygemsMfaOptIn", "Opt in a gem you are managing by releasing a version that has `metadata.rubygems_mfa_required` set to `true`."),
     ],
   },
   {
@@ -236,7 +242,10 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingGaDate: null,
     trustedPublishingMechanism: null,
     notes: "Checksum database (sum.golang.org) verified by default since Go 1.13.",
-    sources: ["https://go.dev/ref/mod#checksum-database", "https://go.dev/blog/module-mirror-launch"],
+    sources: [
+      cite("goChecksumDb", "The default value of `GOSUMDB` is `sum.golang.org`, the public checksum database operated by Google"),
+      cite("goModuleMirrorLaunch", "The `go` command will use the module mirror and checksum database by default for Go 1.13 module users."),
+    ],
   },
   {
     ecosystem: "maven",
@@ -248,10 +257,10 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingMechanism: null,
     notes: "PGP signatures mandatory for all deployed files; Sigstore bundles optional and validated since 2025-01-28.",
     sources: [
-      "https://central.sonatype.org/publish/requirements/gpg/",
-      "https://central.sonatype.org/news/20250128_sigstore_signature_validation_via_portal/",
-      "https://central.sonatype.org/publish/publish-portal-api/",
-      "https://help.sonatype.com/en/authentication-with-sonatype-cloud.html",
+      cite("mavenGpgRequirement", "One of the requirements for publishing your artifacts to the Central Repository, is that they have been signed with PGP."),
+      cite("mavenSigstoreValidation", "we have rolled out an update to the Central Publisher Portal that validates Sigstore signature files."),
+      cite("mavenPortalApi", "Requests to the API must be authenticated via a user token header."),
+      cite("sonatypeMfa", "Multi-factor authentication (MFA) may be configured with an authenticator of your choice."),
     ],
   },
   {
@@ -264,11 +273,12 @@ export const ECOSYSTEM_FACTS: EcosystemFact[] = [
     trustedPublishingMechanism: null,
     notes: "Packagist indexes VCS repositories; Composer downloads archives from the forge. Stable versions keep their original commit since 2026-07 (archives are still generated by the forge); a login-gated security-event log records ownership, maintainer and reference changes. Hosted artifacts with SLSA provenance and trusted publishing are a stated direction.",
     sources: [
-      "https://packagist.org/about",
-      "https://getcomposer.org/doc/05-repositories.md",
-      "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
-      "https://blog.packagist.com/immutable-versions-on-packagist/",
-      "https://blog.packagist.com/whats-new-in-private-packagist-august-2026-update/",
+      cite("packagistAbout", "New versions of your package are automatically fetched from tags you create in your VCS repository."),
+      cite("composerRepositories", "there is special support for GitHub and Bitbucket that use the APIs provided by these sites, to fetch the packages without having to install the version control system."),
+      cite("packagist2026", "Packagist.org has a public transparency log (login required) that records security-relevant events across the repository."),
+      cite("packagist2026", "Beyond that, we intend to implement FIDO2 support and eventually require MFA for all Packagist.org accounts."),
+      cite("packagistImmutable", "Stable version metadata on Packagist.org is now immutable."),
+      cite("privatePackagistAug2026", "a user without MFA configured can no longer use their Composer auth token to reach the Composer repository of an organization that requires MFA."),
     ],
   },
 ];
@@ -282,7 +292,7 @@ export function seedFacts(db: Db): void {
   );
   const facts = validateAll(
     ecosystemFactsInsert,
-    ECOSYSTEM_FACTS.map((f) => ({ ...f, sources: f.sources.join("\n") })),
+    ECOSYSTEM_FACTS.map((f) => ({ ...f, sources: [...new Set(f.sources.map((c) => sourceUrl(c.source)))].join("\n") })),
     "ecosystem_facts",
   );
 

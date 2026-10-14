@@ -1,0 +1,79 @@
+{
+  "_id": "wesily",
+  "_rev": "3-ce6ec4d74d586726859ae3623c288cce",
+  "time": {
+    "8.8.8": "2021-03-12T13:07:30.169Z",
+    "created": "2021-03-13T11:23:36.000Z",
+    "0.0.1-security": "2021-03-13T11:23:36.110Z",
+    "modified": "2022-05-24T10:19:32.990Z"
+  },
+  "name": "wesily",
+  "dist-tags": {
+    "latest": "0.0.1-security"
+  },
+  "versions": {
+    "0.0.1-security": {
+      "name": "wesily",
+      "version": "0.0.1-security",
+      "description": "security holding package",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/npm/security-holder.git"
+      },
+      "bugs": {
+        "url": "https://github.com/npm/security-holder/issues"
+      },
+      "homepage": "https://github.com/npm/security-holder#readme",
+      "_id": "wesily@0.0.1-security",
+      "_nodeVersion": "12.20.1",
+      "_npmVersion": "6.14.10",
+      "dist": {
+        "integrity": "sha512-KEq7UfFPCm3fidz4BCCks+qgzXghy5UFJg7dWPtwSquDU01brVu/gVH0d+eh4C+WUzyEdkUIqzmvrnMLRwXZgA==",
+        "shasum": "cd8e02e6adce81a25349f369230d2480fb6c439c",
+        "tarball": "https://registry.npmjs.org/wesily/-/wesily-0.0.1-security.tgz",
+        "fileCount": 2,
+        "unpackedSize": 425,
+        "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v3.0.13\r\nComment: https://openpgpjs.org\r\n\r\nwsFcBAEBCAAQBQJgTKC4CRA9TVsSAnZWagAA69MP/2lSOKsL5P2XbDw+AZqO\n/7CjreIZd927tkLA9Y0ypwGYZ7d8WsB1MH0VMIcdf/6kACYDumAwh1LiyPpJ\nNBSxmohH96Swqg3RH+LhAAbVNXxjg/wOkB4oF233ejRivx9ThrzkWz2s+48q\n5GyyihpEGiEJrBDz81dkR58rb+fJivYcJwSpT8Y3fM2ZoXOlQqPZ1JVGJi6w\nlaKutoFFoKHfqkgHNtRDqLqC7FNTJ498Oe0tyalH7l6heIn3hzLT8vuqoARL\nQflRDRan8OcnvTeTXtu36pXM2DgYO4nfsTlzq3cMx2FqP58qb0K+w3LuIpg/\nx1wv1SSKx13Kot4YQUXIR9KBy1weCO02urxj+aCEwZwW+sTUbUtYoqt4x/WK\nbk3f6NM1sbTfVvaxksySlRZZaX5eZQ6Vy/FRqJkFVPV6C0y+QTEoaYlxIG6G\nFBZ+yer1F4eL6FQrmG8eEsgt4SVIOQhN7zxm/pHoc1TUvlDIu2FJLdAvBYZw\nhnmltI5BxAYX+4zW7yOrv4DLR8BB0MWYHPRmx4OeZ0s0e5Cir6i8y5Cmli40\nj6wQLMLgV0YkcIFNN8kxLkmxOvb43F6qs67BtcX6kcJt/Sv7pgc90Asbznz6\nr8Gt+SUNDFjoykSv5QeO9I/a/V9BSBsWCsmJ3opX69t9EN8fWh9dCyEna0s3\nEayf\r\n=c5kj\r\n-----END PGP SIGNATURE-----\r\n",
+        "signatures": [
+          {
+            "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA",
+            "sig": "MEQCIBneGIc24p4PKkaop5U7j4n6SEH31tTeVaJyuMd7qKoIAiBUODHztIY7HXVLhBGGild8XQVacCNp8iH4T3keZoLzCw=="
+          }
+        ]
+      },
+      "_npmUser": {
+        "name": "npm",
+        "email": "npm@npmjs.com"
+      },
+      "directories": {},
+      "maintainers": [
+        {
+          "name": "npm",
+          "email": "npm@npmjs.com"
+        }
+      ],
+      "_npmOperationalInternal": {
+        "host": "s3://npm-registry-packages",
+        "tmp": "tmp/wesily_0.0.1-security_1615634616001_0.34087593428249985"
+      },
+      "_hasShrinkwrap": false
+    }
+  },
+  "maintainers": [
+    {
+      "name": "npm",
+      "email": "npm@npmjs.com"
+    }
+  ],
+  "description": "security holding package",
+  "homepage": "https://github.com/npm/security-holder#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npm/security-holder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/npm/security-holder/issues"
+  },
+  "readme": "# Security holding package\n\nThis package contained malicious code and was removed from the registry by the npm security team. A placeholder was published to ensure users are not affected in the future.\n\nPlease refer to www.npmjs.com/advisories?search={package-name} for more information.\n",
+  "readmeFilename": "README.md"
+}

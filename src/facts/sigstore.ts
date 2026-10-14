@@ -1,5 +1,5 @@
 /**
- * Sigstore across the seven registries, curated from primary sources (verified 2026-10-13).
+ * Sigstore across the seven registries, curated from primary sources.
  *
  * Four of the seven accept Sigstore bundles, so "uses Sigstore" is a cross-registry fact
  * worth stating once rather than re-deriving from the per-release signals, which already
@@ -11,6 +11,7 @@
  * part of the trust score.
  */
 
+import { cite, type Cite } from "../sources/index.ts";
 import type { EcosystemId } from "../types.ts";
 
 export type SigstoreStatus = "yes" | "planned" | "no";
@@ -25,7 +26,7 @@ export interface ClientFact {
   /** "yes" only when an ordinary install checks bundles with no configuration. */
   verifies: VerifiedBy;
   note: string;
-  source: string;
+  sources: Cite[];
 }
 
 export interface SigstoreFact {
@@ -43,40 +44,8 @@ export interface SigstoreFact {
   similar: string;
   /** A few words of `similar`, for the chart. */
   similarShort: string;
-  sources: string[];
+  sources: Cite[];
 }
-
-const S = {
-  npmGa: "https://github.blog/changelog/2023-09-26-npm-provenance-general-availability/",
-  npmProvenance: "https://docs.npmjs.com/generating-provenance-statements",
-  npmProvenanceDetails: "https://github.com/npm/provenance",
-  npmVerify: "https://docs.npmjs.com/verifying-registry-signatures",
-  pypiGa: "https://blog.pypi.org/posts/2024-11-14-pypi-now-supports-digital-attestations/",
-  pep740: "https://peps.python.org/pep-0740/",
-  pipSecure: "https://pip.pypa.io/en/stable/topics/secure-installs/",
-  pypiGpg: "https://blog.pypi.org/posts/2023-05-23-removing-pgp/",
-  rubygemsDec2024: "https://blog.rubygems.org/2025/01/24/december-rubygems-updates.html",
-  rubygemsPusher: "https://github.com/rubygems/rubygems.org/blob/master/app/models/pusher.rb",
-  rubygemsSecurity: "https://guides.rubygems.org/security/",
-  mavenSigstore: "https://central.sonatype.org/news/20250128_sigstore_signature_validation_via_portal/",
-  mavenGpg: "https://central.sonatype.org/publish/requirements/gpg/",
-  goSumdb: "https://go.dev/ref/mod#checksum-database",
-  goMirror: "https://go.dev/blog/module-mirror-launch",
-  pnpmTrust: "https://pnpm.io/settings/dependency-resolution#trustpolicy",
-  pnpmTrustSrc: "https://github.com/pnpm/pnpm/blob/main/pnpm11/resolving/npm-resolver/src/trustChecks.ts",
-  pnpmSignatures: "https://github.com/pnpm/pnpm/blob/main/pnpm11/deps/security/signatures/README.md",
-  yarnProvenance: "https://github.com/yarnpkg/berry/blob/master/packages/plugin-npm/sources/npmProvenance.ts",
-  bunInstall: "https://bun.sh/docs/cli/install",
-  uvPublish: "https://docs.astral.sh/uv/reference/cli/#uv-publish",
-  gemPush: "https://github.com/ruby/rubygems/blob/master/lib/rubygems/commands/push_command.rb",
-  gradleVerification: "https://docs.gradle.org/current/userguide/dependency_verification.html",
-  cargo: "https://doc.rust-lang.org/cargo/reference/registry-index.html",
-  composer: "https://getcomposer.org/doc/03-cli.md#install-i",
-  cargoRfc: "https://github.com/rust-lang/rfcs/pull/3403",
-  rustTuf: "https://rust-lang.github.io/goals/2025h1/verification-and-mirroring.html",
-  packagist2026: "https://blog.packagist.com/an-update-on-composer-packagist-supply-chain-security/",
-  packagist15: "https://blog.packagist.com/15-years-of-packagist-over-200-billion-package-installs/",
-};
 
 export const SIGSTORE: SigstoreFact[] = [
   {
@@ -86,14 +55,24 @@ export const SIGSTORE: SigstoreFact[] = [
     signs: "The tarball, by the publisher's CI identity (Fulcio), as SLSA provenance in dist.attestations; npm adds a publish attestation signed with its own registry key. Both are logged in the public Rekor.",
     registryVerifies: "yes",
     clients: [
-      { client: "npm 12", verifies: "opt-in", note: "`npm audit signatures` checks attestations and registry signatures of an installed tree; `npm install` itself does not.", source: S.npmVerify },
-      { client: "pnpm 12", verifies: "no", note: "`trustPolicy: no-downgrade` (opt-in, since 10.21) refuses a version whose trusted-publisher/provenance metadata is weaker than an earlier one's, but reads the packument fields without verifying the bundle. `pnpm audit signatures` checks registry ECDSA signatures only.", source: S.pnpmTrustSrc },
-      { client: "Yarn 4", verifies: "no", note: "Generates provenance on publish; does not verify on install.", source: S.yarnProvenance },
-      { client: "Bun", verifies: "no", note: "No attestation handling.", source: S.bunInstall },
+      { client: "npm 12", verifies: "opt-in", note: "`npm audit signatures` checks attestations and registry signatures of an installed tree; `npm install` itself does not.", sources: [cite("npmGeneratingProvenance", "You can verify the provenance attestations of downloaded packages with the following `audit` command: `npm audit signatures`")] },
+      { client: "pnpm 12", verifies: "no", note: "`trustPolicy: no-downgrade` (opt-in, since 10.21) refuses a version whose trusted-publisher/provenance metadata is weaker than an earlier one's, but reads the packument fields without verifying the bundle. `pnpm audit signatures` checks registry ECDSA signatures only.", sources: [
+          cite("pnpmTrustPolicy", "When set to `no-downgrade`, pnpm will fail if a package's trust level has decreased compared to previous releases."),
+          cite("pnpmTrustChecks", "if (manifest._npmUser?.trustedPublisher && manifest.dist?.attestations?.provenance) { return 'trustedPublisher' }"),
+          cite("pnpmSignatures", "`verifySignatures()` verifies ECDSA registry signatures for installed package versions."),
+        ],
+      },
+      { client: "Yarn 4", verifies: "no", note: "Generates provenance on publish; does not verify on install.", sources: [cite("yarnProvenance", "export const generateProvenance = async (subject: any, opts?: sigstore.SignOptions) => {")] },
+      { client: "Bun", verifies: "no", note: "No attestation handling.", sources: [cite("bunInstall", "Skip verifying integrity of newly downloaded packages")] },
     ],
     similar: "Registry-applied ECDSA signatures on every tarball (dist.signatures), also checked only by `npm audit signatures`.",
     similarShort: "registry ECDSA signatures",
-    sources: [S.npmGa, S.npmProvenance, S.npmProvenanceDetails, S.npmVerify],
+    sources: [
+      cite("npmProvenanceGa", "npm provenance is now generally available."),
+      cite("npmGeneratingProvenance", "When an npm package is published with provenance, it is signed by Sigstore public good servers and logged in a public transparency ledger"),
+      cite("npmProvenanceRepo", "When verification is succesful npm attests the publish with by signing a publish attestation."),
+      cite("npmVerifyingSignatures", "Registry signatures can be verified using the following `audit` command:"),
+    ],
   },
   {
     ecosystem: "pypi",
@@ -102,12 +81,18 @@ export const SIGSTORE: SigstoreFact[] = [
     signs: "Each distribution file, by the Trusted Publisher's CI identity (PEP 740), served through the Integrity API. Most bundles carry the publish predicate, not SLSA provenance.",
     registryVerifies: "yes",
     clients: [
-      { client: "pip 26", verifies: "no", note: "Checks file hashes only; no attestation verification.", source: S.pipSecure },
-      { client: "uv 0.12", verifies: "no", note: "Uploads attestations by default when publishing (since 0.9.12); does not verify them on install.", source: S.uvPublish },
+      { client: "pip 26", verifies: "no", note: "Checks file hashes only; no attestation verification.", sources: [cite("pipSecureInstalls", "By default, pip does not perform any checks to protect against remote tampering")] },
+      { client: "uv 0.12", verifies: "no", note: "Uploads attestations by default when publishing (since 0.9.12); does not verify them on install.", sources: [cite("uvPublish", "By default, uv attempts to upload matching PEP 740 attestations with each distribution that is published.")] },
     ],
     similar: "None left: PGP signature uploads were removed in 2023.",
     similarShort: "none (PGP removed 2023)",
-    sources: [S.pypiGa, S.pep740, S.pipSecure, S.pypiGpg],
+    sources: [
+      cite("pypiAttestationsGa", "PyPI package maintainers can now publish signed digital attestations when publishing"),
+      cite("pypiAttestationsGa", "The Integrity API provides programmatic access to PyPI's implementation of PEP 740."),
+      cite("pep740", "Each bundle corresponds to a signing identity (such as a Trusted Publishing identity), and contains one or more attestation objects."),
+      cite("pipSecureInstalls", "By default, pip does not perform any checks to protect against remote tampering"),
+      cite("pypiPgpRemoved", "any PGP signatures will be silently ignored"),
+    ],
   },
   {
     ecosystem: "rubygems",
@@ -116,11 +101,15 @@ export const SIGSTORE: SigstoreFact[] = [
     signs: "The .gem, by the CI identity, via `gem push --attestation` (RubyGems 3.6, used by rubygems/release-gem); served at /api/v1/attestations. Accepted only from a trusted-publishing push.",
     registryVerifies: "yes",
     clients: [
-      { client: "gem / Bundler 4", verifies: "no", note: "Attestations are only sent (`gem push --attestation`); legacy X.509 signatures are checked only with `-P MediumSecurity`.", source: S.gemPush },
+      { client: "gem / Bundler 4", verifies: "no", note: "Attestations are only sent (`gem push --attestation`); legacy X.509 signatures are checked only with `-P MediumSecurity`.", sources: [cite("gemPushCommand", "add_option(\"--attestation FILE\", \"Push with sigstore attestations\""), cite("rubygemsSecurityGuide", "users opt into verification with a trust policy, using `gem install -P MediumSecurity`")] },
     ],
     similar: "Legacy X.509 `gem cert` signatures: opt-in to verify, rarely used, not exposed by the API.",
     similarShort: "legacy X.509 gem signing",
-    sources: [S.rubygemsDec2024, S.rubygemsPusher, S.rubygemsSecurity],
+    sources: [
+      cite("rubygemsDec2024", "adding a `--attestation` option to `gem push` for improved security"),
+      cite("rubygemsPusher", "def initialize(api_key, body, request: nil, attestations: nil)"),
+      cite("rubygemsSecurityGuide", "In practice signing is rarely used"),
+    ],
   },
   {
     ecosystem: "maven",
@@ -129,12 +118,16 @@ export const SIGSTORE: SigstoreFact[] = [
     signs: "Any deployed file, as an optional .sigstore.json next to the mandatory PGP .asc.",
     registryVerifies: "yes",
     clients: [
-      { client: "Maven 3/4", verifies: "no", note: "Checks checksums only; signatures need a plugin.", source: S.mavenGpg },
-      { client: "Gradle 9", verifies: "no", note: "Dependency verification (opt-in, via verification-metadata.xml) checks checksums and PGP .asc signatures, not Sigstore bundles.", source: S.gradleVerification },
+      { client: "Maven 3/4", verifies: "no", note: "Checks checksums only; signatures need a plugin.", sources: [cite("pgpverifyMavenPlugin", "This plugin allows you to automatically verify PGP signature of all project dependencies.")] },
+      { client: "Gradle 9", verifies: "no", note: "Dependency verification (opt-in, via verification-metadata.xml) checks checksums and PGP .asc signatures, not Sigstore bundles.", sources: [cite("gradleVerification", "Checksums alone verify integrity but not authenticity. Signatures alone verify authenticity but may use weak hashes.")] },
     ],
     similar: "Mandatory PGP signatures on every file: long-lived publisher keys, not logged, not checked by Maven by default.",
     similarShort: "mandatory PGP signatures",
-    sources: [S.mavenSigstore, S.mavenGpg],
+    sources: [
+      cite("mavenSigstoreValidation", "we have rolled out an update to the Central Publisher Portal that validates Sigstore signature files."),
+      cite("mavenSigstoreValidation", "Sigstore signature files are not required to publish at this time."),
+      cite("mavenGpgRequirement", "One of the requirements for publishing your artifacts to the Central Repository, is that they have been signed with PGP."),
+    ],
   },
   {
     ecosystem: "go",
@@ -142,31 +135,42 @@ export const SIGSTORE: SigstoreFact[] = [
     signs: "Nothing: modules are fetched from VCS and authors cannot sign them.",
     registryVerifies: "n/a",
     clients: [
-      { client: "go", verifies: "n/a", note: "No bundles to check; every download is checked against sum.golang.org by default.", source: S.goSumdb },
+      { client: "go", verifies: "n/a", note: "No bundles to check; every download is checked against sum.golang.org by default.", sources: [cite("goModuleMirrorLaunch", "The `go` command will use the module mirror and checksum database by default for Go 1.13 module users.")] },
     ],
     similar: "sum.golang.org, Google's own append-only Merkle log of module hashes with signed tree heads, checked by the go command by default. A transparency log like Rekor, but of hashes, not publisher identities.",
     similarShort: "own checksum log, checked by default",
-    sources: [S.goSumdb, S.goMirror],
+    sources: [
+      cite("goChecksumDb", "It is a Transparent Log (or \"Merkle Tree\") of `go.sum` line hashes"),
+      cite("goModuleMirrorLaunch", "The `go` command will use the module mirror and checksum database by default for Go 1.13 module users."),
+    ],
   },
   {
     ecosystem: "crates",
     status: "no",
     signs: "Nothing: the Sigstore RFC for Cargo (#3403) was closed unmerged in 2023.",
     registryVerifies: "n/a",
-    clients: [{ client: "cargo", verifies: "n/a", note: "No bundles to check; checks the index's sha256.", source: S.cargo }],
+    clients: [{ client: "cargo", verifies: "n/a", note: "No bundles to check; checks the index's sha256.", sources: [cite("cargoDownloadVerify", "anyhow::bail!(\"failed to verify the checksum of `{}`\", pkg)")] }],
     similar: "None deployed. A TUF signing experiment exists; trusted publishing records the commit from the CI's OIDC token, but nothing is signed for consumers.",
     similarShort: "none (TUF experiment only)",
-    sources: [S.cargoRfc, S.rustTuf],
+    sources: [
+      cite("cargoSigstoreRfc", "This proposal will enhance cargo and crates.io through adoption of the Sigstore capabilities and workflows as described in the document."),
+      cite("cargoSigstoreRfc", "closed this Aug 14, 2023"),
+      cite("rustTufGoal", "We would like to have a experimental out-of-band version of a signing pipeline for the project for releases and crates.io."),
+    ],
   },
   {
     ecosystem: "packagist",
     status: "planned",
     signs: "Nothing yet: hosted artifacts with SLSA provenance and Sigstore attestations verified by Composer are a stated direction (2026-05), with news promised 2026-09-29.",
     registryVerifies: "n/a",
-    clients: [{ client: "Composer 2.10", verifies: "n/a", note: "No bundles to check; client-side verification is planned with hosted artifacts.", source: S.composer }],
+    clients: [{ client: "Composer 2.10", verifies: "n/a", note: "No bundles to check; client-side verification is planned with hosted artifacts.", sources: [cite("composerInstall", "The `install` command reads the `composer.json` file from the current directory, resolves the dependencies, and installs them into `vendor`.")] }],
     similar: "A login-gated log of security events (ownership, maintainers, version references); not a log of artifacts.",
     similarShort: "login-gated event log",
-    sources: [S.packagist2026, S.packagist15],
+    sources: [
+      cite("packagist2026", "Further out, we want Packagist.org to begin hosting immutable build artifacts directly, alongside SLSA build provenance and Sigstore attestations"),
+      cite("packagist2026", "Packagist.org has a public transparency log (login required) that records security-relevant events across the repository."),
+      cite("packagist15Years", "We have some good news to share on that last point in a separate blog post in the next few days."),
+    ],
   },
 ];
 

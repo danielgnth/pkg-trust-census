@@ -1,0 +1,31 @@
+This plugin allows you to automatically verify PGP signature of all project dependencies.
+
+## Features
+
+-   check signature of artifacts during each build, not only during artifact download from the remote repository to local
+-   possibility to map PGP key fingerprint to artifacts, so we can detect if correct key was used for making signature
+-   possibility to check signature of maven plugins used during build
+-   there is no external software need to install - plugin uses Bouncy Castle library to manage PGP operations
+-   works on many operating system and JDK versions - confirmed by CI builds - Linux, Windows, Mac OS, JDK 8, 11, 14
+
+## Usage
+
+You can try it by running in your project directory:
+
+```
+mvn org.simplify4u.plugins:pgpverify-maven-plugin:check
+```
+
+or wherever you want in order to see information about a specific artifact:
+
+```
+mvn org.simplify4u.plugins:pgpverify-maven-plugin:show -Dartifact=junit:junit:4.12
+```
+
+More [examples of usage](examples.html)
+
+## Support
+
+Issues, bugs, new feature requests, questions can be submitted to [issue management system](issue-management.html).
+
+If you need help, don't hesitate to create new issue.

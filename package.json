@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
     "fixtures": "bun run scripts/capture-fixtures.ts",
-    "probe:tls": "bun run scripts/probe-pq-tls.ts"
+    "probe:tls": "bun run scripts/probe-pq-tls.ts",
+    "sources": "bun run scripts/archive-sources.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
