@@ -4,12 +4,16 @@
  * The only network-touching stage. Resumability is a property of the cache rather than of
  * bookkeeping here — a warm URL is never re-requested — so an interrupted run is resumed
  * simply by invoking the stage again.
+ *
+ * After a package's registry responses are cached, its versions are read back from the cache
+ * and OSV is asked about them, so `extract` finds the advisory responses cached as well.
  */
 
 import { and, eq } from "drizzle-orm";
 import type { EcosystemId } from "../types.ts";
-import type { HttpClient } from "../http/client.ts";
+import { CacheSource, type HttpClient } from "../http/client.ts";
 import { getAdapter } from "../adapters/index.ts";
+import { advisoryVersions, gatherAdvisories } from "../advisories/osv.ts";
 import { snapshotAsOf, type Db } from "../db/open.ts";
 import { packages } from "../db/schema.ts";
 import { loadCandidates } from "./rank.ts";
@@ -47,6 +51,7 @@ export async function runFetch(
 
     const summary: FetchSummary = { ecosystem: eco, attempted: 0, succeeded: 0, failed: 0 };
     const ctx = { asOf: snapshotAsOf(db, snapshotId) };
+    const cached = new CacheSource(http.cache);
 
     for (const [i, c] of candidates.entries()) {
       summary.attempted++;
@@ -59,6 +64,9 @@ export async function runFetch(
 
       try {
         await adapter.fetch(c, http, ctx);
+        // A parse failure here is the extract stage's to report, against the right stage.
+        const versions = await adapter.extract(c, cached, ctx).then(advisoryVersions, () => null);
+        if (versions) await gatherAdvisories(http, eco, c.name, versions);
         db.update(packages).set({ fetchTimestamp: now, fetchError: null }).where(where).run();
         summary.succeeded++;
         onProgress?.({ ecosystem: eco, index: i + 1, total: candidates.length, package: c.name });

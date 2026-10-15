@@ -157,6 +157,14 @@ export const SOURCES = {
   github2fa: "https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/about-two-factor-authentication",
   rfc9980: "https://www.rfc-editor.org/rfc/rfc9980.html",
 
+  // Advisories, package URLs, SBOM
+  osvQuerybatch: "https://google.github.io/osv.dev/post-v1-querybatch/",
+  osvSchema: "https://ossf.github.io/osv-schema/",
+  ghsaDatabase: "https://github.com/github/advisory-database/blob/main/README.md",
+  purlSpec: "https://github.com/package-url/purl-spec/blob/main/README.md",
+  purlGolangType: "https://github.com/package-url/purl-spec/blob/main/types/golang-definition.json",
+  cyclonedxVdr: "https://cyclonedx.org/capabilities/vdr/",
+
   // Our own measurements
   probePqTls: { command: ["bun", "run", "scripts/probe-pq-tls.ts"], repoPath: "scripts/probe-pq-tls.ts" },
 } as const satisfies Record<string, SourceDef>;

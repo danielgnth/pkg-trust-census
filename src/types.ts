@@ -85,6 +85,8 @@ export interface CacheEntry {
   package: string;
   /** Repo-relative path of the gzipped payload. */
   path: string;
+  /** The body of a POST request; `url` then holds "POST {url} {sha256 of the body}". */
+  requestBody?: string;
 }
 
 export interface FetchResult {
@@ -134,6 +136,8 @@ export interface Withdrawal {
   versionsInWindow: number | null;
   /** Withdrawn versions published in the window; all-time where versions are undated (Go). */
   withdrawn: string[];
+  /** Release time of each withdrawn version, where the registry dates it. */
+  releasedAt?: Record<string, string>;
 }
 
 export interface ExtractedPackage {

@@ -258,6 +258,46 @@ counted over all time. RubyGems hides yanked versions from every API, Maven allo
 Packagist's soft-deleted versions are not public, so those three have no counts. Stored in
 `package_withdrawals`; reported in the summary, `withdrawals.csv` and `charts/withdrawals.svg`.
 
+### Known advisories
+
+Each package's versions are looked up in OSV, which aggregates the GitHub Advisory Database, the
+ecosystems' own databases (PYSEC, RUSTSEC, GO) and the OpenSSF malicious-packages reports (MAL) under one
+schema. One `querybatch` per package asks about every stored version (latest and quarter anchors) and
+every withdrawn version (yanked, unpublished, deprecated, retracted). It is sent during `fetch`, after the
+registry's responses are cached, and replayed from the cache by `extract`. A package OSV was not asked about
+has `packages.osv_queried_at` null and is left out of every advisory denominator, so "no advisory" is never
+confused with "not checked". Matches are stored in `advisory_matches`, the records in `advisories`.
+
+Databases list one vulnerability under their own ids and cross-reference them as `aliases`. Records sharing
+an id, directly or through other records, form one *vulnerability* (alias group), counted once. It counts
+as known from the earliest `published` time among its records, and is named by that record. Withdrawn
+records are left out. GHSA's `github_reviewed_at` is the *latest* review, and GitHub asks consumers not to
+rely on its `database_specific` fields, so neither it nor `nvd_published_at` is used; the NVD API is not
+queried either. A vulnerability is a *malware report* when one of its ids is a MAL id.
+
+Reported per ecosystem (`advisories.md`, `advisories.csv`, `charts/advisories.svg`):
+
+- **Exposure**: the share of latest releases with a vulnerability published by the snapshot instant.
+- **Known then and now**: for each quarter anchor, whether a vulnerability had been published by the
+  quarter's end (what a default install resolved while it was already known) and whether one has been
+  published by the snapshot (what it resolved before anyone knew).
+- **Malware reports**: every sampled or withdrawn release with one, with its release time, the report's
+  first publication and the hours between, and how the registry withdrew it. Release times of withdrawn
+  versions come from the same fields as the other release dates; Go's retractions are undated.
+- **Database lag**: per database, how many of the vulnerabilities affecting sampled versions it lists, how
+  many it published first, and the median days it trailed the first publication on the others.
+
+Every stored version also carries its package URL (`package_versions.purl`, built with packageurl-js), and
+`sbom.cdx.json` is a CycloneDX 1.6 SBOM of the sample: the latest version of every package as a component
+named by its purl, and the vulnerabilities published by the snapshot that affect them. The purl type for Go
+says to lowercase module paths, but module paths are case-sensitive; packageurl-js keeps the case, and so
+does this dataset. No sampled Go module has a mixed-case path.
+
+OSV is queried when `fetch` runs, which can be later than the snapshot instant. Matches therefore reflect
+the records as they were then; only the "known by" times are cut at the snapshot. A record changed later
+(a corrected range, a new alias) can change past numbers on a re-fetch. The matching rests on OSV's own
+version ranges for each ecosystem, which this project does not re-check.
+
 ### Publish authentication
 
 The identity signal also answers the reverse question, how releases *not* published through trusted
@@ -286,7 +326,7 @@ install hashes everywhere except Maven and Packagist, and the Merkle trees under
 
 ### Curated facts and their sources
 
-The four curated tables, the availability classes and the registry policy facts (`src/facts/`) are
+The four curated tables, the advisory method notes, the availability classes and the registry policy facts (`src/facts/`) are
 judgements about mechanisms, not measurements, so each value carries its evidence: the id of a source in
 [`src/sources/registry.ts`](../src/sources/registry.ts) and the passage quoted from it. `bun run sources`
 archives every source under `sources/` (readable text, the access time and the sha256 of the original
@@ -340,3 +380,6 @@ rebuilt offline from the cached payloads. The sources of the curated facts are a
    A Sigstore signature from CI and a GPG signature made on a developer's machine both score 1 for artifact
    authenticity. Go's logged checksum database and npm's registry signature both score ½. The ½ itself is a
    convention (see *Trust summary score*). The matrix, not the score, shows which signal each platform has.
+10. **Advisory coverage differs by ecosystem.** OSV counts only what its source databases record, and which
+    databases cover an ecosystem differs (the database table in `advisories.md` shows it per snapshot). A
+    lower share of affected releases is not by itself evidence of fewer vulnerabilities.

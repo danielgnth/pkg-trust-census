@@ -23,10 +23,11 @@ bun run cli --help
 | `src/stages/` | rank → fetch → extract → aggregate → report |
 | `src/adapters/` | one per registry: ranking, the requests `fetch` makes, and parsing into versions and signals |
 | `src/extract/` | registry-independent helpers: quarter anchors, version rules, signal construction |
-| `src/facts/` | curated tables: availability classes, registry policies, baseline, Sigstore, post-quantum |
+| `src/advisories/` | OSV lookups (run by `fetch`, replayed by `extract`), alias grouping, package URLs |
+| `src/facts/` | curated tables: availability classes, registry policies, baseline, Sigstore, post-quantum, advisory method notes |
 | `src/sources/` | the source registry, citations and quote matching |
 | `src/http/` | the shared client (ky for retries, p-queue for per-host pacing), the response cache, transports |
-| `src/report/` | labels and the SVG charts (Observable Plot, rendered headlessly through linkedom) |
+| `src/report/` | labels, the SVG charts (Observable Plot, rendered headlessly through linkedom) and the CycloneDX SBOM |
 | `src/db/` | Drizzle schema, migrations runner, zod validation |
 | `sources/` | archived sources and their manifest (committed) |
 | `data/out/` | report output per snapshot (committed; the results site is built from it) |
@@ -52,7 +53,8 @@ bun run cli report    --snapshot <id>
 ```
 
 `fetch` is the only stage that touches the network, and it skips anything already cached, so an
-interrupted run resumes for free. `extract` is pure, so parsers can be refined and re-run offline
+interrupted run resumes for free. After each package's registry responses it asks OSV about that package's
+versions; re-running `fetch` on a snapshot taken before this existed adds only the OSV requests. `extract` is pure, so parsers can be refined and re-run offline
 without re-hitting any registry.
 
 ### Long runs
@@ -84,9 +86,11 @@ Results land in `data/out/<snapshot>/`:
 | `pqc.md` / `pqc.csv` | Post-quantum exposure of each mechanism, per ecosystem |
 | `policies.md` / `policies.csv` | Governance (namespaces, confusable names, upload scanning) and containment (yank, deletion, advisories) |
 | `withdrawals.csv` | Per package: versions yanked, unpublished, deprecated or retracted, with the version numbers |
+| `advisories.md` / `advisories.csv` | Known advisories (OSV): exposure, known then and now, malware reports, database lag; every match with its purl and dates |
+| `sbom.cdx.json` | CycloneDX 1.6 SBOM: the latest version of every sampled package and the vulnerabilities known for it |
 | `packages.csv` | The sampled packages |
 | `signals.csv` | Every signal with its evidence, rule (`signal_source`) and the responses it was read from |
-| `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, governance and containment, withdrawals, Sigstore, post-quantum exposure, adoption per signal |
+| `charts/*.svg` | Charts: trust matrix, scores, publish authentication, registry baseline, governance and containment, withdrawals, known advisories, Sigstore, post-quantum exposure, adoption per signal |
 
 ## Results site
 
@@ -165,7 +169,7 @@ and the claim needs re-checking. A page that moved should get its new URL in the
 ## HTTP
 
 [`src/http/client.ts`](../src/http/client.ts) is the only way adapters reach the network. ky retries
-transient statuses and honours `Retry-After`; a p-queue per host enforces the request rate and concurrency
+transient statuses (POST too: it is only used for OSV queries) and honours `Retry-After`; a p-queue per host enforces the request rate and concurrency
 in `HOST_POLICIES` (crates.io: one request per second, as its crawler policy asks). Every response goes
 through the cache, and `extract` replays from the cache alone.
 
@@ -185,7 +189,7 @@ its exact numbers.
 Raw responses are gzipped under `data/cache/` and git-ignored (as is `data/trust.sqlite`), because npm packuments alone run to
 hundreds of megabytes per snapshot. `data/cache/manifest.jsonl` *is* committed. It records the URL,
 sha256, byte size, HTTP status and fetch time of every response, so integrity can be verified without
-the payloads.
+the payloads. A POST is keyed `POST {url} {sha256 of the body}` and its entry keeps the body (`requestBody`).
 
 ## Test fixtures
 

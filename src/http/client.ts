@@ -12,7 +12,7 @@
 import ky, { HTTPError } from "ky";
 import PQueue from "p-queue";
 import type { EcosystemId, FetchResult } from "../types.ts";
-import { ResponseCache } from "./cache.ts";
+import { ResponseCache, sha256 } from "./cache.ts";
 import { defaultTransport, type Transport } from "./transport.ts";
 
 export const TOOL_VERSION = "0.1.0";
@@ -62,6 +62,8 @@ export const HOST_POLICIES: Record<string, HostPolicy> = {
   // The downloads API answered 5 req/s with HTTP 429 on two thirds of requests (2026-10-13).
   "api.npmjs.org": { rps: 1, concurrency: 1 },
   "raw.githubusercontent.com": { rps: 4, concurrency: 4 },
+  // OSV publishes no rate limit; held to the same pace as the registries.
+  "api.osv.dev": { rps: 4, concurrency: 4 },
 };
 
 export interface RequestOptions {
@@ -69,7 +71,9 @@ export interface RequestOptions {
   /** Package this request belongs to; determines the cache path. */
   package: string;
   headers?: Record<string, string>;
-  method?: "GET" | "HEAD";
+  method?: "GET" | "HEAD" | "POST";
+  /** Request body of a POST. Part of the cache key, and recorded in the manifest. */
+  body?: string;
   /** Re-fetch even on a cache hit. */
   force?: boolean;
   /** Treat these non-OK statuses as facts worth caching rather than errors. */
@@ -105,6 +109,8 @@ export class HttpClient {
       retry: {
         limit: opts.maxRetries ?? 4,
         statusCodes: RETRYABLE,
+        // POST is only used for queries (OSV), which are safe to repeat.
+        methods: ["get", "head", "post"],
         // Exponential with jitter, capped so a long run cannot stall for minutes.
         delay: (attempt) => 1000 * 2 ** (attempt - 1),
         backoffLimit: 30_000,
@@ -141,7 +147,7 @@ export class HttpClient {
   }
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
-    const key = cacheKey(url, opts.method);
+    const key = cacheKey(url, opts.method, opts.body);
     if (!opts.force) {
       const hit = await this.cache.get(key);
       if (hit) {
@@ -156,7 +162,8 @@ export class HttpClient {
     try {
       res = await this.#ky(url, {
         method: opts.method ?? "GET",
-        headers: opts.headers,
+        headers: opts.body === undefined ? opts.headers : { "Content-Type": "application/json", ...opts.headers },
+        body: opts.body,
         throwHttpErrors: (status) => !accept.has(status),
         hooks: {
           beforeRetry: [
@@ -186,12 +193,17 @@ export class HttpClient {
       httpStatus: res.status,
       ecosystem: opts.ecosystem,
       package: opts.package,
+      requestBody: opts.body,
     });
     return { url, status: res.status, body, fromCache: false, entry };
   }
 
   async getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
     return parseJsonResult<T>(await this.get(url, opts));
+  }
+
+  postJson<T = unknown>(url: string, body: unknown, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
+    return this.getJson<T>(url, { ...opts, method: "POST", body: JSON.stringify(body) });
   }
 
   flush(): Promise<void> {
@@ -207,6 +219,8 @@ export class HttpClient {
 export interface Source {
   get(url: string, opts: RequestOptions): Promise<FetchResult>;
   getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }>;
+  /** POSTs `body` as JSON. Cached like a GET, keyed by the URL and the body's hash. */
+  postJson<T = unknown>(url: string, body: unknown, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }>;
 }
 
 /** Thrown by `CacheSource` when `extract` needs a response that `fetch` never stored. */
@@ -222,19 +236,28 @@ export class CacheSource implements Source {
   constructor(readonly cache: ResponseCache) {}
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
-    const hit = await this.cache.get(cacheKey(url, opts.method));
-    if (!hit) throw new CacheMissError(url);
+    const hit = await this.cache.get(cacheKey(url, opts.method, opts.body));
+    if (!hit) throw new CacheMissError(opts.method === "POST" ? `POST ${url}` : url);
     return { url, status: hit.entry.httpStatus, body: hit.body, fromCache: true, entry: hit.entry };
   }
 
   async getJson<T = unknown>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
     return parseJsonResult<T>(await this.get(url, opts));
   }
+
+  postJson<T = unknown>(url: string, body: unknown, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
+    return this.getJson<T>(url, { ...opts, method: "POST", body: JSON.stringify(body) });
+  }
 }
 
-/** HEAD and GET of one URL are different facts, so they must not share a cache entry. */
-export function cacheKey(url: string, method: RequestOptions["method"] = "GET"): string {
-  return method === "HEAD" ? `HEAD ${url}` : url;
+/**
+ * HEAD and GET of one URL are different facts, so they must not share a cache entry. A POST
+ * answers its body, so the body's hash is part of the key.
+ */
+export function cacheKey(url: string, method: RequestOptions["method"] = "GET", body?: string): string {
+  if (method === "HEAD") return `HEAD ${url}`;
+  if (method === "POST") return `POST ${url} ${sha256(body ?? "")}`;
+  return url;
 }
 
 function parseJsonResult<T>(res: FetchResult): { data: T | null; res: FetchResult } {

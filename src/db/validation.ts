@@ -15,6 +15,8 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
 import {
+  advisories,
+  advisoryMatches,
   ecosystemFacts,
   packageVersions,
   packageWithdrawals,
@@ -97,6 +99,7 @@ export const packageVersionInsert = createInsertSchema(packageVersions, {
   version: z.string().min(1),
   publishedAt: isoTimestamp.nullish(),
   quarterAnchor: quarterAnchor.nullish(),
+  purl: z.string().startsWith("pkg:").nullish(),
 });
 
 /** Rows that rest on a curated fact rather than a response: policy, no mechanism, not exposed. */
@@ -132,6 +135,30 @@ export const packageWithdrawalInsert = createInsertSchema(packageWithdrawals, {
   path: ["withdrawnCount"],
 });
 
+/** A response named by URL, or for a POST by its cache key: "POST {url} {sha256 of the body}". */
+const responseRef = z.object({
+  url: z.string().refine((u) => URL.canParse(u.replace(/^POST (\S+) [0-9a-f]{64}$/, "$1")), "expected a URL or a POST cache key"),
+  sha256: sha256Hex,
+});
+
+export const advisoryInsert = createInsertSchema(advisories, {
+  advisoryId: z.string().min(1),
+  aliases: z.array(z.string().min(1)),
+  published: isoTimestamp.nullish(),
+  modified: isoTimestamp,
+  withdrawn: isoTimestamp.nullish(),
+  response: responseRef,
+});
+
+export const advisoryMatchInsert = createInsertSchema(advisoryMatches, {
+  ecosystem: ecosystemEnum,
+  packageName: z.string().min(1),
+  version: z.string().min(1),
+  advisoryId: z.string().min(1),
+  releasedAt: isoTimestamp.nullish(),
+  responses: z.array(responseRef).min(1),
+});
+
 export type PackageInsert = z.infer<typeof packageInsert>;
 export type PackageVersionInsert = z.infer<typeof packageVersionInsert>;
 export type VersionSignalInsert = z.infer<typeof versionSignalInsert>;
@@ -159,6 +186,6 @@ function describe(row: unknown): string {
   if (typeof row !== "object" || row === null) return String(row);
   const r = row as Record<string, unknown>;
   return (
-    [r.ecosystem, r.packageName, r.version, r.signalId].filter(Boolean).join("/") || "unidentified"
+    [r.ecosystem, r.packageName, r.version, r.signalId, r.advisoryId].filter(Boolean).join("/") || "unidentified"
   );
 }

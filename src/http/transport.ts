@@ -52,10 +52,17 @@ export class CurlTransport implements Transport {
       String.raw`\n` + SENTINEL + String.raw`\n%{http_code}\n%{header_json}`,
     ];
     if (request.method === "HEAD") args.push("--head", "-o", "/dev/null");
+    // A body goes through stdin, so it never appears in the process list or hits ARG_MAX.
+    const payload = request.body ? await request.text() : null;
+    if (payload !== null) args.push("-X", request.method, "--data-binary", "@-");
     request.headers.forEach((v, k) => args.push("-H", `${k}: ${v}`));
     args.push("--url", url);
 
-    const proc = Bun.spawn(["curl", ...args], { stdout: "pipe", stderr: "pipe" });
+    const proc = Bun.spawn(["curl", ...args], {
+      stdin: payload !== null ? new Blob([payload]) : "ignore",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
     const [out, err] = await Promise.all([
       new Response(proc.stdout).text(),
       new Response(proc.stderr).text(),

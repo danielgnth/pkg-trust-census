@@ -1309,6 +1309,66 @@
     "sha256": "f58085a1887dcc8eeadbd9c00bd2322b76c93a6af92775cfac7047b75626c30f",
     "archive": "sources/archive/www.rfc-editor.org_rfc_rfc9980.md"
   },
+  "osvQuerybatch": {
+    "fetched": "https://google.github.io/osv.dev/post-v1-querybatch/",
+    "finalUrl": "https://google.github.io/osv.dev/post-v1-querybatch/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:28.691Z",
+    "title": "POST /v1/querybatch",
+    "sha256": "5cc0b641a28e06bf02dd1b15a69317708468fcf14a544ce2dfd715468fc767ae",
+    "archive": "sources/archive/google.github.io_osv.dev_post-v1-querybatch.md"
+  },
+  "osvSchema": {
+    "fetched": "https://ossf.github.io/osv-schema/",
+    "finalUrl": "https://ossf.github.io/osv-schema/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:28.693Z",
+    "title": "Open Source Vulnerability format - Open Source Vulnerability schema",
+    "sha256": "8cf1e3d3f9e10eba902d03af6c281d6bc5e71c22dc351fcb4b811c64030570e8",
+    "archive": "sources/archive/ossf.github.io_osv-schema.md"
+  },
+  "ghsaDatabase": {
+    "fetched": "https://raw.githubusercontent.com/github/advisory-database/main/README.md",
+    "finalUrl": "https://raw.githubusercontent.com/github/advisory-database/main/README.md",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:28.693Z",
+    "title": "README.md",
+    "sha256": "e955fd376fc3a29f207b7b33d5e1e277ec0087c977e650e002f3d12654eb0aa7",
+    "archive": "sources/archive/raw.githubusercontent.com_github_advisory-database_main_README.md"
+  },
+  "purlSpec": {
+    "fetched": "https://raw.githubusercontent.com/package-url/purl-spec/main/README.md",
+    "finalUrl": "https://raw.githubusercontent.com/package-url/purl-spec/main/README.md",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:29.702Z",
+    "title": "README.md",
+    "sha256": "573e5db82f7acd8e1e11798c73a5bb6349f928dc5001923c47e7711517163d34",
+    "archive": "sources/archive/raw.githubusercontent.com_package-url_purl-spec_main_README.md"
+  },
+  "purlGolangType": {
+    "fetched": "https://raw.githubusercontent.com/package-url/purl-spec/main/types/golang-definition.json",
+    "finalUrl": "https://raw.githubusercontent.com/package-url/purl-spec/main/types/golang-definition.json",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:30.708Z",
+    "title": "golang-definition.json",
+    "sha256": "cda50fd0d6d10a93ce7d8724cf20ff84d311196c0edd1532ce621044bebc027a",
+    "archive": "sources/archive/raw.githubusercontent.com_package-url_purl-spec_main_types_golang-definition.json"
+  },
+  "cyclonedxVdr": {
+    "fetched": "https://cyclonedx.org/capabilities/vdr/",
+    "finalUrl": "https://cyclonedx.org/capabilities/vdr/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-15T07:08:28.693Z",
+    "title": "Vulnerability Disclosure Report (VDR) | CycloneDX",
+    "sha256": "98ab865f16b3ec782088ecba9dbe982eb2a573fda4a5154afabe1ded39733da7",
+    "archive": "sources/archive/cyclonedx.org_capabilities_vdr.md"
+  },
   "probePqTls": {
     "fetched": "bun run scripts/probe-pq-tls.ts",
     "accessedAt": "2026-10-14T07:20:31.432Z",

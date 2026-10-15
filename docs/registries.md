@@ -169,3 +169,23 @@ all-time `downloads` it reports.
   not artifacts, so it is not counted as a transparency log.
 - Forge-hosted archives have an empty `dist.shasum`; the commit in the archive URL is the only pin.
 - Soft-deleted versions are not in the public JSON, so withdrawals cannot be counted.
+
+## OSV (advisories, all registries)
+
+OSV is not a registry, but every package's versions are looked up there ([methodology](methodology.md#known-advisories)).
+
+| Data | Source |
+|---|---|
+| matches | `POST api.osv.dev/v1/querybatch`, one query per version: `{package: {ecosystem, name}, version}` |
+| records | `GET api.osv.dev/v1/vulns/{id}`: `aliases`, `published`, `modified`, `withdrawn`, `summary` |
+
+- OSV's ecosystem names are `PyPI`, `npm`, `crates.io`, `RubyGems`, `Go`, `Maven` and `Packagist`; package
+  names are the ones the registries use (Maven `group:artifact`, Go module paths).
+- Versions are sent as the registry spells them. OSV accepts Go's and Packagist's `v` prefix (`v0.17.0` and
+  `0.17.0` match the same records) and PyPI names in any case.
+- `querybatch` returns ids only, and pages a query past about 1,000 results (3,000 per batch) with
+  `next_page_token`; only the queries that returned a token are asked again.
+- A POST is cached under `POST {url} {sha256 of the body}`, and the manifest keeps the body
+  (`requestBody`), so each query can be replayed.
+- `database_specific` fields on GHSA records (`github_reviewed_at`, `nvd_published_at`, `severity`) are not
+  read: GitHub documents them as internal and subject to change.

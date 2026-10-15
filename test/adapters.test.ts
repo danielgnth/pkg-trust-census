@@ -36,7 +36,7 @@ class FakeSource implements Source {
   constructor(private routes: Record<string, Route>) {}
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
-    const key = cacheKey(url, opts.method);
+    const key = cacheKey(url, opts.method, opts.body);
     this.calls.push(key);
     const route = this.routes[key];
     if (route === undefined) throw new CacheMissError(url);
@@ -56,6 +56,10 @@ class FakeSource implements Source {
   async getJson<T>(url: string, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
     const res = await this.get(url, opts);
     return { data: res.status === 404 || res.status === 410 ? null : (JSON.parse(res.body) as T), res };
+  }
+
+  postJson<T>(url: string, body: unknown, opts: RequestOptions): Promise<{ data: T | null; res: FetchResult }> {
+    return this.getJson<T>(url, { ...opts, method: "POST", body: JSON.stringify(body) });
   }
 }
 
@@ -203,7 +207,7 @@ describe("PyPI extract", () => {
 
     expect(sig(pkg, "0.16.3", "build_provenance")!.value).toBe("false");
     expect(sig(pkg, "0.16.3", "identity_publish")!.value).toBe("unknown");
-    expect(pkg.withdrawals).toEqual([{ kind: "yanked", versionsInWindow: expect.any(Number), withdrawn: expect.any(Array) }]);
+    expect(pkg.withdrawals).toEqual([{ kind: "yanked", versionsInWindow: expect.any(Number), withdrawn: expect.any(Array), releasedAt: expect.any(Object) }]);
     // Without a provenance URL there is no provenance object, so the negative rests on the index.
     expect(sig(pkg, "0.16.3", "build_provenance")!.responses.map((r) => r.url)).toEqual([simpleUrl("ruff")]);
     assertConsistentWithFacts(pkg);
@@ -286,8 +290,9 @@ describe("npm extract", () => {
     const pkg = await new NpmAdapter().extract(candidate("npm", "w"), new FakeSource(routes), CTX);
     // 1.0.0 predates the window; 1.1.1 was unpublished and survives only in `time`.
     expect(pkg.withdrawals).toEqual([
-      { kind: "unpublished", versionsInWindow: 3, withdrawn: ["1.1.1"] },
-      { kind: "deprecated", versionsInWindow: 3, withdrawn: ["1.1.0"] },
+      // The release time of an unpublished version is what advisory timing is measured from.
+      { kind: "unpublished", versionsInWindow: 3, withdrawn: ["1.1.1"], releasedAt: { "1.1.1": "2025-09-08T13:00:00Z" } },
+      { kind: "deprecated", versionsInWindow: 3, withdrawn: ["1.1.0"], releasedAt: { "1.1.0": "2025-01-01T00:00:00Z" } },
     ]);
   });
 

@@ -8,14 +8,15 @@
  * lower bound. `pctKnown` excludes unknowns and is reported alongside, never instead.
  */
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type Availability, type EcosystemId, type SignalId, type WithdrawalKind } from "../types.ts";
 import { snapshotAsOf, type Db } from "../db/open.ts";
-import { packageVersions, packageWithdrawals, packages, signalAvailability, versionSignals } from "../db/schema.ts";
+import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, signalAvailability, versionSignals } from "../db/schema.ts";
 import { dataDir } from "../http/cache.ts";
 import { quarterBoundaries, withdrawalWindowStart } from "../extract/quarters.ts";
+import { aliasGroups, databaseOf } from "../advisories/osv.ts";
 
 export interface Counts {
   n: number;
@@ -116,6 +117,83 @@ export interface Aggregate {
   /** Start of the window withdrawn versions are counted in (`withdrawalWindowStart`). */
   withdrawalWindowStart: string;
   withdrawals: WithdrawalCell[];
+  advisories: AdvisorySummary;
+}
+
+/**
+ * Known advisories (OSV) for the sampled versions. A vulnerability listed by several databases
+ * counts once (its alias group), and counts as known from its group's first publication.
+ * Packages OSV was not asked about are left out of every denominator.
+ */
+export interface AdvisorySummary {
+  /** When OSV was queried: the earliest and latest query of the snapshot. */
+  queriedFrom: string | null;
+  queriedTo: string | null;
+  exposure: AdvisoryExposure[];
+  series: AdvisoryPoint[];
+  withdrawn: WithdrawnMalicious[];
+  databases: DatabaseLag[];
+  malicious: MaliciousRelease[];
+}
+
+export interface AdvisoryExposure {
+  ecosystem: EcosystemId;
+  /** Packages whose latest version OSV was asked about: the denominator. */
+  checked: number;
+  /** Latest versions with at least one advisory published by the snapshot. */
+  affected: number;
+  /** Of those, latest versions with a malicious-package report. */
+  malicious: number;
+  /** Distinct vulnerabilities (alias groups) affecting them. */
+  vulnerabilities: number;
+}
+
+export interface AdvisoryPoint {
+  quarter: string;
+  ecosystem: EcosystemId;
+  /** Packages with an anchor this quarter that OSV was asked about. */
+  n: number;
+  /** Anchors with an advisory published by the quarter's end: known when a default install chose them. */
+  knownThen: number;
+  /** Anchors with an advisory published by the snapshot. */
+  knownNow: number;
+}
+
+export interface WithdrawnMalicious {
+  ecosystem: EcosystemId;
+  kind: WithdrawalKind;
+  /** Withdrawn versions of packages OSV was asked about. */
+  withdrawn: number;
+  /** Of those, versions with a malicious-package report. */
+  malicious: number;
+}
+
+export interface DatabaseLag {
+  ecosystem: EcosystemId;
+  /** OSV id prefix: GHSA, PYSEC, RUSTSEC, GO, MAL, … */
+  database: string;
+  /** Vulnerabilities affecting sampled versions that this database lists. */
+  vulnerabilities: number;
+  /** Of those, the ones it published first (a tie counts for each database in it). */
+  first: number;
+  /** Median days behind the first publication, over the ones it did not publish first. */
+  medianLagDays: number | null;
+}
+
+export interface MaliciousRelease {
+  ecosystem: EcosystemId;
+  package: string;
+  version: string;
+  /** The alias group's name (its first-published record) and every record in it. */
+  advisory: string;
+  ids: string[];
+  releasedAt: string | null;
+  /** First publication of the report. */
+  reportedAt: string | null;
+  /** Hours from release to report. */
+  hours: number | null;
+  /** How the registry withdrew the version, if it did. */
+  withdrawn: WithdrawalKind[];
 }
 
 /**
@@ -327,7 +405,155 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
     scoreSeries,
     withdrawalWindowStart: withdrawalWindowStart(asOf).toISOString(),
     withdrawals: withdrawals(db, snapshotId),
+    advisories: advisorySummary(db, snapshotId, asOf),
   };
+}
+
+export function advisorySummary(db: Db, snapshotId: string, asOf: Date): AdvisorySummary {
+  const records = db.select().from(advisories).where(eq(advisories.snapshotId, snapshotId)).all();
+  const group = aliasGroups(records.map((r) => ({ id: r.advisoryId, aliases: r.aliases, published: r.published, withdrawn: r.withdrawn })));
+
+  /** Per alias group: first publication (ms), whether it reports malware, and its records. */
+  const groups = new Map<string, { first: number; malicious: boolean; members: typeof records }>();
+  for (const r of records) {
+    const g = group.get(r.advisoryId);
+    if (!g) continue;
+    const entry = groups.get(g) ?? { first: Number.POSITIVE_INFINITY, malicious: false, members: [] };
+    if (r.published) entry.first = Math.min(entry.first, Date.parse(r.published));
+    entry.malicious ||= r.malicious;
+    entry.members.push(r);
+    groups.set(g, entry);
+  }
+
+  const checkedRows = db
+    .select({ ecosystem: packages.ecosystem, name: packages.packageName, at: packages.osvQueriedAt })
+    .from(packages)
+    .where(and(eq(packages.snapshotId, snapshotId), isNotNull(packages.osvQueriedAt)))
+    .all();
+  const checked = new Set(checkedRows.map((r) => `${r.ecosystem}/${r.name}`));
+  const queried = checkedRows.map((r) => r.at!).sort();
+
+  /** "{ecosystem}/{package}@{version}" → alias groups OSV lists for it. */
+  const groupsOf = new Map<string, Set<string>>();
+  const matchRows = db.select().from(advisoryMatches).where(eq(advisoryMatches.snapshotId, snapshotId)).all();
+  for (const m of matchRows) {
+    const g = group.get(m.advisoryId);
+    if (!g) continue;
+    const key = `${m.ecosystem}/${m.packageName}@${m.version}`;
+    groupsOf.set(key, (groupsOf.get(key) ?? new Set()).add(g));
+  }
+  const known = (key: string, by: number) => [...(groupsOf.get(key) ?? [])].filter((g) => groups.get(g)!.first <= by);
+
+  const versions = db
+    .select({ ecosystem: packageVersions.ecosystem, name: packageVersions.packageName, version: packageVersions.version, isLatest: packageVersions.isLatest, quarterAnchor: packageVersions.quarterAnchor })
+    .from(packageVersions)
+    .where(eq(packageVersions.snapshotId, snapshotId))
+    .all()
+    .filter((v) => checked.has(`${v.ecosystem}/${v.name}`));
+  const present = ECOSYSTEMS.filter((e) => versions.some((v) => v.ecosystem === e));
+  const now = asOf.getTime();
+
+  const exposure: AdvisoryExposure[] = present.map((ecosystem) => {
+    const latest = versions.filter((v) => v.ecosystem === ecosystem && v.isLatest).map((v) => known(`${ecosystem}/${v.name}@${v.version}`, now));
+    return {
+      ecosystem,
+      checked: latest.length,
+      affected: latest.filter((gs) => gs.length > 0).length,
+      malicious: latest.filter((gs) => gs.some((g) => groups.get(g)!.malicious)).length,
+      vulnerabilities: new Set(latest.flat()).size,
+    };
+  });
+
+  const series: AdvisoryPoint[] = [];
+  for (const q of quarterBoundaries(asOf)) {
+    for (const ecosystem of present) {
+      const anchors = versions.filter((v) => v.ecosystem === ecosystem && v.quarterAnchor?.split(",").includes(q.label)).map((v) => `${ecosystem}/${v.name}@${v.version}`);
+      if (anchors.length === 0) continue;
+      series.push({
+        quarter: q.label,
+        ecosystem,
+        n: anchors.length,
+        knownThen: anchors.filter((k) => known(k, q.at.getTime()).length > 0).length,
+        knownNow: anchors.filter((k) => known(k, now).length > 0).length,
+      });
+    }
+  }
+
+  const withdrawnRows = db.select().from(packageWithdrawals).where(eq(packageWithdrawals.snapshotId, snapshotId)).all().filter((w) => checked.has(`${w.ecosystem}/${w.packageName}`));
+  const isMalicious = (key: string) => [...(groupsOf.get(key) ?? [])].some((g) => groups.get(g)!.malicious);
+  const withdrawnCells = new Map<string, WithdrawnMalicious>();
+  /** "{ecosystem}/{package}@{version}" → how it was withdrawn. */
+  const withdrawnHow = new Map<string, WithdrawalKind[]>();
+  for (const w of withdrawnRows) {
+    const cell = withdrawnCells.get(`${w.ecosystem}/${w.kind}`) ?? { ecosystem: w.ecosystem as EcosystemId, kind: w.kind as WithdrawalKind, withdrawn: 0, malicious: 0 };
+    for (const v of w.withdrawnVersions ? w.withdrawnVersions.split(",") : []) {
+      const key = `${w.ecosystem}/${w.packageName}@${v}`;
+      cell.withdrawn++;
+      if (isMalicious(key)) cell.malicious++;
+      withdrawnHow.set(key, [...(withdrawnHow.get(key) ?? []), w.kind as WithdrawalKind]);
+    }
+    withdrawnCells.set(`${w.ecosystem}/${w.kind}`, cell);
+  }
+  const kindOrder = (c: WithdrawnMalicious) => ECOSYSTEMS.indexOf(c.ecosystem) * 10 + WITHDRAWAL_KINDS.indexOf(c.kind);
+
+  const databases: DatabaseLag[] = present.flatMap((ecosystem) => {
+    const touched = new Set(matchRows.filter((m) => m.ecosystem === ecosystem && checked.has(`${m.ecosystem}/${m.packageName}`)).flatMap((m) => group.get(m.advisoryId) ?? []));
+    const byDb = new Map<string, number[]>();
+    for (const g of touched) {
+      const { first, members } = groups.get(g)!;
+      if (!Number.isFinite(first)) continue;
+      const earliest = new Map<string, number>();
+      for (const r of members) {
+        if (!r.published) continue;
+        const name = databaseOf(r.advisoryId);
+        earliest.set(name, Math.min(earliest.get(name) ?? Number.POSITIVE_INFINITY, Date.parse(r.published)));
+      }
+      for (const [name, t] of earliest) byDb.set(name, [...(byDb.get(name) ?? []), (t - first) / 86_400_000]);
+    }
+    return [...byDb]
+      .map(([database, lags]) => ({ ecosystem, database, vulnerabilities: lags.length, first: lags.filter((d) => d === 0).length, medianLagDays: median(lags.filter((d) => d > 0)) }))
+      .sort((a, b) => b.vulnerabilities - a.vulnerabilities || a.database.localeCompare(b.database));
+  });
+
+  const malicious: MaliciousRelease[] = matchRows
+    .filter((m) => checked.has(`${m.ecosystem}/${m.packageName}`) && groups.get(group.get(m.advisoryId) ?? "")?.malicious)
+    // One row per version and vulnerability, however many of the group's records matched it.
+    .filter((m, i, all) => all.findIndex((o) => o.ecosystem === m.ecosystem && o.packageName === m.packageName && o.version === m.version && group.get(o.advisoryId) === group.get(m.advisoryId)) === i)
+    .map((m) => {
+      const g = group.get(m.advisoryId)!;
+      const { first, members } = groups.get(g)!;
+      const reportedAt = Number.isFinite(first) ? new Date(first).toISOString() : null;
+      const hours = reportedAt && m.releasedAt ? (first - Date.parse(m.releasedAt)) / 3_600_000 : null;
+      return {
+        ecosystem: m.ecosystem as EcosystemId,
+        package: m.packageName,
+        version: m.version,
+        advisory: g,
+        ids: members.map((r) => r.advisoryId).sort(),
+        releasedAt: m.releasedAt,
+        reportedAt,
+        hours,
+        withdrawn: withdrawnHow.get(`${m.ecosystem}/${m.packageName}@${m.version}`) ?? [],
+      };
+    })
+    .sort((a, b) => ECOSYSTEMS.indexOf(a.ecosystem) - ECOSYSTEMS.indexOf(b.ecosystem) || a.package.localeCompare(b.package) || a.version.localeCompare(b.version));
+
+  return {
+    queriedFrom: queried[0] ?? null,
+    queriedTo: queried.at(-1) ?? null,
+    exposure,
+    series,
+    withdrawn: [...withdrawnCells.values()].sort((a, b) => kindOrder(a) - kindOrder(b)),
+    databases,
+    malicious,
+  };
+}
+
+function median(xs: number[]): number | null {
+  if (xs.length === 0) return null;
+  const s = [...xs].sort((a, b) => a - b);
+  const mid = s.length >> 1;
+  return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 }
 
 function withdrawals(db: Db, snapshotId: string): WithdrawalCell[] {

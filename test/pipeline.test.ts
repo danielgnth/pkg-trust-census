@@ -14,7 +14,7 @@ process.env.PKG_TRUST_DATA_DIR = TMP;
 const { HttpClient } = await import("../src/http/client.ts");
 const { ResponseCache } = await import("../src/http/cache.ts");
 const { openDb, closeDb } = await import("../src/db/open.ts");
-const { packages, packageVersions, versionSignals, signalAvailability } = await import("../src/db/schema.ts");
+const { packages, packageVersions, versionSignals, signalAvailability, advisoryMatches } = await import("../src/db/schema.ts");
 const { runRank } = await import("../src/stages/rank.ts");
 const { runFetch } = await import("../src/stages/fetch.ts");
 const { runExtract } = await import("../src/stages/extract.ts");
@@ -22,6 +22,7 @@ const { runAggregate } = await import("../src/stages/aggregate.ts");
 const { runReport } = await import("../src/stages/report.ts");
 const { simpleUrl, jsonUrl } = await import("../src/adapters/pypi.ts");
 import { eq, isNotNull } from "drizzle-orm";
+import * as CDX from "@cyclonedx/cyclonedx-library";
 import type { Transport } from "../src/http/transport.ts";
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
@@ -68,9 +69,29 @@ const ROUTES: Record<string, string> = {
   [jsonUrl("plain")]: JSON.stringify({ info: { version: "0.9" } }),
 };
 
+/**
+ * OSV: attested 1.0 has one vulnerability under two ids (GHSA first, PYSEC three months later);
+ * plain 0.9 has a malware report published long after its release.
+ */
+const OSV_MATCHES: Record<string, string[]> = {
+  "attested@1.0": ["GHSA-aaaa-bbbb-cccc", "PYSEC-2025-1"],
+  "plain@0.9": ["MAL-2025-7"],
+};
+const OSV_RECORDS: Record<string, object> = {
+  "GHSA-aaaa-bbbb-cccc": { id: "GHSA-aaaa-bbbb-cccc", aliases: ["CVE-2025-0001", "PYSEC-2025-1"], published: "2025-03-01T00:00:00Z", modified: "2025-03-02T00:00:00Z", summary: "A flaw" },
+  "PYSEC-2025-1": { id: "PYSEC-2025-1", aliases: ["CVE-2025-0001", "GHSA-aaaa-bbbb-cccc"], published: "2025-06-01T00:00:00Z", modified: "2025-06-01T00:00:00Z" },
+  "MAL-2025-7": { id: "MAL-2025-7", published: "2025-06-01T00:00:00Z", modified: "2025-06-01T00:00:00Z", summary: "Malicious code in plain (PyPI)" },
+};
+
 const transport: Transport = {
   name: "mock",
   async fetch(req) {
+    if (req.method === "POST" && req.url === "https://api.osv.dev/v1/querybatch") {
+      const { queries } = (await req.json()) as { queries: Array<{ package: { name: string }; version: string }> };
+      return Response.json({ results: queries.map((q) => ({ vulns: (OSV_MATCHES[`${q.package.name}@${q.version}`] ?? []).map((id) => ({ id, modified: "2025-06-01T00:00:00Z" })) })) });
+    }
+    const record = OSV_RECORDS[decodeURIComponent(req.url.replace("https://api.osv.dev/v1/vulns/", ""))];
+    if (record) return Response.json(record);
     const body = ROUTES[req.url];
     return body === undefined ? new Response(null, { status: 404 }) : new Response(body);
   },
@@ -127,7 +148,35 @@ describe("pipeline", () => {
     expect(q1).toMatchObject({ n: 2, t: 0 });
     expect(aggregate.coverage[0]).toMatchObject({ sampled: 2, fetched: 2, extracted: 2, extractErrors: 0 });
 
+    // Advisories: one vulnerability under two ids, unknown at 2024Q1, known now; one malware report.
+    expect(db.select().from(advisoryMatches).all().map((m) => `${m.packageName}@${m.version} ${m.advisoryId}`).sort()).toEqual([
+      "attested@1.0 GHSA-aaaa-bbbb-cccc",
+      "attested@1.0 PYSEC-2025-1",
+      "plain@0.9 MAL-2025-7",
+    ]);
+    expect(db.select({ purl: packageVersions.purl }).from(packageVersions).where(eq(packageVersions.version, "2.0")).get()!.purl).toBe("pkg:pypi/attested@2.0");
+    const adv = aggregate.advisories;
+    expect(adv.exposure).toEqual([{ ecosystem: "pypi", checked: 2, affected: 1, malicious: 1, vulnerabilities: 1 }]);
+    expect(adv.series.find((p) => p.quarter === "2024Q1")).toEqual({ quarter: "2024Q1", ecosystem: "pypi", n: 2, knownThen: 0, knownNow: 2 });
+    expect(adv.databases).toEqual([
+      { ecosystem: "pypi", database: "GHSA", vulnerabilities: 1, first: 1, medianLagDays: null },
+      { ecosystem: "pypi", database: "MAL", vulnerabilities: 1, first: 1, medianLagDays: null },
+      { ecosystem: "pypi", database: "PYSEC", vulnerabilities: 1, first: 0, medianLagDays: 92 },
+    ]);
+    expect(adv.malicious).toMatchObject([{ package: "plain", version: "0.9", advisory: "MAL-2025-7", releasedAt: "2022-01-01T00:00:00.000Z", reportedAt: "2025-06-01T00:00:00.000Z", withdrawn: [] }]);
+
     const { dir, files } = await runReport(db, "snap-e2e");
+    const sbomText = await Bun.file(join(dir, "sbom.cdx.json")).text();
+    expect(await new CDX.Validation.JsonStrictValidator(CDX.Spec.Version.v1dot6).validate(sbomText)).toBeNull();
+    const sbom = JSON.parse(sbomText);
+    expect(sbom).toMatchObject({ bomFormat: "CycloneDX", specVersion: "1.6" });
+    expect(sbom.components.map((c: { purl: string }) => c.purl)).toEqual(["pkg:pypi/attested@2.0", "pkg:pypi/plain@0.9"]);
+    expect(sbom.vulnerabilities).toMatchObject([{ id: "MAL-2025-7", affects: [{ ref: "pkg:pypi/plain@0.9" }] }]);
+    const advisoriesMd = await Bun.file(join(dir, "advisories.md")).text();
+    expect(advisoriesMd).toContain("| **PyPI** | 50% (1/2) | 1 | 1 | 0% → 100% (n=2) |");
+    expect(advisoriesMd).toContain("#### Method and sources");
+    expect((await Bun.file(join(dir, "advisories.csv")).text()).split("\n")).toHaveLength(5);
+    expect(await Bun.file(join(dir, "charts/advisories.svg")).text()).toContain("Known advisories (OSV)");
     expect(files).toContain("charts/matrix.svg");
     const matrix = await Bun.file(join(dir, "matrix.md")).text();
     expect(matrix).toContain("≥ 50% (1/2)");

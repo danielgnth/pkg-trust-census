@@ -306,6 +306,64 @@ describe("HttpClient", () => {
       srv.stop(true);
     }
   });
+
+  test("a POST is cached per body, records the body in the manifest, and replays from the cache", async () => {
+    const bodies: string[] = [];
+    const srv = serve(async (req) => {
+      const body = await req.text();
+      bodies.push(body);
+      return Response.json({ echo: JSON.parse(body), type: req.headers.get("content-type") });
+    });
+    try {
+      const http = new HttpClient();
+      const url = `http://localhost:${srv.port}/v1/querybatch`;
+      const opts = { ecosystem: "npm", package: "chalk" } as const;
+      const a = await http.postJson<{ echo: unknown; type: string }>(url, { q: 1 }, opts);
+      const again = await http.postJson(url, { q: 1 }, opts);
+      const b = await http.postJson(url, { q: 2 }, opts);
+      await http.flush();
+
+      expect(bodies).toEqual(['{"q":1}', '{"q":2}']);
+      expect(a.data).toEqual({ echo: { q: 1 }, type: "application/json" });
+      expect(again.res.fromCache).toBe(true);
+      expect(b.res.fromCache).toBe(false);
+      expect(a.res.entry.url).toBe(`POST ${url} ${sha256('{"q":1}')}`);
+
+      const manifest = (await Bun.file(join(TMP, "cache", "manifest.jsonl")).text()).trim().split("\n").map((l) => JSON.parse(l));
+      expect(manifest.find((e) => e.url === a.res.entry.url).requestBody).toBe('{"q":1}');
+
+      const { CacheSource } = await import("../src/http/client.ts");
+      const replay = new CacheSource(new ResponseCache());
+      expect((await replay.postJson(url, { q: 2 }, opts)).data).toEqual(b.data);
+      await expect(replay.postJson(url, { q: 3 }, opts)).rejects.toThrow("not in cache: POST");
+    } finally {
+      srv.stop(true);
+    }
+  });
+
+  test("a POST query is retried like a GET", async () => {
+    let hits = 0;
+    const srv = serve(() => (++hits < 2 ? new Response("busy", { status: 503 }) : Response.json({ ok: true })));
+    try {
+      const http = new HttpClient({ maxRetries: 2 });
+      const { data } = await http.postJson(`http://localhost:${srv.port}/q`, { q: 1 }, { ecosystem: "pypi", package: "p" });
+      expect(data).toEqual({ ok: true });
+      expect(hits).toBe(2);
+    } finally {
+      srv.stop(true);
+    }
+  });
+
+  test("the curl transport sends a POST body", async () => {
+    const srv = serve(async (req) => Response.json({ method: req.method, body: await req.text() }));
+    try {
+      const { CurlTransport } = await import("../src/http/transport.ts");
+      const res = await new CurlTransport().fetch(new Request(`http://localhost:${srv.port}/q`, { method: "POST", body: '{"a":1}' }));
+      expect(await res.json()).toEqual({ method: "POST", body: '{"a":1}' });
+    } finally {
+      srv.stop(true);
+    }
+  });
 });
 
 describe("per-host pacing", () => {

@@ -233,7 +233,7 @@ const extract = defineCommand({
       });
       s.stop("extract complete");
       for (const sum of summaries) {
-        const line = `${sum.ecosystem}: ${sum.extracted}/${sum.packages} packages, ${sum.versions} versions, ${sum.signals} signals`;
+        const line = `${sum.ecosystem}: ${sum.extracted}/${sum.packages} packages, ${sum.versions} versions, ${sum.signals} signals, ${sum.advisoryMatches} advisory matches`;
         if (sum.failed) p.log.warn(`${line} (${sum.failed} failed — recorded as extract_error)`);
         else p.log.success(line);
       }

@@ -26,6 +26,7 @@ package managers?"*
 | **Signals** | identity-bound publish · publisher signature · registry integrity · SLSA provenance · source link · transparency log · MFA enforced |
 | **Sample** | top 250 packages per ecosystem (pilot: 50) |
 | **Timeline** | quarterly, back to 2024-01 |
+| **Advisories** | known vulnerabilities and malware reports per sampled release (OSV), with a CycloneDX SBOM of the sample |
 
 Each signal is `true`, `false` or `unknown`. For each ecosystem the census also records whether the
 registry exposes the signal at all, because *"0% adoption"* and *"the registry won't tell you"* are

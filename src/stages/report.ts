@@ -11,17 +11,21 @@ import { stringify } from "csv-stringify/sync";
 import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ECOSYSTEMS, SIGNALS } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, type EcosystemId } from "../types.ts";
 import type { Db } from "../db/open.ts";
-import { packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
+import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
 import { CATEGORIES, aggregatePath, outDir, type Aggregate, type Score } from "./aggregate.ts";
-import { adoptionSvg, baselineSvg, matrixSvg, measurable, policiesSvg, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg, withdrawalsSvg } from "../report/charts.ts";
+import { adoptionSvg, advisoriesSvg, baselineSvg, matrixSvg, measurable, policiesSvg, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg, withdrawalsSvg } from "../report/charts.ts";
 import { CATEGORY_LABEL, ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SHARED_MECHANISM, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText, pointsText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
 import { PQC, PQC_LAYERS, PQC_VERIFIED, pqcOf, type PqcStatus } from "../facts/pqc.ts";
 import { POLICIES, POLICIES_VERIFIED, POLICY_PROPERTIES, policyOf } from "../facts/policies.ts";
+import { ADVISORY_NOTES } from "../facts/advisories.ts";
+import { aliasGroups, databaseOf } from "../advisories/osv.ts";
+import { purlOf } from "../advisories/purl.ts";
+import { sbomJson } from "../report/sbom.ts";
 
 export interface ReportResult {
   dir: string;
@@ -49,6 +53,10 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["charts/policies.svg", policiesSvg(agg)],
     ["withdrawals.csv", withdrawalsCsv(db, snapshotId)],
     ["charts/withdrawals.svg", withdrawalsSvg(agg)],
+    ["advisories.md", advisoriesMarkdown(agg, true)],
+    ["advisories.csv", advisoriesCsv(db, snapshotId)],
+    ["charts/advisories.svg", advisoriesSvg(agg)],
+    ["sbom.cdx.json", sbomJson(db, snapshotId, agg.asOf)],
     ["sigstore.md", sigstoreMarkdown(agg, true)],
     ["sigstore.csv", sigstoreCsv()],
     ["charts/sigstore.svg", sigstoreSvg(agg)],
@@ -115,6 +123,11 @@ export function readmeMarkdown(agg: Aggregate): string {
     ...chart("withdrawals", "Withdrawn versions"),
     "Per package, with the version numbers: [withdrawals.csv](withdrawals.csv).",
     "",
+    "## Known advisories",
+    "",
+    ...chart("advisories", "Known advisories"),
+    "Malware reports, which databases list each vulnerability and how late, and the method: [known advisories](advisories.md).",
+    "",
     "## Sigstore",
     "",
     ...chart("sigstore", "Sigstore support"),
@@ -136,6 +149,8 @@ export function readmeMarkdown(agg: Aggregate): string {
     "| [scores.csv](scores.csv), [score_series.csv](score_series.csv) | Trust summary per ecosystem, overall and per quarter |",
     "| [baseline.csv](baseline.csv), [policies.csv](policies.csv), [sigstore.csv](sigstore.csv), [pqc.csv](pqc.csv) | The curated tables, with their sources |",
     "| [withdrawals.csv](withdrawals.csv) | Versions yanked, unpublished, deprecated or retracted, per package |",
+    "| [advisories.csv](advisories.csv) | Every OSV record matched to a sampled or withdrawn version, with its purl and dates |",
+    "| [sbom.cdx.json](sbom.cdx.json) | CycloneDX SBOM: the latest version of every sampled package and its known vulnerabilities |",
     "| [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |",
     "",
   ].join("\n");
@@ -227,6 +242,7 @@ export function summaryMarkdown(agg: Aggregate): string {
     baselineMarkdown(agg, false),
     policiesMarkdown(agg, false),
     withdrawalsMarkdown(agg),
+    advisoriesMarkdown(agg, false),
     sigstoreMarkdown(agg, false),
     pqcMarkdown(agg, false),
     "## Headline numbers",
@@ -509,6 +525,117 @@ export function withdrawalsMarkdown(agg: Aggregate): string {
   ].join("\n");
 }
 
+/**
+ * Known advisories: exposure of the latest releases, then and now for the first quarter's
+ * releases, malware reports with their timing, and which databases list what, how late.
+ */
+export function advisoriesMarkdown(agg: Aggregate, withNotes: boolean): string {
+  const adv = agg.advisories;
+  const first = agg.quarters[0];
+  const days = (d: number | null) => (d == null ? "–" : d < 1 ? `${Math.round(d * 24)} h` : `${Math.round(d)}`);
+  const lines = [
+    `### Known advisories (OSV, queried ${adv.queriedFrom?.slice(0, 10) ?? "–"}; snapshot ${agg.snapshotId})`,
+    "",
+    `| Platform | Latest releases with an advisory | Vulnerabilities | Malware reports | ${first ?? "First quarter"} release: known then → now |`,
+    "|---|---:|---:|---:|---:|",
+    ...adv.exposure.map((c) => {
+      const q = adv.series.find((p) => p.quarter === first && p.ecosystem === c.ecosystem);
+      const then = q ? `${pctText(q.knownThen / q.n)} → ${pctText(q.knownNow / q.n)} (n=${q.n})` : "–";
+      return `| **${ECOSYSTEM_LABEL[c.ecosystem]}** | ${c.checked ? `${pctText(c.affected / c.checked)} (${c.affected}/${c.checked})` : "–"} | ${c.vulnerabilities} | ${c.malicious} | ${then} |`;
+    }),
+    "",
+    "A vulnerability listed by several databases (GHSA, PYSEC, RUSTSEC, GO, …) counts once, and counts as known from",
+    "its first publication in any of them. *Known then → now*: of the releases a default install resolved at the end of",
+    `${first ?? "the first quarter"}, the share with an advisory published by then, and by the snapshot.`,
+    "",
+  ];
+
+  const mal = adv.malicious;
+  lines.push("#### Malware reports", "");
+  if (mal.length === 0) lines.push("No sampled or withdrawn release carries a malware report.", "");
+  else {
+    lines.push(
+      "| Platform | Package | Version | Report | Released | Reported | Hours | Withdrawn |",
+      "|---|---|---|---|---|---|---:|---|",
+      ...mal.map((m) => `| ${ECOSYSTEM_LABEL[m.ecosystem]} | ${m.package} | ${m.version} | ${m.ids.join(", ")} | ${m.releasedAt ?? "–"} | ${m.reportedAt ?? "–"} | ${m.hours == null ? "–" : m.hours.toFixed(1)} | ${m.withdrawn.join(", ") || "no"} |`),
+      "",
+    );
+  }
+  if (adv.withdrawn.length) {
+    lines.push(
+      "Withdrawn versions with a malware report:",
+      "",
+      "| Platform | Mechanism | Withdrawn versions | With a malware report |",
+      "|---|---|---:|---:|",
+      ...adv.withdrawn.map((w) => `| ${ECOSYSTEM_LABEL[w.ecosystem]} | ${WITHDRAWAL_LABEL[w.kind]} | ${w.withdrawn} | ${w.malicious} |`),
+      "",
+    );
+  }
+
+  lines.push(
+    "#### Which databases list them, and how late",
+    "",
+    "| Platform | Database | Vulnerabilities listed | Published first | Median days behind the first |",
+    "|---|---|---:|---:|---:|",
+    ...adv.databases.map((d) => `| ${ECOSYSTEM_LABEL[d.ecosystem]} | ${d.database} | ${d.vulnerabilities} | ${d.first} | ${days(d.medianLagDays)} |`),
+    "",
+    "Over the vulnerabilities affecting any sampled or withdrawn version. A database whose record carries the earliest",
+    "`published` time counts as first (ties count for each); the median is over the vulnerabilities it listed later.",
+    "",
+  );
+  if (!withNotes) return lines.join("\n");
+
+  lines.push("#### Method and sources", "");
+  for (const n of ADVISORY_NOTES) lines.push(`- **${n.label}**: ${n.note} ${citeLinks(n.sources, outDir(agg.snapshotId))}`);
+  lines.push("");
+  return lines.join("\n");
+}
+
+/** One row per version and matched OSV record, with the vulnerability (alias group) it belongs to. */
+function advisoriesCsv(db: Db, snapshotId: string): string {
+  const records = db.select().from(advisories).where(eq(advisories.snapshotId, snapshotId)).all();
+  const byId = new Map(records.map((r) => [r.advisoryId, r]));
+  const group = aliasGroups(records.map((r) => ({ id: r.advisoryId, aliases: r.aliases, published: r.published, withdrawn: r.withdrawn })));
+  const firstOf = new Map<string, string>();
+  for (const r of records) {
+    const g = group.get(r.advisoryId);
+    if (g && r.published && (!firstOf.has(g) || r.published < firstOf.get(g)!)) firstOf.set(g, r.published);
+  }
+  const versions = new Map(
+    db.select().from(packageVersions).where(eq(packageVersions.snapshotId, snapshotId)).all().map((v) => [`${v.ecosystem}/${v.packageName}@${v.version}`, v]),
+  );
+  const withdrawn = new Map<string, string[]>();
+  for (const w of db.select().from(packageWithdrawals).where(eq(packageWithdrawals.snapshotId, snapshotId)).all()) {
+    for (const v of w.withdrawnVersions ? w.withdrawnVersions.split(",") : []) {
+      const key = `${w.ecosystem}/${w.packageName}@${v}`;
+      withdrawn.set(key, [...(withdrawn.get(key) ?? []), w.kind]);
+    }
+  }
+  const rows = db
+    .select()
+    .from(advisoryMatches)
+    .where(eq(advisoryMatches.snapshotId, snapshotId))
+    .orderBy(asc(advisoryMatches.ecosystem), asc(advisoryMatches.packageName), asc(advisoryMatches.version), asc(advisoryMatches.advisoryId))
+    .all();
+  return csv(
+    [
+      "ecosystem", "package", "version", "purl", "is_latest", "quarter_anchor", "withdrawn_as", "released_at", "advisory_id", "database",
+      "vulnerability", "malicious", "published", "vulnerability_first_published", "record_withdrawn", "aliases", "response_url", "response_sha256",
+    ],
+    rows.map((m) => {
+      const key = `${m.ecosystem}/${m.packageName}@${m.version}`;
+      const v = versions.get(key);
+      const r = byId.get(m.advisoryId)!;
+      const g = group.get(m.advisoryId) ?? null;
+      return [
+        m.ecosystem, m.packageName, m.version, v?.purl ?? purlOf(m.ecosystem as EcosystemId, m.packageName, m.version), v?.isLatest ?? false, v?.quarterAnchor ?? null,
+        (withdrawn.get(key) ?? []).join(" ") || null, m.releasedAt, m.advisoryId, databaseOf(m.advisoryId),
+        g, r.malicious, r.published, g ? firstOf.get(g) ?? null : null, r.withdrawn, r.aliases.join(" "), r.response.url, r.response.sha256,
+      ];
+    }),
+  );
+}
+
 function withdrawalsCsv(db: Db, snapshotId: string): string {
   const rows = db
     .select()
@@ -577,11 +704,11 @@ function packagesCsv(db: Db, snapshotId: string): string {
   return csv(
     [
       "ecosystem", "package", "rank", "rank_frame", "download_count", "dependent_count", "latest_version",
-      "latest_publish_date", "maintainer_count", "maintainer_count_source", "repository_url", "fetch_error", "extract_error",
+      "latest_publish_date", "maintainer_count", "maintainer_count_source", "repository_url", "fetch_error", "extract_error", "osv_queried_at",
     ],
     rows.map((r) => [
       r.ecosystem, r.packageName, r.rank, r.rankFrame, r.downloadCount, r.dependentCount, r.latestVersion,
-      r.latestPublishDate, r.maintainerCount, r.maintainerCountSource, r.repositoryUrl, r.fetchError, r.extractError,
+      r.latestPublishDate, r.maintainerCount, r.maintainerCountSource, r.repositoryUrl, r.fetchError, r.extractError, r.osvQueriedAt,
     ]),
   );
 }

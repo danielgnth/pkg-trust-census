@@ -125,6 +125,8 @@ export class ResponseCache {
     httpStatus: number;
     ecosystem: EcosystemId;
     package: string;
+    /** The body of a POST, kept so the request can be replayed from the manifest. */
+    requestBody?: string | undefined;
   }): Promise<CacheEntry> {
     const path = cachePath(args.ecosystem, args.package, args.url);
     await mkdir(dirname(path), { recursive: true });
@@ -139,6 +141,7 @@ export class ResponseCache {
       ecosystem: args.ecosystem,
       package: args.package,
       path,
+      ...(args.requestBody !== undefined ? { requestBody: args.requestBody } : {}),
     };
     this.#index.set(entry.url, entry);
     await this.#manifest.append(entry);

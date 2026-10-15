@@ -103,6 +103,11 @@ export const packages = sqliteTable(
     fetchError: text("fetch_error"),
     /** Why `extract` produced no versions for this package, e.g. a missing cache entry. */
     extractError: text("extract_error"),
+    /**
+     * When OSV was asked about this package's versions. Null means not asked, so "no advisory"
+     * cannot be told apart from "not checked" and the package is left out of advisory counts.
+     */
+    osvQueriedAt: text("osv_queried_at"),
   },
   (t) => [
     primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName] }),
@@ -135,6 +140,8 @@ export const packageVersions = sqliteTable(
     isLatest: integer("is_latest", { mode: "boolean" }).notNull().default(false),
     /** '2024Q1', or several comma-joined when one release anchors many quarters. */
     quarterAnchor: text("quarter_anchor"),
+    /** Package URL of this release, e.g. `pkg:npm/chalk@5.6.1`. */
+    purl: text("purl"),
   },
   (t) => [
     primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName, t.version] }),
@@ -231,3 +238,60 @@ export const packageWithdrawals = sqliteTable(
   ],
 );
 
+
+/**
+ * OSV records matched to any sampled version, as OSV served them during `fetch`. Records are
+ * shared between packages, so they are keyed by snapshot and id only.
+ */
+export const advisories = sqliteTable(
+  "advisories",
+  {
+    snapshotId: text("snapshot_id").notNull(),
+    advisoryId: text("advisory_id").notNull(),
+    /** JSON array of the ids other databases give the same vulnerability (CVE, GHSA, PYSEC, …). */
+    aliases: text("aliases", { mode: "json" }).$type<string[]>().notNull().default([]),
+    published: text("published"),
+    modified: text("modified").notNull(),
+    /** Set when the database withdrew the record; withdrawn records are left out of every count. */
+    withdrawn: text("withdrawn"),
+    malicious: integer("malicious", { mode: "boolean" }).notNull(),
+    summary: text("summary"),
+    /** The cached `/v1/vulns/{id}` response this row was read from. */
+    response: text("response", { mode: "json" }).$type<ResponseRef>().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.snapshotId, t.advisoryId] })],
+);
+
+/**
+ * Which versions OSV lists as affected by which record. The versions are the stored ones and
+ * the withdrawn ones (`package_withdrawals`), so there is no foreign key onto package_versions.
+ */
+export const advisoryMatches = sqliteTable(
+  "advisory_matches",
+  {
+    snapshotId: text("snapshot_id").notNull(),
+    ecosystem: text("ecosystem").notNull(),
+    packageName: text("package_name").notNull(),
+    version: text("version").notNull(),
+    advisoryId: text("advisory_id").notNull(),
+    /** When the matched version was released, where the registry dates it. */
+    releasedAt: text("released_at"),
+    /** The querybatch responses for this package, named by cache key ("POST {url} {body sha256}"). */
+    responses: text("responses", { mode: "json" }).$type<ResponseRef[]>().notNull().default([]),
+  },
+  (t) => [
+    primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName, t.version, t.advisoryId] }),
+    foreignKey({
+      columns: [t.snapshotId, t.ecosystem, t.packageName],
+      foreignColumns: [packages.snapshotId, packages.ecosystem, packages.packageName],
+      name: "advisory_matches_package_fk",
+    }),
+    foreignKey({
+      columns: [t.snapshotId, t.advisoryId],
+      foreignColumns: [advisories.snapshotId, advisories.advisoryId],
+      name: "advisory_matches_advisory_fk",
+    }),
+    index("idx_adv_match_advisory").on(t.snapshotId, t.advisoryId),
+    check("advisory_matches_ecosystem", sql.raw(`${t.ecosystem.name} IN (${ECOSYSTEM_LIST})`)),
+  ],
+);

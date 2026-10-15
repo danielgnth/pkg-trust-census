@@ -184,6 +184,12 @@ export function withdrawalIn(
     const t = v.publishedAt ? Date.parse(v.publishedAt) : NaN;
     return Number.isFinite(t) && t >= since.getTime() && t <= until.getTime();
   });
-  return { kind, versionsInWindow: inWindow.length, withdrawn: inWindow.filter((v) => v.withdrawn).map((v) => v.version) };
+  const withdrawn = inWindow.filter((v) => v.withdrawn);
+  return {
+    kind,
+    versionsInWindow: inWindow.length,
+    withdrawn: withdrawn.map((v) => v.version),
+    releasedAt: Object.fromEntries(withdrawn.map((v) => [v.version, v.publishedAt!])),
+  };
 }
 
