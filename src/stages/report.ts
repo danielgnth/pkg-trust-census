@@ -536,7 +536,7 @@ export function advisoriesMarkdown(agg: Aggregate, withNotes: boolean): string {
   const lines = [
     `### Known advisories (OSV, queried ${adv.queriedFrom?.slice(0, 10) ?? "–"}; snapshot ${agg.snapshotId})`,
     "",
-    `| Platform | Latest releases with an advisory | Vulnerabilities | Malware reports | ${first ?? "First quarter"} release: known then → now |`,
+    `| Platform | Latest release: with a known vulnerability | Vulnerabilities | Malware reports | Release installed at the end of ${first ?? "the first quarter"}: known then → now |`,
     "|---|---:|---:|---:|---:|",
     ...adv.exposure.map((c) => {
       const q = adv.series.find((p) => p.quarter === first && p.ecosystem === c.ecosystem);
@@ -545,8 +545,10 @@ export function advisoriesMarkdown(agg: Aggregate, withNotes: boolean): string {
     }),
     "",
     "A vulnerability listed by several databases (GHSA, PYSEC, RUSTSEC, GO, …) counts once, and counts as known from",
-    "its first publication in any of them. *Known then → now*: of the releases a default install resolved at the end of",
-    `${first ?? "the first quarter"}, the share with an advisory published by then, and by the snapshot.`,
+    "its first publication in any of them. The last column is about a different, older release of each package: the one",
+    `a default install chose at the end of ${first ?? "the first quarter"}, with the share that had a published advisory by then, and by the snapshot.`,
+    "A low share for the latest release beside a high one for the older release means the vulnerabilities were found later",
+    "and fixed in newer releases.",
     "",
   ];
 

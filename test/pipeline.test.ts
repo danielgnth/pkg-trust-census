@@ -176,7 +176,7 @@ describe("pipeline", () => {
     expect(advisoriesMd).toContain("| **PyPI** | 50% (1/2) | 1 | 1 | 0% → 100% (n=2) |");
     expect(advisoriesMd).toContain("#### Method and sources");
     expect((await Bun.file(join(dir, "advisories.csv")).text()).split("\n")).toHaveLength(5);
-    expect(await Bun.file(join(dir, "charts/advisories.svg")).text()).toContain("Known advisories (OSV)");
+    expect(await Bun.file(join(dir, "charts/advisories.svg")).text()).toContain("Known vulnerabilities in sampled releases (OSV)");
     expect(files).toContain("charts/matrix.svg");
     const matrix = await Bun.file(join(dir, "matrix.md")).text();
     expect(matrix).toContain("≥ 50% (1/2)");

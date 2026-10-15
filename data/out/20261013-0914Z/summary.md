@@ -118,7 +118,7 @@ history. Per-package rows, with the version numbers, are in `withdrawals.csv`.
 
 ### Known advisories (OSV, queried 2026-10-15; snapshot 20261013-0914Z)
 
-| Platform | Latest releases with an advisory | Vulnerabilities | Malware reports | 2024Q1 release: known then → now |
+| Platform | Latest release: with a known vulnerability | Vulnerabilities | Malware reports | Release installed at the end of 2024Q1: known then → now |
 |---|---:|---:|---:|---:|
 | **PyPI** | 0% (0/50) | 0 | 0 | 0% → 35% (n=49) |
 | **npm** | 0% (0/50) | 0 | 0 | 0% → 16% (n=50) |
@@ -129,8 +129,10 @@ history. Per-package rows, with the version numbers, are in `withdrawals.csv`.
 | **Packagist** | 0% (0/50) | 0 | 0 | 0% → 16% (n=50) |
 
 A vulnerability listed by several databases (GHSA, PYSEC, RUSTSEC, GO, …) counts once, and counts as known from
-its first publication in any of them. *Known then → now*: of the releases a default install resolved at the end of
-2024Q1, the share with an advisory published by then, and by the snapshot.
+its first publication in any of them. The last column is about a different, older release of each package: the one
+a default install chose at the end of 2024Q1, with the share that had a published advisory by then, and by the snapshot.
+A low share for the latest release beside a high one for the older release means the vulnerabilities were found later
+and fixed in newer releases.
 
 #### Malware reports
 

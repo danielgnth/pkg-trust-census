@@ -643,38 +643,46 @@ export function withdrawalsSvg(agg: Aggregate): string {
 }
 
 /**
- * Known advisories, two ways. Left: the share of latest releases with an advisory published
- * by the snapshot. Right: for the release a default install resolved at the end of the first
- * quarter, whether an advisory existed then and whether one exists now; the gap is what was
- * installed before anyone knew. Two states of one measure, so two steps of one ramp.
+ * Known vulnerabilities, for two different releases of each package. Left: the latest release
+ * at the snapshot. Right: the release a default install chose at the end of the first quarter,
+ * checked twice, against advisories published by then and by the snapshot; the gap is what
+ * was installed before anyone knew. Two states of one measure, so two steps of one ramp. Every
+ * header names its release and month, because the two panels are easy to read as one.
  */
 export function advisoriesSvg(agg: Aggregate): string {
   const adv = agg.advisories;
   const first = agg.quarters[0];
+  const [year, q] = first ? first.split("Q") : ["", ""];
+  const thenMonth = first ? humanMonth(`${year}-${String(Number(q) * 3).padStart(2, "0")}`) : "–";
+  const nowMonth = humanMonth(agg.asOf.slice(0, 7));
   const rows = adv.exposure.filter((c) => c.checked > 0);
   const labels = rows.map((c) => ECOSYSTEM_LABEL[c.ecosystem]);
   const rowH = 34;
+  const top = 80;
   type Row = (typeof rows)[number];
   const share = (c: Row) => c.affected / c.checked;
+  const header = (title: string, sub: string) => [
+    Plot.text([title], { frameAnchor: "top-left", dy: -66, fontSize: 12, fontWeight: 600, fill: INK }),
+    Plot.text([sub], { frameAnchor: "top-left", dy: -51, fontSize: 11, fill: INK_2 }),
+  ];
 
   const left = plot({
     width: 120 + 220 + 250,
-    height: 64 + rows.length * rowH,
-    marginTop: 64,
+    height: top + rows.length * rowH,
+    marginTop: top,
     marginLeft: 120,
     marginRight: 250,
     marginBottom: 0,
     x: { domain: [0, 1], axis: null },
     y: { domain: labels, padding: 0, axis: null },
     marks: [
-      Plot.text(["Latest release"], { frameAnchor: "top-left", dy: -50, fontSize: 11, fontWeight: 600, fill: INK_2 }),
-      Plot.text(["with an advisory published by the snapshot"], { frameAnchor: "top-left", dy: -37, fontSize: 11, fill: MUTED }),
+      ...header(`Latest release, ${nowMonth}`, "share of packages with a known vulnerability"),
       Plot.axisX({ anchor: "top", ticks: QUARTILES, tickFormat: "%", tickSize: 0, fontSize: 10, fill: MUTED, label: null }),
       Plot.axisY({ tickSize: 0, tickPadding: 12, fontSize: 12, fill: INK, label: null }),
       ...shareBars(rows, {
         y: (c) => ECOSYSTEM_LABEL[c.ecosystem],
         share,
-        title: (c) => `${ECOSYSTEM_LABEL[c.ecosystem]}: ${c.affected} of ${c.checked} latest releases have a known advisory (${c.vulnerabilities} vulnerabilities, ${c.malicious} malware reports)`,
+        title: (c) => `${ECOSYSTEM_LABEL[c.ecosystem]}: ${c.affected} of ${c.checked} latest releases (${nowMonth}) have a known vulnerability (${c.vulnerabilities} vulnerabilities, ${c.malicious} malware reports)`,
         rowH,
       }),
       Plot.text(rows, {
@@ -683,7 +691,7 @@ export function advisoriesSvg(agg: Aggregate): string {
         dx: 12,
         textAnchor: "start",
         fontSize: 11,
-        text: (c: Row) => `${pctText(share(c))} (${c.affected}/${c.checked}) · ${c.vulnerabilities} vuln.${c.malicious ? ` · ${c.malicious} malware` : ""}`,
+        text: (c: Row) => `${pctText(share(c))} (${c.affected}/${c.checked}) · ${c.vulnerabilities} ${c.vulnerabilities === 1 ? "vulnerability" : "vulnerabilities"}${c.malicious ? ` · ${c.malicious} malware` : ""}`,
       }),
     ],
   });
@@ -693,40 +701,44 @@ export function advisoriesSvg(agg: Aggregate): string {
     .filter((p) => p.quarter === first && p.n > 0)
     .map((p) => ({ label: ECOSYSTEM_LABEL[p.ecosystem], then: p.knownThen / p.n, now: p.knownNow / p.n, p }))
     .filter((d) => labels.includes(d.label));
-  const tip = (d: Point) => `${d.label}, release chosen at the end of ${first}: ${d.p.knownThen} of ${d.p.n} had an advisory then, ${d.p.knownNow} have one now`;
+  const tip = (d: Point) =>
+    `${d.label}, release installed at the end of ${first} (${thenMonth}): ${d.p.knownThen} of ${d.p.n} had a known vulnerability in ${thenMonth}, ${d.p.knownNow} have one in ${nowMonth}`;
+  const legendDot = (dx: number, fill: string, text: string) => [
+    Plot.dot([null], { frameAnchor: "top-left", dx: dx + 5, dy: -33, r: 5, fill, stroke: SURFACE, strokeWidth: 2 }),
+    Plot.text([text], { frameAnchor: "top-left", dx: dx + 14, dy: -33, fontSize: 11, fill: INK_2, textAnchor: "start", lineAnchor: "middle" }),
+  ];
   const right = plot({
-    width: 24 + 220 + 120,
-    height: 64 + rows.length * rowH,
-    marginTop: 64,
+    width: 24 + 220 + 170,
+    height: top + rows.length * rowH,
+    marginTop: top,
     marginLeft: 24,
-    marginRight: 120,
+    marginRight: 170,
     marginBottom: 0,
     x: { domain: [0, 1], axis: null },
     // No bar mark here, so without an explicit band scale Plot would infer a point scale and the rows would not line up with the left panel.
     y: { type: "band", domain: labels, padding: 0, axis: null },
     marks: [
-      Plot.text([`Release chosen at the end of ${first}`], { frameAnchor: "top-left", dy: -50, fontSize: 11, fontWeight: 600, fill: INK_2 }),
-      Plot.text(["with an advisory: known then → known now"], { frameAnchor: "top-left", dy: -37, fontSize: 11, fill: MUTED }),
+      ...header(`Release installed at the end of ${first} (${thenMonth})`, "share of packages with a known vulnerability"),
+      ...legendDot(0, RAMP[3]!, `known in ${thenMonth}`),
+      ...legendDot(130, RAMP[10]!, `known in ${nowMonth}`),
       Plot.axisX({ anchor: "top", ticks: QUARTILES, tickFormat: "%", tickSize: 0, fontSize: 10, fill: MUTED, label: null }),
       Plot.ruleX(labels.flatMap((y) => QUARTILES.map((x) => ({ x, y }))), { x: "x", y: "y", stroke: GRID }),
       Plot.link(points, { x1: "then", x2: "now", y1: "label", y2: "label", stroke: RAMP[6], strokeWidth: 2 }),
       Plot.dot(points, { x: "then", y: "label", r: 5, fill: RAMP[3], stroke: SURFACE, strokeWidth: 2, title: tip }),
       Plot.dot(points, { x: "now", y: "label", r: 5, fill: RAMP[10], stroke: SURFACE, strokeWidth: 2, title: tip }),
-      Plot.text(points, { x: 1, y: "label", dx: 12, textAnchor: "start", fontSize: 11, text: (d: Point) => `${pctText(d.then)} → ${pctText(d.now)}` }),
+      Plot.text(points, { x: 1, y: "label", dx: 12, textAnchor: "start", fontSize: 11, text: (d: Point) => `${pctText(d.then)} then → ${pctText(d.now)} now` }),
     ],
   });
 
   const malware = adv.malicious.length;
   return figure({
-    title: "Known advisories (OSV)",
-    subtitle: `Sampled packages whose release is listed in an advisory, counting each vulnerability once across databases · snapshot ${humanDate(agg.asOf)}`,
-    legend: [
-      { label: `known at the end of ${first}`, fill: RAMP[3]!, outline: true },
-      { label: "known at the snapshot", fill: RAMP[10]! },
-    ],
+    title: "Known vulnerabilities in sampled releases (OSV)",
+    subtitle: `Two different releases of each package: the latest one today, and the one a default install chose at the end of ${first} · snapshot ${humanDate(agg.asOf)}`,
     panels: [left, { ...right, x: left.width }],
     notes: [
-      `OSV queried ${adv.queriedFrom ? humanDate(adv.queriedFrom, true) : "–"}. Known = first published in any database by that time; withdrawn records are left out.`,
+      `Left: the version you would install now. Right: the version installed in ${thenMonth}, checked against advisories published by ${thenMonth} (light) and by ${nowMonth} (dark).`,
+      `A low left bar beside a long right line means the vulnerabilities were found after ${thenMonth} and fixed in newer releases: installs never upgraded since are exposed.`,
+      `A vulnerability listed by several databases counts once; withdrawn advisories are left out. OSV queried ${adv.queriedFrom ? humanDate(adv.queriedFrom, true) : "–"}.`,
       `${malware} sampled or withdrawn release${malware === 1 ? " carries" : "s carry"} a malware report; advisories.md lists each, with the hours from release to report.`,
     ],
   });
