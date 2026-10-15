@@ -1,7 +1,7 @@
 {
   "snapshotId": "20261013-0914Z",
   "asOf": "2026-10-13T09:14:26.098Z",
-  "generatedAt": "2026-10-14T08:29:20.681Z",
+  "generatedAt": "2026-10-15T07:17:04.821Z",
   "quarters": [
     "2024Q1",
     "2024Q2",
@@ -7591,5 +7591,852 @@
       "withdrawnVersions": 44,
       "versionsInWindow": null
     }
-  ]
+  ],
+  "advisories": {
+    "queriedFrom": "2026-10-15T07:13:24.464Z",
+    "queriedTo": "2026-10-15T07:16:51.234Z",
+    "exposure": [
+      {
+        "ecosystem": "pypi",
+        "checked": 50,
+        "affected": 0,
+        "malicious": 0,
+        "vulnerabilities": 0
+      },
+      {
+        "ecosystem": "npm",
+        "checked": 50,
+        "affected": 0,
+        "malicious": 0,
+        "vulnerabilities": 0
+      },
+      {
+        "ecosystem": "crates",
+        "checked": 50,
+        "affected": 0,
+        "malicious": 0,
+        "vulnerabilities": 0
+      },
+      {
+        "ecosystem": "rubygems",
+        "checked": 50,
+        "affected": 0,
+        "malicious": 0,
+        "vulnerabilities": 0
+      },
+      {
+        "ecosystem": "go",
+        "checked": 50,
+        "affected": 1,
+        "malicious": 0,
+        "vulnerabilities": 1
+      },
+      {
+        "ecosystem": "maven",
+        "checked": 50,
+        "affected": 2,
+        "malicious": 0,
+        "vulnerabilities": 7
+      },
+      {
+        "ecosystem": "packagist",
+        "checked": 50,
+        "affected": 0,
+        "malicious": 0,
+        "vulnerabilities": 0
+      }
+    ],
+    "series": [
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "pypi",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 17
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 14
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "go",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2024Q1",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "pypi",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 17
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 14
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "go",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2024Q2",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "pypi",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 16
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 14
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "go",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 12
+      },
+      {
+        "quarter": "2024Q3",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "pypi",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 16
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 13
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 12
+      },
+      {
+        "quarter": "2024Q4",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 15
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 13
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 12
+      },
+      {
+        "quarter": "2025Q1",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 14
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "crates",
+        "n": 48,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 13
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2025Q2",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 14
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "crates",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 10
+      },
+      {
+        "quarter": "2025Q3",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 15
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "crates",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 10
+      },
+      {
+        "quarter": "2025Q4",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 9
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 11
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 4
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "crates",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 1
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 8
+      },
+      {
+        "quarter": "2026Q1",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 7
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 6
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 3
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "crates",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 0
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 1
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 0,
+        "knownNow": 4
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 3,
+        "knownNow": 4
+      },
+      {
+        "quarter": "2026Q2",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 1
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "pypi",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 0
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "npm",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 0
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "crates",
+        "n": 50,
+        "knownThen": 1,
+        "knownNow": 1
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "rubygems",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 0
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "go",
+        "n": 49,
+        "knownThen": 1,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "maven",
+        "n": 50,
+        "knownThen": 2,
+        "knownNow": 2
+      },
+      {
+        "quarter": "2026Q3",
+        "ecosystem": "packagist",
+        "n": 50,
+        "knownThen": 0,
+        "knownNow": 0
+      }
+    ],
+    "withdrawn": [
+      {
+        "ecosystem": "pypi",
+        "kind": "yanked",
+        "withdrawn": 41,
+        "malicious": 0
+      },
+      {
+        "ecosystem": "npm",
+        "kind": "unpublished",
+        "withdrawn": 9,
+        "malicious": 9
+      },
+      {
+        "ecosystem": "npm",
+        "kind": "deprecated",
+        "withdrawn": 20,
+        "malicious": 0
+      },
+      {
+        "ecosystem": "crates",
+        "kind": "yanked",
+        "withdrawn": 16,
+        "malicious": 0
+      },
+      {
+        "ecosystem": "go",
+        "kind": "retracted",
+        "withdrawn": 44,
+        "malicious": 0
+      }
+    ],
+    "databases": [
+      {
+        "ecosystem": "pypi",
+        "database": "GHSA",
+        "vulnerabilities": 74,
+        "first": 62,
+        "medianLagDays": 13.040671180555556
+      },
+      {
+        "ecosystem": "pypi",
+        "database": "PYSEC",
+        "vulnerabilities": 71,
+        "first": 13,
+        "medianLagDays": 9.937439189814814
+      },
+      {
+        "ecosystem": "npm",
+        "database": "GHSA",
+        "vulnerabilities": 28,
+        "first": 25,
+        "medianLagDays": 7.29449074074074
+      },
+      {
+        "ecosystem": "npm",
+        "database": "MAL",
+        "vulnerabilities": 9,
+        "first": 9,
+        "medianLagDays": null
+      },
+      {
+        "ecosystem": "crates",
+        "database": "GHSA",
+        "vulnerabilities": 3,
+        "first": 0,
+        "medianLagDays": 4.5441666666666665
+      },
+      {
+        "ecosystem": "crates",
+        "database": "RUSTSEC",
+        "vulnerabilities": 3,
+        "first": 3,
+        "medianLagDays": null
+      },
+      {
+        "ecosystem": "rubygems",
+        "database": "GHSA",
+        "vulnerabilities": 75,
+        "first": 75,
+        "medianLagDays": null
+      },
+      {
+        "ecosystem": "go",
+        "database": "GO",
+        "vulnerabilities": 52,
+        "first": 46,
+        "medianLagDays": 6.898182870370371
+      },
+      {
+        "ecosystem": "go",
+        "database": "GHSA",
+        "vulnerabilities": 28,
+        "first": 6,
+        "medianLagDays": 34.8374537037037
+      },
+      {
+        "ecosystem": "maven",
+        "database": "GHSA",
+        "vulnerabilities": 43,
+        "first": 43,
+        "medianLagDays": null
+      },
+      {
+        "ecosystem": "packagist",
+        "database": "GHSA",
+        "vulnerabilities": 25,
+        "first": 25,
+        "medianLagDays": null
+      }
+    ],
+    "malicious": [
+      {
+        "ecosystem": "npm",
+        "package": "ansi-regex",
+        "version": "6.2.1",
+        "advisory": "MAL-2025-46966",
+        "ids": [
+          "MAL-2025-46966"
+        ],
+        "releasedAt": "2025-09-08T13:14:15.663Z",
+        "reportedAt": "2025-09-08T17:18:30.000Z",
+        "hours": 4.070649166666667,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "ansi-styles",
+        "version": "6.2.2",
+        "advisory": "MAL-2025-46967",
+        "ids": [
+          "MAL-2025-46967"
+        ],
+        "releasedAt": "2025-09-08T13:12:10.343Z",
+        "reportedAt": "2025-09-08T17:07:44.000Z",
+        "hours": 3.9260158333333335,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "chalk",
+        "version": "5.6.1",
+        "advisory": "MAL-2025-46969",
+        "ids": [
+          "MAL-2025-46969"
+        ],
+        "releasedAt": "2025-09-08T13:13:05.239Z",
+        "reportedAt": "2025-09-08T17:11:19.000Z",
+        "hours": 3.970489166666667,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "color-convert",
+        "version": "3.1.1",
+        "advisory": "MAL-2025-46971",
+        "ids": [
+          "GHSA-pxx3-g568-hxr4",
+          "MAL-2025-46971"
+        ],
+        "releasedAt": "2025-09-08T13:14:53.099Z",
+        "reportedAt": "2025-09-08T15:20:15.000Z",
+        "hours": 2.0894169444444444,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "color-name",
+        "version": "2.0.1",
+        "advisory": "MAL-2025-46972",
+        "ids": [
+          "GHSA-5fvm-p68v-5wmh",
+          "MAL-2025-46972"
+        ],
+        "releasedAt": "2025-09-08T13:15:12.330Z",
+        "reportedAt": "2025-09-08T15:05:16.000Z",
+        "hours": 1.8343527777777777,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "debug",
+        "version": "4.4.2",
+        "advisory": "MAL-2025-46974",
+        "ids": [
+          "GHSA-4x49-vf9v-38px",
+          "MAL-2025-46974"
+        ],
+        "releasedAt": "2025-09-08T13:12:39.973Z",
+        "reportedAt": "2025-09-08T14:26:51.000Z",
+        "hours": 1.236396388888889,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "strip-ansi",
+        "version": "7.1.1",
+        "advisory": "MAL-2025-46980",
+        "ids": [
+          "MAL-2025-46980"
+        ],
+        "releasedAt": "2025-09-08T13:13:50.431Z",
+        "reportedAt": "2025-09-08T17:14:19.000Z",
+        "hours": 4.007935833333334,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "supports-color",
+        "version": "10.2.1",
+        "advisory": "MAL-2025-46981",
+        "ids": [
+          "MAL-2025-46981"
+        ],
+        "releasedAt": "2025-09-08T13:13:28.154Z",
+        "reportedAt": "2025-09-08T17:16:42.000Z",
+        "hours": 4.0538461111111115,
+        "withdrawn": [
+          "unpublished"
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "package": "wrap-ansi",
+        "version": "9.0.1",
+        "advisory": "MAL-2025-46983",
+        "ids": [
+          "MAL-2025-46983"
+        ],
+        "releasedAt": "2025-09-08T13:14:36.637Z",
+        "reportedAt": "2025-09-08T17:19:41.000Z",
+        "hours": 4.084545277777778,
+        "withdrawn": [
+          "unpublished"
+        ]
+      }
+    ]
+  }
 }

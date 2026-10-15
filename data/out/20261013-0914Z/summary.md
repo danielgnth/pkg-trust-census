@@ -1,6 +1,6 @@
 # Run summary — snapshot 20261013-0914Z
 
-As of 2026-10-13T09:14:26.098Z · generated 2026-10-14T08:29:20.681Z
+As of 2026-10-13T09:14:26.098Z · generated 2026-10-15T07:17:04.821Z
 
 **350/350 packages extracted · error rate 0.0%** (within the < 5% target)
 
@@ -115,6 +115,65 @@ What each column asks:
 
 Counted over versions published in the window; Go's retractions are undated and counted over each module's
 history. Per-package rows, with the version numbers, are in `withdrawals.csv`.
+
+### Known advisories (OSV, queried 2026-10-15; snapshot 20261013-0914Z)
+
+| Platform | Latest releases with an advisory | Vulnerabilities | Malware reports | 2024Q1 release: known then → now |
+|---|---:|---:|---:|---:|
+| **PyPI** | 0% (0/50) | 0 | 0 | 0% → 35% (n=49) |
+| **npm** | 0% (0/50) | 0 | 0 | 0% → 16% (n=50) |
+| **crates.io** | 0% (0/50) | 0 | 0 | 0% → 4% (n=48) |
+| **RubyGems** | 0% (0/50) | 0 | 0 | 0% → 28% (n=50) |
+| **Go** | 2% (1/50) | 1 | 0 | 0% → 17% (n=48) |
+| **Maven Central** | 4% (2/50) | 7 | 0 | 4% → 22% (n=50) |
+| **Packagist** | 0% (0/50) | 0 | 0 | 0% → 16% (n=50) |
+
+A vulnerability listed by several databases (GHSA, PYSEC, RUSTSEC, GO, …) counts once, and counts as known from
+its first publication in any of them. *Known then → now*: of the releases a default install resolved at the end of
+2024Q1, the share with an advisory published by then, and by the snapshot.
+
+#### Malware reports
+
+| Platform | Package | Version | Report | Released | Reported | Hours | Withdrawn |
+|---|---|---|---|---|---|---:|---|
+| npm | ansi-regex | 6.2.1 | MAL-2025-46966 | 2025-09-08T13:14:15.663Z | 2025-09-08T17:18:30.000Z | 4.1 | unpublished |
+| npm | ansi-styles | 6.2.2 | MAL-2025-46967 | 2025-09-08T13:12:10.343Z | 2025-09-08T17:07:44.000Z | 3.9 | unpublished |
+| npm | chalk | 5.6.1 | MAL-2025-46969 | 2025-09-08T13:13:05.239Z | 2025-09-08T17:11:19.000Z | 4.0 | unpublished |
+| npm | color-convert | 3.1.1 | GHSA-pxx3-g568-hxr4, MAL-2025-46971 | 2025-09-08T13:14:53.099Z | 2025-09-08T15:20:15.000Z | 2.1 | unpublished |
+| npm | color-name | 2.0.1 | GHSA-5fvm-p68v-5wmh, MAL-2025-46972 | 2025-09-08T13:15:12.330Z | 2025-09-08T15:05:16.000Z | 1.8 | unpublished |
+| npm | debug | 4.4.2 | GHSA-4x49-vf9v-38px, MAL-2025-46974 | 2025-09-08T13:12:39.973Z | 2025-09-08T14:26:51.000Z | 1.2 | unpublished |
+| npm | strip-ansi | 7.1.1 | MAL-2025-46980 | 2025-09-08T13:13:50.431Z | 2025-09-08T17:14:19.000Z | 4.0 | unpublished |
+| npm | supports-color | 10.2.1 | MAL-2025-46981 | 2025-09-08T13:13:28.154Z | 2025-09-08T17:16:42.000Z | 4.1 | unpublished |
+| npm | wrap-ansi | 9.0.1 | MAL-2025-46983 | 2025-09-08T13:14:36.637Z | 2025-09-08T17:19:41.000Z | 4.1 | unpublished |
+
+Withdrawn versions with a malware report:
+
+| Platform | Mechanism | Withdrawn versions | With a malware report |
+|---|---|---:|---:|
+| PyPI | yanked | 41 | 0 |
+| npm | unpublished | 9 | 9 |
+| npm | deprecated (still installs) | 20 | 0 |
+| crates.io | yanked | 16 | 0 |
+| Go | retracted (all time) | 44 | 0 |
+
+#### Which databases list them, and how late
+
+| Platform | Database | Vulnerabilities listed | Published first | Median days behind the first |
+|---|---|---:|---:|---:|
+| PyPI | GHSA | 74 | 62 | 13 |
+| PyPI | PYSEC | 71 | 13 | 10 |
+| npm | GHSA | 28 | 25 | 7 |
+| npm | MAL | 9 | 9 | – |
+| crates.io | GHSA | 3 | 0 | 5 |
+| crates.io | RUSTSEC | 3 | 3 | – |
+| RubyGems | GHSA | 75 | 75 | – |
+| Go | GO | 52 | 46 | 7 |
+| Go | GHSA | 28 | 6 | 35 |
+| Maven Central | GHSA | 43 | 43 | – |
+| Packagist | GHSA | 25 | 25 | – |
+
+Over the vulnerabilities affecting any sampled or withdrawn version. A database whose record carries the earliest
+`published` time counts as first (ties count for each); the median is over the vulnerabilities it listed later.
 
 ### Sigstore across registries (verified 2026-10-14)
 

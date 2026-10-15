@@ -55,6 +55,12 @@ Notes and sources for every cell: [governance and containment](policies.md).
 
 Per package, with the version numbers: [withdrawals.csv](withdrawals.csv).
 
+## Known advisories
+
+![Known advisories](charts/advisories.svg)
+
+Malware reports, which databases list each vulnerability and how late, and the method: [known advisories](advisories.md).
+
 ## Sigstore
 
 ![Sigstore support](charts/sigstore.svg)
@@ -78,4 +84,6 @@ Notes and sources for every cell: [post-quantum exposure](pqc.md).
 | [scores.csv](scores.csv), [score_series.csv](score_series.csv) | Trust summary per ecosystem, overall and per quarter |
 | [baseline.csv](baseline.csv), [policies.csv](policies.csv), [sigstore.csv](sigstore.csv), [pqc.csv](pqc.csv) | The curated tables, with their sources |
 | [withdrawals.csv](withdrawals.csv) | Versions yanked, unpublished, deprecated or retracted, per package |
+| [advisories.csv](advisories.csv) | Every OSV record matched to a sampled or withdrawn version, with its purl and dates |
+| [sbom.cdx.json](sbom.cdx.json) | CycloneDX SBOM: the latest version of every sampled package and its known vulnerabilities |
 | [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |

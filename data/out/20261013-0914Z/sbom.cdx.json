@@ -1,0 +1,3715 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-13T09:14:26.098Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pkg-trust-census",
+          "version": "0.1.0"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "aho-corasick",
+      "version": "1.1.5",
+      "bom-ref": "pkg:cargo/aho-corasick@1.1.5",
+      "purl": "pkg:cargo/aho-corasick@1.1.5"
+    },
+    {
+      "type": "library",
+      "name": "autocfg",
+      "version": "1.5.1",
+      "bom-ref": "pkg:cargo/autocfg@1.5.1",
+      "purl": "pkg:cargo/autocfg@1.5.1"
+    },
+    {
+      "type": "library",
+      "name": "base64",
+      "version": "0.23.1",
+      "bom-ref": "pkg:cargo/base64@0.23.1",
+      "purl": "pkg:cargo/base64@0.23.1"
+    },
+    {
+      "type": "library",
+      "name": "bitflags",
+      "version": "2.13.2",
+      "bom-ref": "pkg:cargo/bitflags@2.13.2",
+      "purl": "pkg:cargo/bitflags@2.13.2"
+    },
+    {
+      "type": "library",
+      "name": "block-buffer",
+      "version": "0.12.1",
+      "bom-ref": "pkg:cargo/block-buffer@0.12.1",
+      "purl": "pkg:cargo/block-buffer@0.12.1"
+    },
+    {
+      "type": "library",
+      "name": "bytes",
+      "version": "1.12.1",
+      "bom-ref": "pkg:cargo/bytes@1.12.1",
+      "purl": "pkg:cargo/bytes@1.12.1"
+    },
+    {
+      "type": "library",
+      "name": "cc",
+      "version": "1.8.0",
+      "bom-ref": "pkg:cargo/cc@1.8.0",
+      "purl": "pkg:cargo/cc@1.8.0"
+    },
+    {
+      "type": "library",
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "bom-ref": "pkg:cargo/cfg-if@1.0.5",
+      "purl": "pkg:cargo/cfg-if@1.0.5"
+    },
+    {
+      "type": "library",
+      "name": "cpufeatures",
+      "version": "0.3.1",
+      "bom-ref": "pkg:cargo/cpufeatures@0.3.1",
+      "purl": "pkg:cargo/cpufeatures@0.3.1"
+    },
+    {
+      "type": "library",
+      "name": "crypto-common",
+      "version": "0.2.2",
+      "bom-ref": "pkg:cargo/crypto-common@0.2.2",
+      "purl": "pkg:cargo/crypto-common@0.2.2"
+    },
+    {
+      "type": "library",
+      "name": "digest",
+      "version": "0.11.3",
+      "bom-ref": "pkg:cargo/digest@0.11.3",
+      "purl": "pkg:cargo/digest@0.11.3"
+    },
+    {
+      "type": "library",
+      "name": "getrandom",
+      "version": "0.4.3",
+      "bom-ref": "pkg:cargo/getrandom@0.4.3",
+      "purl": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
+      "type": "library",
+      "name": "hashbrown",
+      "version": "0.17.1",
+      "bom-ref": "pkg:cargo/hashbrown@0.17.1",
+      "purl": "pkg:cargo/hashbrown@0.17.1"
+    },
+    {
+      "type": "library",
+      "name": "heck",
+      "version": "0.5.0",
+      "bom-ref": "pkg:cargo/heck@0.5.0",
+      "purl": "pkg:cargo/heck@0.5.0"
+    },
+    {
+      "type": "library",
+      "name": "indexmap",
+      "version": "2.14.2",
+      "bom-ref": "pkg:cargo/indexmap@2.14.2",
+      "purl": "pkg:cargo/indexmap@2.14.2"
+    },
+    {
+      "type": "library",
+      "name": "itertools",
+      "version": "0.15.0",
+      "bom-ref": "pkg:cargo/itertools@0.15.0",
+      "purl": "pkg:cargo/itertools@0.15.0"
+    },
+    {
+      "type": "library",
+      "name": "itoa",
+      "version": "1.0.18",
+      "bom-ref": "pkg:cargo/itoa@1.0.18",
+      "purl": "pkg:cargo/itoa@1.0.18"
+    },
+    {
+      "type": "library",
+      "name": "libc",
+      "version": "0.2.190",
+      "bom-ref": "pkg:cargo/libc@0.2.190",
+      "purl": "pkg:cargo/libc@0.2.190"
+    },
+    {
+      "type": "library",
+      "name": "linux-raw-sys",
+      "version": "0.12.1",
+      "bom-ref": "pkg:cargo/linux-raw-sys@0.12.1",
+      "purl": "pkg:cargo/linux-raw-sys@0.12.1"
+    },
+    {
+      "type": "library",
+      "name": "log",
+      "version": "0.4.34",
+      "bom-ref": "pkg:cargo/log@0.4.34",
+      "purl": "pkg:cargo/log@0.4.34"
+    },
+    {
+      "type": "library",
+      "name": "memchr",
+      "version": "2.8.3",
+      "bom-ref": "pkg:cargo/memchr@2.8.3",
+      "purl": "pkg:cargo/memchr@2.8.3"
+    },
+    {
+      "type": "library",
+      "name": "mio",
+      "version": "1.2.4",
+      "bom-ref": "pkg:cargo/mio@1.2.4",
+      "purl": "pkg:cargo/mio@1.2.4"
+    },
+    {
+      "type": "library",
+      "name": "once_cell",
+      "version": "1.21.4",
+      "bom-ref": "pkg:cargo/once_cell@1.21.4",
+      "purl": "pkg:cargo/once_cell@1.21.4"
+    },
+    {
+      "type": "library",
+      "name": "pin-project-lite",
+      "version": "0.2.17",
+      "bom-ref": "pkg:cargo/pin-project-lite@0.2.17",
+      "purl": "pkg:cargo/pin-project-lite@0.2.17"
+    },
+    {
+      "type": "library",
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "bom-ref": "pkg:cargo/proc-macro2@1.0.107",
+      "purl": "pkg:cargo/proc-macro2@1.0.107"
+    },
+    {
+      "type": "library",
+      "name": "quote",
+      "version": "1.0.47",
+      "bom-ref": "pkg:cargo/quote@1.0.47",
+      "purl": "pkg:cargo/quote@1.0.47"
+    },
+    {
+      "type": "library",
+      "name": "rand_chacha",
+      "version": "0.10.0",
+      "bom-ref": "pkg:cargo/rand_chacha@0.10.0",
+      "purl": "pkg:cargo/rand_chacha@0.10.0"
+    },
+    {
+      "type": "library",
+      "name": "rand_core",
+      "version": "0.10.1",
+      "bom-ref": "pkg:cargo/rand_core@0.10.1",
+      "purl": "pkg:cargo/rand_core@0.10.1"
+    },
+    {
+      "type": "library",
+      "name": "rand",
+      "version": "0.10.3",
+      "bom-ref": "pkg:cargo/rand@0.10.3",
+      "purl": "pkg:cargo/rand@0.10.3"
+    },
+    {
+      "type": "library",
+      "name": "regex-automata",
+      "version": "0.4.18",
+      "bom-ref": "pkg:cargo/regex-automata@0.4.18",
+      "purl": "pkg:cargo/regex-automata@0.4.18"
+    },
+    {
+      "type": "library",
+      "name": "regex-syntax",
+      "version": "0.8.11",
+      "bom-ref": "pkg:cargo/regex-syntax@0.8.11",
+      "purl": "pkg:cargo/regex-syntax@0.8.11"
+    },
+    {
+      "type": "library",
+      "name": "regex",
+      "version": "1.13.1",
+      "bom-ref": "pkg:cargo/regex@1.13.1",
+      "purl": "pkg:cargo/regex@1.13.1"
+    },
+    {
+      "type": "library",
+      "name": "rustix",
+      "version": "1.1.5",
+      "bom-ref": "pkg:cargo/rustix@1.1.5",
+      "purl": "pkg:cargo/rustix@1.1.5"
+    },
+    {
+      "type": "library",
+      "name": "serde_core",
+      "version": "1.0.229",
+      "bom-ref": "pkg:cargo/serde_core@1.0.229",
+      "purl": "pkg:cargo/serde_core@1.0.229"
+    },
+    {
+      "type": "library",
+      "name": "serde_derive",
+      "version": "1.0.229",
+      "bom-ref": "pkg:cargo/serde_derive@1.0.229",
+      "purl": "pkg:cargo/serde_derive@1.0.229"
+    },
+    {
+      "type": "library",
+      "name": "serde_json",
+      "version": "1.0.154",
+      "bom-ref": "pkg:cargo/serde_json@1.0.154",
+      "purl": "pkg:cargo/serde_json@1.0.154"
+    },
+    {
+      "type": "library",
+      "name": "serde",
+      "version": "1.0.229",
+      "bom-ref": "pkg:cargo/serde@1.0.229",
+      "purl": "pkg:cargo/serde@1.0.229"
+    },
+    {
+      "type": "library",
+      "name": "sha2",
+      "version": "0.11.1",
+      "bom-ref": "pkg:cargo/sha2@0.11.1",
+      "purl": "pkg:cargo/sha2@0.11.1"
+    },
+    {
+      "type": "library",
+      "name": "shlex",
+      "version": "2.0.1",
+      "bom-ref": "pkg:cargo/shlex@2.0.1",
+      "purl": "pkg:cargo/shlex@2.0.1"
+    },
+    {
+      "type": "library",
+      "name": "smallvec",
+      "version": "1.16.3",
+      "bom-ref": "pkg:cargo/smallvec@1.16.3",
+      "purl": "pkg:cargo/smallvec@1.16.3"
+    },
+    {
+      "type": "library",
+      "name": "socket2",
+      "version": "0.6.5",
+      "bom-ref": "pkg:cargo/socket2@0.6.5",
+      "purl": "pkg:cargo/socket2@0.6.5"
+    },
+    {
+      "type": "library",
+      "name": "syn",
+      "version": "3.0.9",
+      "bom-ref": "pkg:cargo/syn@3.0.9",
+      "purl": "pkg:cargo/syn@3.0.9"
+    },
+    {
+      "type": "library",
+      "name": "thiserror-impl",
+      "version": "2.0.21",
+      "bom-ref": "pkg:cargo/thiserror-impl@2.0.21",
+      "purl": "pkg:cargo/thiserror-impl@2.0.21"
+    },
+    {
+      "type": "library",
+      "name": "thiserror",
+      "version": "2.0.21",
+      "bom-ref": "pkg:cargo/thiserror@2.0.21",
+      "purl": "pkg:cargo/thiserror@2.0.21"
+    },
+    {
+      "type": "library",
+      "name": "toml_datetime",
+      "version": "1.1.2+spec-1.1.0",
+      "bom-ref": "pkg:cargo/toml_datetime@1.1.2+spec-1.1.0",
+      "purl": "pkg:cargo/toml_datetime@1.1.2+spec-1.1.0"
+    },
+    {
+      "type": "library",
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "bom-ref": "pkg:cargo/unicode-ident@1.0.27",
+      "purl": "pkg:cargo/unicode-ident@1.0.27"
+    },
+    {
+      "type": "library",
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "bom-ref": "pkg:cargo/windows-sys@0.61.2",
+      "purl": "pkg:cargo/windows-sys@0.61.2"
+    },
+    {
+      "type": "library",
+      "name": "winnow",
+      "version": "1.0.4",
+      "bom-ref": "pkg:cargo/winnow@1.0.4",
+      "purl": "pkg:cargo/winnow@1.0.4"
+    },
+    {
+      "type": "library",
+      "name": "zerocopy",
+      "version": "0.8.62",
+      "bom-ref": "pkg:cargo/zerocopy@0.8.62",
+      "purl": "pkg:cargo/zerocopy@0.8.62"
+    },
+    {
+      "type": "library",
+      "name": "zmij",
+      "version": "1.0.23",
+      "bom-ref": "pkg:cargo/zmij@1.0.23",
+      "purl": "pkg:cargo/zmij@1.0.23"
+    },
+    {
+      "type": "library",
+      "name": "brick/math",
+      "version": "1.0.0",
+      "bom-ref": "pkg:composer/brick/math@1.0.0",
+      "purl": "pkg:composer/brick/math@1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "doctrine/inflector",
+      "version": "2.1.0",
+      "bom-ref": "pkg:composer/doctrine/inflector@2.1.0",
+      "purl": "pkg:composer/doctrine/inflector@2.1.0"
+    },
+    {
+      "type": "library",
+      "name": "doctrine/lexer",
+      "version": "3.0.3",
+      "bom-ref": "pkg:composer/doctrine/lexer@3.0.3",
+      "purl": "pkg:composer/doctrine/lexer@3.0.3"
+    },
+    {
+      "type": "library",
+      "name": "egulias/email-validator",
+      "version": "4.0.4",
+      "bom-ref": "pkg:composer/egulias/email-validator@4.0.4",
+      "purl": "pkg:composer/egulias/email-validator@4.0.4"
+    },
+    {
+      "type": "library",
+      "name": "guzzlehttp/guzzle",
+      "version": "8.2.0",
+      "bom-ref": "pkg:composer/guzzlehttp/guzzle@8.2.0",
+      "purl": "pkg:composer/guzzlehttp/guzzle@8.2.0"
+    },
+    {
+      "type": "library",
+      "name": "guzzlehttp/promises",
+      "version": "3.0.2",
+      "bom-ref": "pkg:composer/guzzlehttp/promises@3.0.2",
+      "purl": "pkg:composer/guzzlehttp/promises@3.0.2"
+    },
+    {
+      "type": "library",
+      "name": "guzzlehttp/psr7",
+      "version": "3.1.0",
+      "bom-ref": "pkg:composer/guzzlehttp/psr7@3.1.0",
+      "purl": "pkg:composer/guzzlehttp/psr7@3.1.0"
+    },
+    {
+      "type": "library",
+      "name": "monolog/monolog",
+      "version": "3.12.1",
+      "bom-ref": "pkg:composer/monolog/monolog@3.12.1",
+      "purl": "pkg:composer/monolog/monolog@3.12.1"
+    },
+    {
+      "type": "library",
+      "name": "myclabs/deep-copy",
+      "version": "1.14.0",
+      "bom-ref": "pkg:composer/myclabs/deep-copy@1.14.0",
+      "purl": "pkg:composer/myclabs/deep-copy@1.14.0"
+    },
+    {
+      "type": "library",
+      "name": "nikic/php-parser",
+      "version": "v5.9.0",
+      "bom-ref": "pkg:composer/nikic/php-parser@v5.9.0",
+      "purl": "pkg:composer/nikic/php-parser@v5.9.0"
+    },
+    {
+      "type": "library",
+      "name": "phpunit/php-code-coverage",
+      "version": "14.4.1",
+      "bom-ref": "pkg:composer/phpunit/php-code-coverage@14.4.1",
+      "purl": "pkg:composer/phpunit/php-code-coverage@14.4.1"
+    },
+    {
+      "type": "library",
+      "name": "phpunit/php-file-iterator",
+      "version": "7.0.2",
+      "bom-ref": "pkg:composer/phpunit/php-file-iterator@7.0.2",
+      "purl": "pkg:composer/phpunit/php-file-iterator@7.0.2"
+    },
+    {
+      "type": "library",
+      "name": "phpunit/php-text-template",
+      "version": "6.0.1",
+      "bom-ref": "pkg:composer/phpunit/php-text-template@6.0.1",
+      "purl": "pkg:composer/phpunit/php-text-template@6.0.1"
+    },
+    {
+      "type": "library",
+      "name": "phpunit/phpunit",
+      "version": "13.4.2",
+      "bom-ref": "pkg:composer/phpunit/phpunit@13.4.2",
+      "purl": "pkg:composer/phpunit/phpunit@13.4.2"
+    },
+    {
+      "type": "library",
+      "name": "psr/clock",
+      "version": "1.0.0",
+      "bom-ref": "pkg:composer/psr/clock@1.0.0",
+      "purl": "pkg:composer/psr/clock@1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "psr/container",
+      "version": "1.1.2",
+      "bom-ref": "pkg:composer/psr/container@1.1.2",
+      "purl": "pkg:composer/psr/container@1.1.2"
+    },
+    {
+      "type": "library",
+      "name": "psr/event-dispatcher",
+      "version": "1.0.0",
+      "bom-ref": "pkg:composer/psr/event-dispatcher@1.0.0",
+      "purl": "pkg:composer/psr/event-dispatcher@1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "psr/http-client",
+      "version": "1.0.3",
+      "bom-ref": "pkg:composer/psr/http-client@1.0.3",
+      "purl": "pkg:composer/psr/http-client@1.0.3"
+    },
+    {
+      "type": "library",
+      "name": "psr/http-factory",
+      "version": "1.1.0",
+      "bom-ref": "pkg:composer/psr/http-factory@1.1.0",
+      "purl": "pkg:composer/psr/http-factory@1.1.0"
+    },
+    {
+      "type": "library",
+      "name": "psr/http-message",
+      "version": "2.0",
+      "bom-ref": "pkg:composer/psr/http-message@2.0",
+      "purl": "pkg:composer/psr/http-message@2.0"
+    },
+    {
+      "type": "library",
+      "name": "psr/log",
+      "version": "3.0.2",
+      "bom-ref": "pkg:composer/psr/log@3.0.2",
+      "purl": "pkg:composer/psr/log@3.0.2"
+    },
+    {
+      "type": "library",
+      "name": "psr/simple-cache",
+      "version": "3.0.0",
+      "bom-ref": "pkg:composer/psr/simple-cache@3.0.0",
+      "purl": "pkg:composer/psr/simple-cache@3.0.0"
+    },
+    {
+      "type": "library",
+      "name": "ralouphie/getallheaders",
+      "version": "3.0.3",
+      "bom-ref": "pkg:composer/ralouphie/getallheaders@3.0.3",
+      "purl": "pkg:composer/ralouphie/getallheaders@3.0.3"
+    },
+    {
+      "type": "library",
+      "name": "ramsey/uuid",
+      "version": "4.9.4",
+      "bom-ref": "pkg:composer/ramsey/uuid@4.9.4",
+      "purl": "pkg:composer/ramsey/uuid@4.9.4"
+    },
+    {
+      "type": "library",
+      "name": "sebastian/diff",
+      "version": "9.0.1",
+      "bom-ref": "pkg:composer/sebastian/diff@9.0.1",
+      "purl": "pkg:composer/sebastian/diff@9.0.1"
+    },
+    {
+      "type": "library",
+      "name": "sebastian/exporter",
+      "version": "4.0.9",
+      "bom-ref": "pkg:composer/sebastian/exporter@4.0.9",
+      "purl": "pkg:composer/sebastian/exporter@4.0.9"
+    },
+    {
+      "type": "library",
+      "name": "sebastian/version",
+      "version": "7.0.1",
+      "bom-ref": "pkg:composer/sebastian/version@7.0.1",
+      "purl": "pkg:composer/sebastian/version@7.0.1"
+    },
+    {
+      "type": "library",
+      "name": "symfony/console",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/console@v8.1.8",
+      "purl": "pkg:composer/symfony/console@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/css-selector",
+      "version": "v8.1.6",
+      "bom-ref": "pkg:composer/symfony/css-selector@v8.1.6",
+      "purl": "pkg:composer/symfony/css-selector@v8.1.6"
+    },
+    {
+      "type": "library",
+      "name": "symfony/deprecation-contracts",
+      "version": "v3.7.1",
+      "bom-ref": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+      "purl": "pkg:composer/symfony/deprecation-contracts@v3.7.1"
+    },
+    {
+      "type": "library",
+      "name": "symfony/error-handler",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/error-handler@v8.1.8",
+      "purl": "pkg:composer/symfony/error-handler@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/event-dispatcher-contracts",
+      "version": "v3.7.1",
+      "bom-ref": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+      "purl": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1"
+    },
+    {
+      "type": "library",
+      "name": "symfony/event-dispatcher",
+      "version": "v8.1.5",
+      "bom-ref": "pkg:composer/symfony/event-dispatcher@v8.1.5",
+      "purl": "pkg:composer/symfony/event-dispatcher@v8.1.5"
+    },
+    {
+      "type": "library",
+      "name": "symfony/finder",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/finder@v8.1.8",
+      "purl": "pkg:composer/symfony/finder@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/http-foundation",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/http-foundation@v8.1.8",
+      "purl": "pkg:composer/symfony/http-foundation@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/http-kernel",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/http-kernel@v8.1.8",
+      "purl": "pkg:composer/symfony/http-kernel@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/mime",
+      "version": "v8.1.7",
+      "bom-ref": "pkg:composer/symfony/mime@v8.1.7",
+      "purl": "pkg:composer/symfony/mime@v8.1.7"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-ctype",
+      "version": "v1.37.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+      "purl": "pkg:composer/symfony/polyfill-ctype@v1.37.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-intl-grapheme",
+      "version": "v1.43.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0",
+      "purl": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-intl-idn",
+      "version": "v1.43.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0",
+      "purl": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-intl-normalizer",
+      "version": "v1.43.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0",
+      "purl": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-mbstring",
+      "version": "v1.43.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-mbstring@v1.43.0",
+      "purl": "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/polyfill-php80",
+      "version": "v1.43.0",
+      "bom-ref": "pkg:composer/symfony/polyfill-php80@v1.43.0",
+      "purl": "pkg:composer/symfony/polyfill-php80@v1.43.0"
+    },
+    {
+      "type": "library",
+      "name": "symfony/process",
+      "version": "v8.1.7",
+      "bom-ref": "pkg:composer/symfony/process@v8.1.7",
+      "purl": "pkg:composer/symfony/process@v8.1.7"
+    },
+    {
+      "type": "library",
+      "name": "symfony/routing",
+      "version": "v8.1.8",
+      "bom-ref": "pkg:composer/symfony/routing@v8.1.8",
+      "purl": "pkg:composer/symfony/routing@v8.1.8"
+    },
+    {
+      "type": "library",
+      "name": "symfony/service-contracts",
+      "version": "v3.7.3",
+      "bom-ref": "pkg:composer/symfony/service-contracts@v3.7.3",
+      "purl": "pkg:composer/symfony/service-contracts@v3.7.3"
+    },
+    {
+      "type": "library",
+      "name": "symfony/string",
+      "version": "v8.1.7",
+      "bom-ref": "pkg:composer/symfony/string@v8.1.7",
+      "purl": "pkg:composer/symfony/string@v8.1.7"
+    },
+    {
+      "type": "library",
+      "name": "symfony/translation-contracts",
+      "version": "v3.7.1",
+      "bom-ref": "pkg:composer/symfony/translation-contracts@v3.7.1",
+      "purl": "pkg:composer/symfony/translation-contracts@v3.7.1"
+    },
+    {
+      "type": "library",
+      "name": "symfony/translation",
+      "version": "v8.1.5",
+      "bom-ref": "pkg:composer/symfony/translation@v8.1.5",
+      "purl": "pkg:composer/symfony/translation@v8.1.5"
+    },
+    {
+      "type": "library",
+      "name": "symfony/var-dumper",
+      "version": "v8.1.7",
+      "bom-ref": "pkg:composer/symfony/var-dumper@v8.1.7",
+      "purl": "pkg:composer/symfony/var-dumper@v8.1.7"
+    },
+    {
+      "type": "library",
+      "name": "actionmailer",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/actionmailer@8.1.4",
+      "purl": "pkg:gem/actionmailer@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "actionpack",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/actionpack@8.1.4",
+      "purl": "pkg:gem/actionpack@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "actionview",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/actionview@8.1.4",
+      "purl": "pkg:gem/actionview@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "activemodel",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/activemodel@8.1.4",
+      "purl": "pkg:gem/activemodel@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "activerecord",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/activerecord@8.1.4",
+      "purl": "pkg:gem/activerecord@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "activesupport",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/activesupport@8.1.4",
+      "purl": "pkg:gem/activesupport@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "addressable",
+      "version": "2.9.0",
+      "bom-ref": "pkg:gem/addressable@2.9.0",
+      "purl": "pkg:gem/addressable@2.9.0"
+    },
+    {
+      "type": "library",
+      "name": "ast",
+      "version": "2.4.3",
+      "bom-ref": "pkg:gem/ast@2.4.3",
+      "purl": "pkg:gem/ast@2.4.3"
+    },
+    {
+      "type": "library",
+      "name": "aws-eventstream",
+      "version": "1.4.0",
+      "bom-ref": "pkg:gem/aws-eventstream@1.4.0",
+      "purl": "pkg:gem/aws-eventstream@1.4.0"
+    },
+    {
+      "type": "library",
+      "name": "aws-partitions",
+      "version": "1.1294.0",
+      "bom-ref": "pkg:gem/aws-partitions@1.1294.0",
+      "purl": "pkg:gem/aws-partitions@1.1294.0"
+    },
+    {
+      "type": "library",
+      "name": "aws-sdk-core",
+      "version": "3.257.0",
+      "bom-ref": "pkg:gem/aws-sdk-core@3.257.0",
+      "purl": "pkg:gem/aws-sdk-core@3.257.0"
+    },
+    {
+      "type": "library",
+      "name": "aws-sdk-kms",
+      "version": "1.132.0",
+      "bom-ref": "pkg:gem/aws-sdk-kms@1.132.0",
+      "purl": "pkg:gem/aws-sdk-kms@1.132.0"
+    },
+    {
+      "type": "library",
+      "name": "aws-sdk-s3",
+      "version": "1.233.2",
+      "bom-ref": "pkg:gem/aws-sdk-s3@1.233.2",
+      "purl": "pkg:gem/aws-sdk-s3@1.233.2"
+    },
+    {
+      "type": "library",
+      "name": "aws-sigv4",
+      "version": "1.12.1",
+      "bom-ref": "pkg:gem/aws-sigv4@1.12.1",
+      "purl": "pkg:gem/aws-sigv4@1.12.1"
+    },
+    {
+      "type": "library",
+      "name": "builder",
+      "version": "3.3.0",
+      "bom-ref": "pkg:gem/builder@3.3.0",
+      "purl": "pkg:gem/builder@3.3.0"
+    },
+    {
+      "type": "library",
+      "name": "bundler",
+      "version": "4.0.22",
+      "bom-ref": "pkg:gem/bundler@4.0.22",
+      "purl": "pkg:gem/bundler@4.0.22"
+    },
+    {
+      "type": "library",
+      "name": "concurrent-ruby",
+      "version": "1.3.8",
+      "bom-ref": "pkg:gem/concurrent-ruby@1.3.8",
+      "purl": "pkg:gem/concurrent-ruby@1.3.8"
+    },
+    {
+      "type": "library",
+      "name": "diff-lcs",
+      "version": "2.0.0",
+      "bom-ref": "pkg:gem/diff-lcs@2.0.0",
+      "purl": "pkg:gem/diff-lcs@2.0.0"
+    },
+    {
+      "type": "library",
+      "name": "faraday",
+      "version": "2.14.4",
+      "bom-ref": "pkg:gem/faraday@2.14.4",
+      "purl": "pkg:gem/faraday@2.14.4"
+    },
+    {
+      "type": "library",
+      "name": "ffi",
+      "version": "1.17.4",
+      "bom-ref": "pkg:gem/ffi@1.17.4",
+      "purl": "pkg:gem/ffi@1.17.4"
+    },
+    {
+      "type": "library",
+      "name": "i18n",
+      "version": "1.15.2",
+      "bom-ref": "pkg:gem/i18n@1.15.2",
+      "purl": "pkg:gem/i18n@1.15.2"
+    },
+    {
+      "type": "library",
+      "name": "jmespath",
+      "version": "1.6.2",
+      "bom-ref": "pkg:gem/jmespath@1.6.2",
+      "purl": "pkg:gem/jmespath@1.6.2"
+    },
+    {
+      "type": "library",
+      "name": "json",
+      "version": "3.1.0",
+      "bom-ref": "pkg:gem/json@3.1.0",
+      "purl": "pkg:gem/json@3.1.0"
+    },
+    {
+      "type": "library",
+      "name": "jwt",
+      "version": "3.3.0",
+      "bom-ref": "pkg:gem/jwt@3.3.0",
+      "purl": "pkg:gem/jwt@3.3.0"
+    },
+    {
+      "type": "library",
+      "name": "method_source",
+      "version": "1.1.0",
+      "bom-ref": "pkg:gem/method_source@1.1.0",
+      "purl": "pkg:gem/method_source@1.1.0"
+    },
+    {
+      "type": "library",
+      "name": "mime-types",
+      "version": "3.7.0",
+      "bom-ref": "pkg:gem/mime-types@3.7.0",
+      "purl": "pkg:gem/mime-types@3.7.0"
+    },
+    {
+      "type": "library",
+      "name": "mini_mime",
+      "version": "1.1.5",
+      "bom-ref": "pkg:gem/mini_mime@1.1.5",
+      "purl": "pkg:gem/mini_mime@1.1.5"
+    },
+    {
+      "type": "library",
+      "name": "minitest",
+      "version": "6.0.6",
+      "bom-ref": "pkg:gem/minitest@6.0.6",
+      "purl": "pkg:gem/minitest@6.0.6"
+    },
+    {
+      "type": "library",
+      "name": "multi_json",
+      "version": "1.21.2",
+      "bom-ref": "pkg:gem/multi_json@1.21.2",
+      "purl": "pkg:gem/multi_json@1.21.2"
+    },
+    {
+      "type": "library",
+      "name": "multipart-post",
+      "version": "2.4.1",
+      "bom-ref": "pkg:gem/multipart-post@2.4.1",
+      "purl": "pkg:gem/multipart-post@2.4.1"
+    },
+    {
+      "type": "library",
+      "name": "nokogiri",
+      "version": "1.19.4",
+      "bom-ref": "pkg:gem/nokogiri@1.19.4",
+      "purl": "pkg:gem/nokogiri@1.19.4"
+    },
+    {
+      "type": "library",
+      "name": "parallel",
+      "version": "2.3.0",
+      "bom-ref": "pkg:gem/parallel@2.3.0",
+      "purl": "pkg:gem/parallel@2.3.0"
+    },
+    {
+      "type": "library",
+      "name": "parser",
+      "version": "3.3.12.0",
+      "bom-ref": "pkg:gem/parser@3.3.12.0",
+      "purl": "pkg:gem/parser@3.3.12.0"
+    },
+    {
+      "type": "library",
+      "name": "public_suffix",
+      "version": "7.0.5",
+      "bom-ref": "pkg:gem/public_suffix@7.0.5",
+      "purl": "pkg:gem/public_suffix@7.0.5"
+    },
+    {
+      "type": "library",
+      "name": "rack-test",
+      "version": "2.2.0",
+      "bom-ref": "pkg:gem/rack-test@2.2.0",
+      "purl": "pkg:gem/rack-test@2.2.0"
+    },
+    {
+      "type": "library",
+      "name": "rack",
+      "version": "3.2.7",
+      "bom-ref": "pkg:gem/rack@3.2.7",
+      "purl": "pkg:gem/rack@3.2.7"
+    },
+    {
+      "type": "library",
+      "name": "rails",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/rails@8.1.4",
+      "purl": "pkg:gem/rails@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "railties",
+      "version": "8.1.4",
+      "bom-ref": "pkg:gem/railties@8.1.4",
+      "purl": "pkg:gem/railties@8.1.4"
+    },
+    {
+      "type": "library",
+      "name": "rake",
+      "version": "13.4.2",
+      "bom-ref": "pkg:gem/rake@13.4.2",
+      "purl": "pkg:gem/rake@13.4.2"
+    },
+    {
+      "type": "library",
+      "name": "rexml",
+      "version": "3.4.4",
+      "bom-ref": "pkg:gem/rexml@3.4.4",
+      "purl": "pkg:gem/rexml@3.4.4"
+    },
+    {
+      "type": "library",
+      "name": "rspec-core",
+      "version": "3.13.6",
+      "bom-ref": "pkg:gem/rspec-core@3.13.6",
+      "purl": "pkg:gem/rspec-core@3.13.6"
+    },
+    {
+      "type": "library",
+      "name": "rspec-expectations",
+      "version": "3.13.5",
+      "bom-ref": "pkg:gem/rspec-expectations@3.13.5",
+      "purl": "pkg:gem/rspec-expectations@3.13.5"
+    },
+    {
+      "type": "library",
+      "name": "rspec-mocks",
+      "version": "3.13.8",
+      "bom-ref": "pkg:gem/rspec-mocks@3.13.8",
+      "purl": "pkg:gem/rspec-mocks@3.13.8"
+    },
+    {
+      "type": "library",
+      "name": "rspec-support",
+      "version": "3.13.7",
+      "bom-ref": "pkg:gem/rspec-support@3.13.7",
+      "purl": "pkg:gem/rspec-support@3.13.7"
+    },
+    {
+      "type": "library",
+      "name": "rspec",
+      "version": "3.13.2",
+      "bom-ref": "pkg:gem/rspec@3.13.2",
+      "purl": "pkg:gem/rspec@3.13.2"
+    },
+    {
+      "type": "library",
+      "name": "rubyzip",
+      "version": "3.7.0",
+      "bom-ref": "pkg:gem/rubyzip@3.7.0",
+      "purl": "pkg:gem/rubyzip@3.7.0"
+    },
+    {
+      "type": "library",
+      "name": "thor",
+      "version": "1.5.0",
+      "bom-ref": "pkg:gem/thor@1.5.0",
+      "purl": "pkg:gem/thor@1.5.0"
+    },
+    {
+      "type": "library",
+      "name": "tilt",
+      "version": "2.9.0",
+      "bom-ref": "pkg:gem/tilt@2.9.0",
+      "purl": "pkg:gem/tilt@2.9.0"
+    },
+    {
+      "type": "library",
+      "name": "tzinfo",
+      "version": "2.0.6",
+      "bom-ref": "pkg:gem/tzinfo@2.0.6",
+      "purl": "pkg:gem/tzinfo@2.0.6"
+    },
+    {
+      "type": "library",
+      "name": "unicode-display_width",
+      "version": "3.3.0",
+      "bom-ref": "pkg:gem/unicode-display_width@3.3.0",
+      "purl": "pkg:gem/unicode-display_width@3.3.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/beorn7/perks",
+      "version": "v1.0.1",
+      "bom-ref": "pkg:golang/github.com/beorn7/perks@v1.0.1",
+      "purl": "pkg:golang/github.com/beorn7/perks@v1.0.1"
+    },
+    {
+      "type": "library",
+      "name": "github.com/cespare/xxhash/v2",
+      "version": "v2.3.0",
+      "bom-ref": "pkg:golang/github.com/cespare/xxhash/v2@v2.3.0",
+      "purl": "pkg:golang/github.com/cespare/xxhash/v2@v2.3.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/davecgh/go-spew",
+      "version": "v1.1.1",
+      "bom-ref": "pkg:golang/github.com/davecgh/go-spew@v1.1.1",
+      "purl": "pkg:golang/github.com/davecgh/go-spew@v1.1.1"
+    },
+    {
+      "type": "library",
+      "name": "github.com/fatih/color",
+      "version": "v1.19.0",
+      "bom-ref": "pkg:golang/github.com/fatih/color@v1.19.0",
+      "purl": "pkg:golang/github.com/fatih/color@v1.19.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/fsnotify/fsnotify",
+      "version": "v1.10.1",
+      "bom-ref": "pkg:golang/github.com/fsnotify/fsnotify@v1.10.1",
+      "purl": "pkg:golang/github.com/fsnotify/fsnotify@v1.10.1"
+    },
+    {
+      "type": "library",
+      "name": "github.com/go-logr/logr",
+      "version": "v1.4.4",
+      "bom-ref": "pkg:golang/github.com/go-logr/logr@v1.4.4",
+      "purl": "pkg:golang/github.com/go-logr/logr@v1.4.4"
+    },
+    {
+      "type": "library",
+      "name": "github.com/gogo/protobuf",
+      "version": "v1.3.2",
+      "bom-ref": "pkg:golang/github.com/gogo/protobuf@v1.3.2",
+      "purl": "pkg:golang/github.com/gogo/protobuf@v1.3.2"
+    },
+    {
+      "type": "library",
+      "name": "github.com/golang/groupcache",
+      "version": "v0.0.0-20241129210726-2c02b8208cf8",
+      "bom-ref": "pkg:golang/github.com/golang/groupcache@v0.0.0-20241129210726-2c02b8208cf8",
+      "purl": "pkg:golang/github.com/golang/groupcache@v0.0.0-20241129210726-2c02b8208cf8"
+    },
+    {
+      "type": "library",
+      "name": "github.com/golang/protobuf",
+      "version": "v1.5.4",
+      "bom-ref": "pkg:golang/github.com/golang/protobuf@v1.5.4",
+      "purl": "pkg:golang/github.com/golang/protobuf@v1.5.4"
+    },
+    {
+      "type": "library",
+      "name": "github.com/golang/snappy",
+      "version": "v1.0.0",
+      "bom-ref": "pkg:golang/github.com/golang/snappy@v1.0.0",
+      "purl": "pkg:golang/github.com/golang/snappy@v1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/google/go-cmp",
+      "version": "v0.7.0",
+      "bom-ref": "pkg:golang/github.com/google/go-cmp@v0.7.0",
+      "purl": "pkg:golang/github.com/google/go-cmp@v0.7.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/google/uuid",
+      "version": "v1.6.0",
+      "bom-ref": "pkg:golang/github.com/google/uuid@v1.6.0",
+      "purl": "pkg:golang/github.com/google/uuid@v1.6.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/gorilla/websocket",
+      "version": "v1.5.3",
+      "bom-ref": "pkg:golang/github.com/gorilla/websocket@v1.5.3",
+      "purl": "pkg:golang/github.com/gorilla/websocket@v1.5.3"
+    },
+    {
+      "type": "library",
+      "name": "github.com/json-iterator/go",
+      "version": "v1.1.12",
+      "bom-ref": "pkg:golang/github.com/json-iterator/go@v1.1.12",
+      "purl": "pkg:golang/github.com/json-iterator/go@v1.1.12"
+    },
+    {
+      "type": "library",
+      "name": "github.com/klauspost/compress",
+      "version": "v1.20.3",
+      "bom-ref": "pkg:golang/github.com/klauspost/compress@v1.20.3",
+      "purl": "pkg:golang/github.com/klauspost/compress@v1.20.3"
+    },
+    {
+      "type": "library",
+      "name": "github.com/mattn/go-colorable",
+      "version": "v0.1.16",
+      "bom-ref": "pkg:golang/github.com/mattn/go-colorable@v0.1.16",
+      "purl": "pkg:golang/github.com/mattn/go-colorable@v0.1.16"
+    },
+    {
+      "type": "library",
+      "name": "github.com/mattn/go-isatty",
+      "version": "v0.0.24",
+      "bom-ref": "pkg:golang/github.com/mattn/go-isatty@v0.0.24",
+      "purl": "pkg:golang/github.com/mattn/go-isatty@v0.0.24"
+    },
+    {
+      "type": "library",
+      "name": "github.com/mitchellh/mapstructure",
+      "version": "v1.5.0",
+      "bom-ref": "pkg:golang/github.com/mitchellh/mapstructure@v1.5.0",
+      "purl": "pkg:golang/github.com/mitchellh/mapstructure@v1.5.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/modern-go/concurrent",
+      "version": "v0.0.0-20180306012644-bacd9c7ef1dd",
+      "bom-ref": "pkg:golang/github.com/modern-go/concurrent@v0.0.0-20180306012644-bacd9c7ef1dd",
+      "purl": "pkg:golang/github.com/modern-go/concurrent@v0.0.0-20180306012644-bacd9c7ef1dd"
+    },
+    {
+      "type": "library",
+      "name": "github.com/modern-go/reflect2",
+      "version": "v1.0.2",
+      "bom-ref": "pkg:golang/github.com/modern-go/reflect2@v1.0.2",
+      "purl": "pkg:golang/github.com/modern-go/reflect2@v1.0.2"
+    },
+    {
+      "type": "library",
+      "name": "github.com/onsi/gomega",
+      "version": "v1.44.0",
+      "bom-ref": "pkg:golang/github.com/onsi/gomega@v1.44.0",
+      "purl": "pkg:golang/github.com/onsi/gomega@v1.44.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/pkg/errors",
+      "version": "v0.9.1",
+      "bom-ref": "pkg:golang/github.com/pkg/errors@v0.9.1",
+      "purl": "pkg:golang/github.com/pkg/errors@v0.9.1"
+    },
+    {
+      "type": "library",
+      "name": "github.com/pmezard/go-difflib",
+      "version": "v1.0.0",
+      "bom-ref": "pkg:golang/github.com/pmezard/go-difflib@v1.0.0",
+      "purl": "pkg:golang/github.com/pmezard/go-difflib@v1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/prometheus/client_golang",
+      "version": "v1.25.0",
+      "bom-ref": "pkg:golang/github.com/prometheus/client_golang@v1.25.0",
+      "purl": "pkg:golang/github.com/prometheus/client_golang@v1.25.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/prometheus/common",
+      "version": "v0.72.1",
+      "bom-ref": "pkg:golang/github.com/prometheus/common@v0.72.1",
+      "purl": "pkg:golang/github.com/prometheus/common@v0.72.1"
+    },
+    {
+      "type": "library",
+      "name": "github.com/prometheus/procfs",
+      "version": "v0.22.0",
+      "bom-ref": "pkg:golang/github.com/prometheus/procfs@v0.22.0",
+      "purl": "pkg:golang/github.com/prometheus/procfs@v0.22.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/sirupsen/logrus",
+      "version": "v1.10.2",
+      "bom-ref": "pkg:golang/github.com/sirupsen/logrus@v1.10.2",
+      "purl": "pkg:golang/github.com/sirupsen/logrus@v1.10.2"
+    },
+    {
+      "type": "library",
+      "name": "github.com/spf13/cast",
+      "version": "v1.10.0",
+      "bom-ref": "pkg:golang/github.com/spf13/cast@v1.10.0",
+      "purl": "pkg:golang/github.com/spf13/cast@v1.10.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/spf13/cobra",
+      "version": "v1.10.2",
+      "bom-ref": "pkg:golang/github.com/spf13/cobra@v1.10.2",
+      "purl": "pkg:golang/github.com/spf13/cobra@v1.10.2"
+    },
+    {
+      "type": "library",
+      "name": "github.com/spf13/pflag",
+      "version": "v1.0.10",
+      "bom-ref": "pkg:golang/github.com/spf13/pflag@v1.0.10",
+      "purl": "pkg:golang/github.com/spf13/pflag@v1.0.10"
+    },
+    {
+      "type": "library",
+      "name": "github.com/spf13/viper",
+      "version": "v1.21.0",
+      "bom-ref": "pkg:golang/github.com/spf13/viper@v1.21.0",
+      "purl": "pkg:golang/github.com/spf13/viper@v1.21.0"
+    },
+    {
+      "type": "library",
+      "name": "github.com/stretchr/testify",
+      "version": "v1.12.1",
+      "bom-ref": "pkg:golang/github.com/stretchr/testify@v1.12.1",
+      "purl": "pkg:golang/github.com/stretchr/testify@v1.12.1"
+    },
+    {
+      "type": "library",
+      "name": "go.uber.org/atomic",
+      "version": "v1.12.0",
+      "bom-ref": "pkg:golang/go.uber.org/atomic@v1.12.0",
+      "purl": "pkg:golang/go.uber.org/atomic@v1.12.0"
+    },
+    {
+      "type": "library",
+      "name": "go.uber.org/zap",
+      "version": "v1.28.0",
+      "bom-ref": "pkg:golang/go.uber.org/zap@v1.28.0",
+      "purl": "pkg:golang/go.uber.org/zap@v1.28.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/crypto",
+      "version": "v0.58.0",
+      "bom-ref": "pkg:golang/golang.org/x/crypto@v0.58.0",
+      "purl": "pkg:golang/golang.org/x/crypto@v0.58.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/net",
+      "version": "v0.61.0",
+      "bom-ref": "pkg:golang/golang.org/x/net@v0.61.0",
+      "purl": "pkg:golang/golang.org/x/net@v0.61.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/oauth2",
+      "version": "v0.37.0",
+      "bom-ref": "pkg:golang/golang.org/x/oauth2@v0.37.0",
+      "purl": "pkg:golang/golang.org/x/oauth2@v0.37.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/sync",
+      "version": "v0.24.0",
+      "bom-ref": "pkg:golang/golang.org/x/sync@v0.24.0",
+      "purl": "pkg:golang/golang.org/x/sync@v0.24.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/sys",
+      "version": "v0.49.0",
+      "bom-ref": "pkg:golang/golang.org/x/sys@v0.49.0",
+      "purl": "pkg:golang/golang.org/x/sys@v0.49.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/text",
+      "version": "v0.43.0",
+      "bom-ref": "pkg:golang/golang.org/x/text@v0.43.0",
+      "purl": "pkg:golang/golang.org/x/text@v0.43.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/time",
+      "version": "v0.16.0",
+      "bom-ref": "pkg:golang/golang.org/x/time@v0.16.0",
+      "purl": "pkg:golang/golang.org/x/time@v0.16.0"
+    },
+    {
+      "type": "library",
+      "name": "golang.org/x/tools",
+      "version": "v0.52.0",
+      "bom-ref": "pkg:golang/golang.org/x/tools@v0.52.0",
+      "purl": "pkg:golang/golang.org/x/tools@v0.52.0"
+    },
+    {
+      "type": "library",
+      "name": "google.golang.org/appengine",
+      "version": "v1.6.8",
+      "bom-ref": "pkg:golang/google.golang.org/appengine@v1.6.8",
+      "purl": "pkg:golang/google.golang.org/appengine@v1.6.8"
+    },
+    {
+      "type": "library",
+      "name": "google.golang.org/genproto",
+      "version": "v0.0.0-20261012220534-4341edf3f941",
+      "bom-ref": "pkg:golang/google.golang.org/genproto@v0.0.0-20261012220534-4341edf3f941",
+      "purl": "pkg:golang/google.golang.org/genproto@v0.0.0-20261012220534-4341edf3f941"
+    },
+    {
+      "type": "library",
+      "name": "google.golang.org/grpc",
+      "version": "v1.84.0",
+      "bom-ref": "pkg:golang/google.golang.org/grpc@v1.84.0",
+      "purl": "pkg:golang/google.golang.org/grpc@v1.84.0"
+    },
+    {
+      "type": "library",
+      "name": "google.golang.org/protobuf",
+      "version": "v1.36.12",
+      "bom-ref": "pkg:golang/google.golang.org/protobuf@v1.36.12",
+      "purl": "pkg:golang/google.golang.org/protobuf@v1.36.12"
+    },
+    {
+      "type": "library",
+      "name": "gopkg.in/check.v1",
+      "version": "v1.0.0-20201130134442-10cb98267c6c",
+      "bom-ref": "pkg:golang/gopkg.in/check.v1@v1.0.0-20201130134442-10cb98267c6c",
+      "purl": "pkg:golang/gopkg.in/check.v1@v1.0.0-20201130134442-10cb98267c6c"
+    },
+    {
+      "type": "library",
+      "name": "gopkg.in/ini.v1",
+      "version": "v1.67.3",
+      "bom-ref": "pkg:golang/gopkg.in/ini.v1@v1.67.3",
+      "purl": "pkg:golang/gopkg.in/ini.v1@v1.67.3"
+    },
+    {
+      "type": "library",
+      "name": "gopkg.in/yaml.v2",
+      "version": "v2.4.0",
+      "bom-ref": "pkg:golang/gopkg.in/yaml.v2@v2.4.0",
+      "purl": "pkg:golang/gopkg.in/yaml.v2@v2.4.0"
+    },
+    {
+      "type": "library",
+      "name": "gopkg.in/yaml.v3",
+      "version": "v3.0.1",
+      "bom-ref": "pkg:golang/gopkg.in/yaml.v3@v3.0.1",
+      "purl": "pkg:golang/gopkg.in/yaml.v3@v3.0.1"
+    },
+    {
+      "type": "library",
+      "name": "ch.qos.logback:logback-classic",
+      "version": "1.6.5",
+      "bom-ref": "pkg:maven/ch.qos.logback/logback-classic@1.6.5",
+      "purl": "pkg:maven/ch.qos.logback/logback-classic@1.6.5"
+    },
+    {
+      "type": "library",
+      "name": "com.fasterxml.jackson.core:jackson-annotations",
+      "version": "2.22",
+      "bom-ref": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.22",
+      "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.22"
+    },
+    {
+      "type": "library",
+      "name": "com.fasterxml.jackson.core:jackson-core",
+      "version": "2.22.3",
+      "bom-ref": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.22.3",
+      "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.22.3"
+    },
+    {
+      "type": "library",
+      "name": "com.fasterxml.jackson.core:jackson-databind",
+      "version": "2.22.3",
+      "bom-ref": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.22.3",
+      "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.22.3"
+    },
+    {
+      "type": "library",
+      "name": "com.google.code.findbugs:jsr305",
+      "version": "3.0.2",
+      "bom-ref": "pkg:maven/com.google.code.findbugs/jsr305@3.0.2",
+      "purl": "pkg:maven/com.google.code.findbugs/jsr305@3.0.2"
+    },
+    {
+      "type": "library",
+      "name": "com.google.code.gson:gson",
+      "version": "2.14.0",
+      "bom-ref": "pkg:maven/com.google.code.gson/gson@2.14.0",
+      "purl": "pkg:maven/com.google.code.gson/gson@2.14.0"
+    },
+    {
+      "type": "library",
+      "name": "com.google.guava:guava",
+      "version": "33.7.2-jre",
+      "bom-ref": "pkg:maven/com.google.guava/guava@33.7.2-jre",
+      "purl": "pkg:maven/com.google.guava/guava@33.7.2-jre"
+    },
+    {
+      "type": "library",
+      "name": "com.h2database:h2",
+      "version": "2.5.252",
+      "bom-ref": "pkg:maven/com.h2database/h2@2.5.252",
+      "purl": "pkg:maven/com.h2database/h2@2.5.252"
+    },
+    {
+      "type": "library",
+      "name": "commons-codec:commons-codec",
+      "version": "1.23.0",
+      "bom-ref": "pkg:maven/commons-codec/commons-codec@1.23.0",
+      "purl": "pkg:maven/commons-codec/commons-codec@1.23.0"
+    },
+    {
+      "type": "library",
+      "name": "commons-io:commons-io",
+      "version": "2.22.0",
+      "bom-ref": "pkg:maven/commons-io/commons-io@2.22.0",
+      "purl": "pkg:maven/commons-io/commons-io@2.22.0"
+    },
+    {
+      "type": "library",
+      "name": "commons-lang:commons-lang",
+      "version": "2.6",
+      "bom-ref": "pkg:maven/commons-lang/commons-lang@2.6",
+      "purl": "pkg:maven/commons-lang/commons-lang@2.6"
+    },
+    {
+      "type": "library",
+      "name": "commons-logging:commons-logging",
+      "version": "1.4.0",
+      "bom-ref": "pkg:maven/commons-logging/commons-logging@1.4.0",
+      "purl": "pkg:maven/commons-logging/commons-logging@1.4.0"
+    },
+    {
+      "type": "library",
+      "name": "javax.servlet:javax.servlet-api",
+      "version": "4.0.1",
+      "bom-ref": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1",
+      "purl": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1"
+    },
+    {
+      "type": "library",
+      "name": "javax.servlet:servlet-api",
+      "version": "2.5",
+      "bom-ref": "pkg:maven/javax.servlet/servlet-api@2.5",
+      "purl": "pkg:maven/javax.servlet/servlet-api@2.5"
+    },
+    {
+      "type": "library",
+      "name": "joda-time:joda-time",
+      "version": "2.15.0",
+      "bom-ref": "pkg:maven/joda-time/joda-time@2.15.0",
+      "purl": "pkg:maven/joda-time/joda-time@2.15.0"
+    },
+    {
+      "type": "library",
+      "name": "junit:junit",
+      "version": "4.13.2",
+      "bom-ref": "pkg:maven/junit/junit@4.13.2",
+      "purl": "pkg:maven/junit/junit@4.13.2"
+    },
+    {
+      "type": "library",
+      "name": "log4j:log4j",
+      "version": "1.2.17",
+      "bom-ref": "pkg:maven/log4j/log4j@1.2.17",
+      "purl": "pkg:maven/log4j/log4j@1.2.17"
+    },
+    {
+      "type": "library",
+      "name": "org.apache.commons:commons-lang3",
+      "version": "3.21.0",
+      "bom-ref": "pkg:maven/org.apache.commons/commons-lang3@3.21.0",
+      "purl": "pkg:maven/org.apache.commons/commons-lang3@3.21.0"
+    },
+    {
+      "type": "library",
+      "name": "org.apache.httpcomponents:httpclient",
+      "version": "4.5.14",
+      "bom-ref": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.14",
+      "purl": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.14"
+    },
+    {
+      "type": "library",
+      "name": "org.apache.logging.log4j:log4j-api",
+      "version": "2.26.1",
+      "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.26.1",
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-api@2.26.1"
+    },
+    {
+      "type": "library",
+      "name": "org.apache.logging.log4j:log4j-core",
+      "version": "2.26.1",
+      "bom-ref": "pkg:maven/org.apache.logging.log4j/log4j-core@2.26.1",
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core@2.26.1"
+    },
+    {
+      "type": "library",
+      "name": "org.apache.maven:maven-plugin-api",
+      "version": "3.10.0",
+      "bom-ref": "pkg:maven/org.apache.maven/maven-plugin-api@3.10.0",
+      "purl": "pkg:maven/org.apache.maven/maven-plugin-api@3.10.0"
+    },
+    {
+      "type": "library",
+      "name": "org.assertj:assertj-core",
+      "version": "3.27.7",
+      "bom-ref": "pkg:maven/org.assertj/assertj-core@3.27.7",
+      "purl": "pkg:maven/org.assertj/assertj-core@3.27.7"
+    },
+    {
+      "type": "library",
+      "name": "org.hamcrest:hamcrest-all",
+      "version": "1.3",
+      "bom-ref": "pkg:maven/org.hamcrest/hamcrest-all@1.3",
+      "purl": "pkg:maven/org.hamcrest/hamcrest-all@1.3"
+    },
+    {
+      "type": "library",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "2.4.21",
+      "bom-ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-common@2.4.21",
+      "purl": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-common@2.4.21"
+    },
+    {
+      "type": "library",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "2.4.21",
+      "bom-ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-jdk8@2.4.21",
+      "purl": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-jdk8@2.4.21"
+    },
+    {
+      "type": "library",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.4.21",
+      "bom-ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.4.21",
+      "purl": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.4.21"
+    },
+    {
+      "type": "library",
+      "name": "org.junit.jupiter:junit-jupiter-api",
+      "version": "6.1.3",
+      "bom-ref": "pkg:maven/org.junit.jupiter/junit-jupiter-api@6.1.3",
+      "purl": "pkg:maven/org.junit.jupiter/junit-jupiter-api@6.1.3"
+    },
+    {
+      "type": "library",
+      "name": "org.junit.jupiter:junit-jupiter-engine",
+      "version": "6.1.3",
+      "bom-ref": "pkg:maven/org.junit.jupiter/junit-jupiter-engine@6.1.3",
+      "purl": "pkg:maven/org.junit.jupiter/junit-jupiter-engine@6.1.3"
+    },
+    {
+      "type": "library",
+      "name": "org.mockito:mockito-all",
+      "version": "1.10.19",
+      "bom-ref": "pkg:maven/org.mockito/mockito-all@1.10.19",
+      "purl": "pkg:maven/org.mockito/mockito-all@1.10.19"
+    },
+    {
+      "type": "library",
+      "name": "org.mockito:mockito-core",
+      "version": "5.24.0",
+      "bom-ref": "pkg:maven/org.mockito/mockito-core@5.24.0",
+      "purl": "pkg:maven/org.mockito/mockito-core@5.24.0"
+    },
+    {
+      "type": "library",
+      "name": "org.projectlombok:lombok",
+      "version": "1.18.48",
+      "bom-ref": "pkg:maven/org.projectlombok/lombok@1.18.48",
+      "purl": "pkg:maven/org.projectlombok/lombok@1.18.48"
+    },
+    {
+      "type": "library",
+      "name": "org.scala-lang:scala-compiler",
+      "version": "2.13.18",
+      "bom-ref": "pkg:maven/org.scala-lang/scala-compiler@2.13.18",
+      "purl": "pkg:maven/org.scala-lang/scala-compiler@2.13.18"
+    },
+    {
+      "type": "library",
+      "name": "org.scala-lang:scala-library",
+      "version": "3.10.0",
+      "bom-ref": "pkg:maven/org.scala-lang/scala-library@3.10.0",
+      "purl": "pkg:maven/org.scala-lang/scala-library@3.10.0"
+    },
+    {
+      "type": "library",
+      "name": "org.scala-lang:scala-reflect",
+      "version": "2.13.18",
+      "bom-ref": "pkg:maven/org.scala-lang/scala-reflect@2.13.18",
+      "purl": "pkg:maven/org.scala-lang/scala-reflect@2.13.18"
+    },
+    {
+      "type": "library",
+      "name": "org.scalatest:scalatest_2.11",
+      "version": "3.3.0-SNAP4",
+      "bom-ref": "pkg:maven/org.scalatest/scalatest_2.11@3.3.0-SNAP4",
+      "purl": "pkg:maven/org.scalatest/scalatest_2.11@3.3.0-SNAP4"
+    },
+    {
+      "type": "library",
+      "name": "org.scalatest:scalatest_2.12",
+      "version": "3.3.0-SNAP4",
+      "bom-ref": "pkg:maven/org.scalatest/scalatest_2.12@3.3.0-SNAP4",
+      "purl": "pkg:maven/org.scalatest/scalatest_2.12@3.3.0-SNAP4"
+    },
+    {
+      "type": "library",
+      "name": "org.slf4j:jcl-over-slf4j",
+      "version": "2.0.20",
+      "bom-ref": "pkg:maven/org.slf4j/jcl-over-slf4j@2.0.20",
+      "purl": "pkg:maven/org.slf4j/jcl-over-slf4j@2.0.20"
+    },
+    {
+      "type": "library",
+      "name": "org.slf4j:slf4j-api",
+      "version": "2.0.20",
+      "bom-ref": "pkg:maven/org.slf4j/slf4j-api@2.0.20",
+      "purl": "pkg:maven/org.slf4j/slf4j-api@2.0.20"
+    },
+    {
+      "type": "library",
+      "name": "org.slf4j:slf4j-log4j12",
+      "version": "2.0.20",
+      "bom-ref": "pkg:maven/org.slf4j/slf4j-log4j12@2.0.20",
+      "purl": "pkg:maven/org.slf4j/slf4j-log4j12@2.0.20"
+    },
+    {
+      "type": "library",
+      "name": "org.slf4j:slf4j-simple",
+      "version": "2.0.20",
+      "bom-ref": "pkg:maven/org.slf4j/slf4j-simple@2.0.20",
+      "purl": "pkg:maven/org.slf4j/slf4j-simple@2.0.20"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework.boot:spring-boot-autoconfigure",
+      "version": "4.1.1",
+      "bom-ref": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@4.1.1",
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@4.1.1"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework.boot:spring-boot-configuration-processor",
+      "version": "4.1.1",
+      "bom-ref": "pkg:maven/org.springframework.boot/spring-boot-configuration-processor@4.1.1",
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-configuration-processor@4.1.1"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework.boot:spring-boot-starter-test",
+      "version": "4.1.1",
+      "bom-ref": "pkg:maven/org.springframework.boot/spring-boot-starter-test@4.1.1",
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-test@4.1.1"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework.boot:spring-boot-starter-web",
+      "version": "4.1.1",
+      "bom-ref": "pkg:maven/org.springframework.boot/spring-boot-starter-web@4.1.1",
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-web@4.1.1"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework:spring-context",
+      "version": "7.0.9",
+      "bom-ref": "pkg:maven/org.springframework/spring-context@7.0.9",
+      "purl": "pkg:maven/org.springframework/spring-context@7.0.9"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework:spring-core",
+      "version": "7.0.9",
+      "bom-ref": "pkg:maven/org.springframework/spring-core@7.0.9",
+      "purl": "pkg:maven/org.springframework/spring-core@7.0.9"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework:spring-test",
+      "version": "7.0.9",
+      "bom-ref": "pkg:maven/org.springframework/spring-test@7.0.9",
+      "purl": "pkg:maven/org.springframework/spring-test@7.0.9"
+    },
+    {
+      "type": "library",
+      "name": "org.springframework:spring-web",
+      "version": "7.0.9",
+      "bom-ref": "pkg:maven/org.springframework/spring-web@7.0.9",
+      "purl": "pkg:maven/org.springframework/spring-web@7.0.9"
+    },
+    {
+      "type": "library",
+      "name": "org.testng:testng",
+      "version": "7.12.0",
+      "bom-ref": "pkg:maven/org.testng/testng@7.12.0",
+      "purl": "pkg:maven/org.testng/testng@7.12.0"
+    },
+    {
+      "type": "library",
+      "name": "@types/node",
+      "version": "26.6.5",
+      "bom-ref": "pkg:npm/%40types/node@26.6.5",
+      "purl": "pkg:npm/%40types/node@26.6.5"
+    },
+    {
+      "type": "library",
+      "name": "ajv",
+      "version": "8.20.0",
+      "bom-ref": "pkg:npm/ajv@8.20.0",
+      "purl": "pkg:npm/ajv@8.20.0"
+    },
+    {
+      "type": "library",
+      "name": "ansi-regex",
+      "version": "6.4.0",
+      "bom-ref": "pkg:npm/ansi-regex@6.4.0",
+      "purl": "pkg:npm/ansi-regex@6.4.0"
+    },
+    {
+      "type": "library",
+      "name": "ansi-styles",
+      "version": "7.0.0",
+      "bom-ref": "pkg:npm/ansi-styles@7.0.0",
+      "purl": "pkg:npm/ansi-styles@7.0.0"
+    },
+    {
+      "type": "library",
+      "name": "balanced-match",
+      "version": "4.0.4",
+      "bom-ref": "pkg:npm/balanced-match@4.0.4",
+      "purl": "pkg:npm/balanced-match@4.0.4"
+    },
+    {
+      "type": "library",
+      "name": "brace-expansion",
+      "version": "5.0.12",
+      "bom-ref": "pkg:npm/brace-expansion@5.0.12",
+      "purl": "pkg:npm/brace-expansion@5.0.12"
+    },
+    {
+      "type": "library",
+      "name": "chalk",
+      "version": "6.0.1",
+      "bom-ref": "pkg:npm/chalk@6.0.1",
+      "purl": "pkg:npm/chalk@6.0.1"
+    },
+    {
+      "type": "library",
+      "name": "color-convert",
+      "version": "3.1.3",
+      "bom-ref": "pkg:npm/color-convert@3.1.3",
+      "purl": "pkg:npm/color-convert@3.1.3"
+    },
+    {
+      "type": "library",
+      "name": "color-name",
+      "version": "2.1.1",
+      "bom-ref": "pkg:npm/color-name@2.1.1",
+      "purl": "pkg:npm/color-name@2.1.1"
+    },
+    {
+      "type": "library",
+      "name": "commander",
+      "version": "15.0.0",
+      "bom-ref": "pkg:npm/commander@15.0.0",
+      "purl": "pkg:npm/commander@15.0.0"
+    },
+    {
+      "type": "library",
+      "name": "debug",
+      "version": "4.4.3",
+      "bom-ref": "pkg:npm/debug@4.4.3",
+      "purl": "pkg:npm/debug@4.4.3"
+    },
+    {
+      "type": "library",
+      "name": "emoji-regex",
+      "version": "11.0.0",
+      "bom-ref": "pkg:npm/emoji-regex@11.0.0",
+      "purl": "pkg:npm/emoji-regex@11.0.0"
+    },
+    {
+      "type": "library",
+      "name": "entities",
+      "version": "8.1.0",
+      "bom-ref": "pkg:npm/entities@8.1.0",
+      "purl": "pkg:npm/entities@8.1.0"
+    },
+    {
+      "type": "library",
+      "name": "escape-string-regexp",
+      "version": "5.0.0",
+      "bom-ref": "pkg:npm/escape-string-regexp@5.0.0",
+      "purl": "pkg:npm/escape-string-regexp@5.0.0"
+    },
+    {
+      "type": "library",
+      "name": "eslint-visitor-keys",
+      "version": "5.0.1",
+      "bom-ref": "pkg:npm/eslint-visitor-keys@5.0.1",
+      "purl": "pkg:npm/eslint-visitor-keys@5.0.1"
+    },
+    {
+      "type": "library",
+      "name": "find-up",
+      "version": "8.0.0",
+      "bom-ref": "pkg:npm/find-up@8.0.0",
+      "purl": "pkg:npm/find-up@8.0.0"
+    },
+    {
+      "type": "library",
+      "name": "glob-parent",
+      "version": "6.0.2",
+      "bom-ref": "pkg:npm/glob-parent@6.0.2",
+      "purl": "pkg:npm/glob-parent@6.0.2"
+    },
+    {
+      "type": "library",
+      "name": "glob",
+      "version": "13.0.6",
+      "bom-ref": "pkg:npm/glob@13.0.6",
+      "purl": "pkg:npm/glob@13.0.6"
+    },
+    {
+      "type": "library",
+      "name": "has-flag",
+      "version": "5.0.1",
+      "bom-ref": "pkg:npm/has-flag@5.0.1",
+      "purl": "pkg:npm/has-flag@5.0.1"
+    },
+    {
+      "type": "library",
+      "name": "iconv-lite",
+      "version": "0.7.3",
+      "bom-ref": "pkg:npm/iconv-lite@0.7.3",
+      "purl": "pkg:npm/iconv-lite@0.7.3"
+    },
+    {
+      "type": "library",
+      "name": "ignore",
+      "version": "7.0.12",
+      "bom-ref": "pkg:npm/ignore@7.0.12",
+      "purl": "pkg:npm/ignore@7.0.12"
+    },
+    {
+      "type": "library",
+      "name": "isexe",
+      "version": "4.0.0",
+      "bom-ref": "pkg:npm/isexe@4.0.0",
+      "purl": "pkg:npm/isexe@4.0.0"
+    },
+    {
+      "type": "library",
+      "name": "js-yaml",
+      "version": "5.4.3",
+      "bom-ref": "pkg:npm/js-yaml@5.4.3",
+      "purl": "pkg:npm/js-yaml@5.4.3"
+    },
+    {
+      "type": "library",
+      "name": "json-schema-traverse",
+      "version": "1.0.0",
+      "bom-ref": "pkg:npm/json-schema-traverse@1.0.0",
+      "purl": "pkg:npm/json-schema-traverse@1.0.0"
+    },
+    {
+      "type": "library",
+      "name": "locate-path",
+      "version": "8.0.0",
+      "bom-ref": "pkg:npm/locate-path@8.0.0",
+      "purl": "pkg:npm/locate-path@8.0.0"
+    },
+    {
+      "type": "library",
+      "name": "lru-cache",
+      "version": "11.5.3",
+      "bom-ref": "pkg:npm/lru-cache@11.5.3",
+      "purl": "pkg:npm/lru-cache@11.5.3"
+    },
+    {
+      "type": "library",
+      "name": "minimatch",
+      "version": "10.2.6",
+      "bom-ref": "pkg:npm/minimatch@10.2.6",
+      "purl": "pkg:npm/minimatch@10.2.6"
+    },
+    {
+      "type": "library",
+      "name": "ms",
+      "version": "2.1.3",
+      "bom-ref": "pkg:npm/ms@2.1.3",
+      "purl": "pkg:npm/ms@2.1.3"
+    },
+    {
+      "type": "library",
+      "name": "p-limit",
+      "version": "7.3.3",
+      "bom-ref": "pkg:npm/p-limit@7.3.3",
+      "purl": "pkg:npm/p-limit@7.3.3"
+    },
+    {
+      "type": "library",
+      "name": "p-locate",
+      "version": "7.0.0",
+      "bom-ref": "pkg:npm/p-locate@7.0.0",
+      "purl": "pkg:npm/p-locate@7.0.0"
+    },
+    {
+      "type": "library",
+      "name": "path-key",
+      "version": "4.0.0",
+      "bom-ref": "pkg:npm/path-key@4.0.0",
+      "purl": "pkg:npm/path-key@4.0.0"
+    },
+    {
+      "type": "library",
+      "name": "picomatch",
+      "version": "4.0.7",
+      "bom-ref": "pkg:npm/picomatch@4.0.7",
+      "purl": "pkg:npm/picomatch@4.0.7"
+    },
+    {
+      "type": "library",
+      "name": "postcss",
+      "version": "8.5.30",
+      "bom-ref": "pkg:npm/postcss@8.5.30",
+      "purl": "pkg:npm/postcss@8.5.30"
+    },
+    {
+      "type": "library",
+      "name": "react-is",
+      "version": "19.3.0",
+      "bom-ref": "pkg:npm/react-is@19.3.0",
+      "purl": "pkg:npm/react-is@19.3.0"
+    },
+    {
+      "type": "library",
+      "name": "readable-stream",
+      "version": "4.8.0",
+      "bom-ref": "pkg:npm/readable-stream@4.8.0",
+      "purl": "pkg:npm/readable-stream@4.8.0"
+    },
+    {
+      "type": "library",
+      "name": "safe-buffer",
+      "version": "5.2.1",
+      "bom-ref": "pkg:npm/safe-buffer@5.2.1",
+      "purl": "pkg:npm/safe-buffer@5.2.1"
+    },
+    {
+      "type": "library",
+      "name": "semver",
+      "version": "7.8.5",
+      "bom-ref": "pkg:npm/semver@7.8.5",
+      "purl": "pkg:npm/semver@7.8.5"
+    },
+    {
+      "type": "library",
+      "name": "source-map",
+      "version": "0.8.0",
+      "bom-ref": "pkg:npm/source-map@0.8.0",
+      "purl": "pkg:npm/source-map@0.8.0"
+    },
+    {
+      "type": "library",
+      "name": "string-width",
+      "version": "8.3.0",
+      "bom-ref": "pkg:npm/string-width@8.3.0",
+      "purl": "pkg:npm/string-width@8.3.0"
+    },
+    {
+      "type": "library",
+      "name": "strip-ansi",
+      "version": "7.2.0",
+      "bom-ref": "pkg:npm/strip-ansi@7.2.0",
+      "purl": "pkg:npm/strip-ansi@7.2.0"
+    },
+    {
+      "type": "library",
+      "name": "supports-color",
+      "version": "11.0.0",
+      "bom-ref": "pkg:npm/supports-color@11.0.0",
+      "purl": "pkg:npm/supports-color@11.0.0"
+    },
+    {
+      "type": "library",
+      "name": "tslib",
+      "version": "2.8.1",
+      "bom-ref": "pkg:npm/tslib@2.8.1",
+      "purl": "pkg:npm/tslib@2.8.1"
+    },
+    {
+      "type": "library",
+      "name": "type-fest",
+      "version": "5.10.0",
+      "bom-ref": "pkg:npm/type-fest@5.10.0",
+      "purl": "pkg:npm/type-fest@5.10.0"
+    },
+    {
+      "type": "library",
+      "name": "typescript",
+      "version": "7.0.2",
+      "bom-ref": "pkg:npm/typescript@7.0.2",
+      "purl": "pkg:npm/typescript@7.0.2"
+    },
+    {
+      "type": "library",
+      "name": "undici-types",
+      "version": "8.11.2",
+      "bom-ref": "pkg:npm/undici-types@8.11.2",
+      "purl": "pkg:npm/undici-types@8.11.2"
+    },
+    {
+      "type": "library",
+      "name": "uuid",
+      "version": "14.0.3",
+      "bom-ref": "pkg:npm/uuid@14.0.3",
+      "purl": "pkg:npm/uuid@14.0.3"
+    },
+    {
+      "type": "library",
+      "name": "which",
+      "version": "7.0.0",
+      "bom-ref": "pkg:npm/which@7.0.0",
+      "purl": "pkg:npm/which@7.0.0"
+    },
+    {
+      "type": "library",
+      "name": "wrap-ansi",
+      "version": "10.0.2",
+      "bom-ref": "pkg:npm/wrap-ansi@10.0.2",
+      "purl": "pkg:npm/wrap-ansi@10.0.2"
+    },
+    {
+      "type": "library",
+      "name": "yallist",
+      "version": "5.0.0",
+      "bom-ref": "pkg:npm/yallist@5.0.0",
+      "purl": "pkg:npm/yallist@5.0.0"
+    },
+    {
+      "type": "library",
+      "name": "zod",
+      "version": "4.6.7",
+      "bom-ref": "pkg:npm/zod@4.6.7",
+      "purl": "pkg:npm/zod@4.6.7"
+    },
+    {
+      "type": "library",
+      "name": "aiobotocore",
+      "version": "3.9.2",
+      "bom-ref": "pkg:pypi/aiobotocore@3.9.2",
+      "purl": "pkg:pypi/aiobotocore@3.9.2"
+    },
+    {
+      "type": "library",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "bom-ref": "pkg:pypi/annotated-types@0.8.0",
+      "purl": "pkg:pypi/annotated-types@0.8.0"
+    },
+    {
+      "type": "library",
+      "name": "anyio",
+      "version": "4.15.1",
+      "bom-ref": "pkg:pypi/anyio@4.15.1",
+      "purl": "pkg:pypi/anyio@4.15.1"
+    },
+    {
+      "type": "library",
+      "name": "attrs",
+      "version": "26.1.0",
+      "bom-ref": "pkg:pypi/attrs@26.1.0",
+      "purl": "pkg:pypi/attrs@26.1.0"
+    },
+    {
+      "type": "library",
+      "name": "boto3",
+      "version": "1.43.112",
+      "bom-ref": "pkg:pypi/boto3@1.43.112",
+      "purl": "pkg:pypi/boto3@1.43.112"
+    },
+    {
+      "type": "library",
+      "name": "botocore",
+      "version": "1.43.112",
+      "bom-ref": "pkg:pypi/botocore@1.43.112",
+      "purl": "pkg:pypi/botocore@1.43.112"
+    },
+    {
+      "type": "library",
+      "name": "certifi",
+      "version": "2026.7.22",
+      "bom-ref": "pkg:pypi/certifi@2026.7.22",
+      "purl": "pkg:pypi/certifi@2026.7.22"
+    },
+    {
+      "type": "library",
+      "name": "cffi",
+      "version": "2.1.1",
+      "bom-ref": "pkg:pypi/cffi@2.1.1",
+      "purl": "pkg:pypi/cffi@2.1.1"
+    },
+    {
+      "type": "library",
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "bom-ref": "pkg:pypi/charset-normalizer@3.5.2",
+      "purl": "pkg:pypi/charset-normalizer@3.5.2"
+    },
+    {
+      "type": "library",
+      "name": "click",
+      "version": "8.5.0",
+      "bom-ref": "pkg:pypi/click@8.5.0",
+      "purl": "pkg:pypi/click@8.5.0"
+    },
+    {
+      "type": "library",
+      "name": "cryptography",
+      "version": "50.0.2",
+      "bom-ref": "pkg:pypi/cryptography@50.0.2",
+      "purl": "pkg:pypi/cryptography@50.0.2"
+    },
+    {
+      "type": "library",
+      "name": "filelock",
+      "version": "4.1.1",
+      "bom-ref": "pkg:pypi/filelock@4.1.1",
+      "purl": "pkg:pypi/filelock@4.1.1"
+    },
+    {
+      "type": "library",
+      "name": "fsspec",
+      "version": "2026.9.0",
+      "bom-ref": "pkg:pypi/fsspec@2026.9.0",
+      "purl": "pkg:pypi/fsspec@2026.9.0"
+    },
+    {
+      "type": "library",
+      "name": "h11",
+      "version": "0.16.0",
+      "bom-ref": "pkg:pypi/h11@0.16.0",
+      "purl": "pkg:pypi/h11@0.16.0"
+    },
+    {
+      "type": "library",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "bom-ref": "pkg:pypi/httpcore@1.0.9",
+      "purl": "pkg:pypi/httpcore@1.0.9"
+    },
+    {
+      "type": "library",
+      "name": "httpx",
+      "version": "0.28.1",
+      "bom-ref": "pkg:pypi/httpx@0.28.1",
+      "purl": "pkg:pypi/httpx@0.28.1"
+    },
+    {
+      "type": "library",
+      "name": "idna",
+      "version": "3.20",
+      "bom-ref": "pkg:pypi/idna@3.20",
+      "purl": "pkg:pypi/idna@3.20"
+    },
+    {
+      "type": "library",
+      "name": "iniconfig",
+      "version": "2.3.1",
+      "bom-ref": "pkg:pypi/iniconfig@2.3.1",
+      "purl": "pkg:pypi/iniconfig@2.3.1"
+    },
+    {
+      "type": "library",
+      "name": "jinja2",
+      "version": "3.1.6",
+      "bom-ref": "pkg:pypi/jinja2@3.1.6",
+      "purl": "pkg:pypi/jinja2@3.1.6"
+    },
+    {
+      "type": "library",
+      "name": "jmespath",
+      "version": "1.1.0",
+      "bom-ref": "pkg:pypi/jmespath@1.1.0",
+      "purl": "pkg:pypi/jmespath@1.1.0"
+    },
+    {
+      "type": "library",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "bom-ref": "pkg:pypi/jsonschema@4.26.0",
+      "purl": "pkg:pypi/jsonschema@4.26.0"
+    },
+    {
+      "type": "library",
+      "name": "markupsafe",
+      "version": "3.0.4",
+      "bom-ref": "pkg:pypi/markupsafe@3.0.4",
+      "purl": "pkg:pypi/markupsafe@3.0.4"
+    },
+    {
+      "type": "library",
+      "name": "multidict",
+      "version": "7.1.0",
+      "bom-ref": "pkg:pypi/multidict@7.1.0",
+      "purl": "pkg:pypi/multidict@7.1.0"
+    },
+    {
+      "type": "library",
+      "name": "numpy",
+      "version": "2.5.4",
+      "bom-ref": "pkg:pypi/numpy@2.5.4",
+      "purl": "pkg:pypi/numpy@2.5.4"
+    },
+    {
+      "type": "library",
+      "name": "packaging",
+      "version": "26.3",
+      "bom-ref": "pkg:pypi/packaging@26.3",
+      "purl": "pkg:pypi/packaging@26.3"
+    },
+    {
+      "type": "library",
+      "name": "pandas",
+      "version": "3.0.6",
+      "bom-ref": "pkg:pypi/pandas@3.0.6",
+      "purl": "pkg:pypi/pandas@3.0.6"
+    },
+    {
+      "type": "library",
+      "name": "pathspec",
+      "version": "1.1.1",
+      "bom-ref": "pkg:pypi/pathspec@1.1.1",
+      "purl": "pkg:pypi/pathspec@1.1.1"
+    },
+    {
+      "type": "library",
+      "name": "platformdirs",
+      "version": "4.13.0",
+      "bom-ref": "pkg:pypi/platformdirs@4.13.0",
+      "purl": "pkg:pypi/platformdirs@4.13.0"
+    },
+    {
+      "type": "library",
+      "name": "pluggy",
+      "version": "1.6.0",
+      "bom-ref": "pkg:pypi/pluggy@1.6.0",
+      "purl": "pkg:pypi/pluggy@1.6.0"
+    },
+    {
+      "type": "library",
+      "name": "protobuf",
+      "version": "7.36.2",
+      "bom-ref": "pkg:pypi/protobuf@7.36.2",
+      "purl": "pkg:pypi/protobuf@7.36.2"
+    },
+    {
+      "type": "library",
+      "name": "pycparser",
+      "version": "3.11",
+      "bom-ref": "pkg:pypi/pycparser@3.11",
+      "purl": "pkg:pypi/pycparser@3.11"
+    },
+    {
+      "type": "library",
+      "name": "pydantic-core",
+      "version": "2.50.1",
+      "bom-ref": "pkg:pypi/pydantic-core@2.50.1",
+      "purl": "pkg:pypi/pydantic-core@2.50.1"
+    },
+    {
+      "type": "library",
+      "name": "pydantic",
+      "version": "2.14.1",
+      "bom-ref": "pkg:pypi/pydantic@2.14.1",
+      "purl": "pkg:pypi/pydantic@2.14.1"
+    },
+    {
+      "type": "library",
+      "name": "pygments",
+      "version": "2.21.0",
+      "bom-ref": "pkg:pypi/pygments@2.21.0",
+      "purl": "pkg:pypi/pygments@2.21.0"
+    },
+    {
+      "type": "library",
+      "name": "pyjwt",
+      "version": "2.15.1",
+      "bom-ref": "pkg:pypi/pyjwt@2.15.1",
+      "purl": "pkg:pypi/pyjwt@2.15.1"
+    },
+    {
+      "type": "library",
+      "name": "pytest",
+      "version": "9.1.1",
+      "bom-ref": "pkg:pypi/pytest@9.1.1",
+      "purl": "pkg:pypi/pytest@9.1.1"
+    },
+    {
+      "type": "library",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "bom-ref": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0"
+    },
+    {
+      "type": "library",
+      "name": "python-dotenv",
+      "version": "1.2.4",
+      "bom-ref": "pkg:pypi/python-dotenv@1.2.4",
+      "purl": "pkg:pypi/python-dotenv@1.2.4"
+    },
+    {
+      "type": "library",
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "bom-ref": "pkg:pypi/pyyaml@6.0.3",
+      "purl": "pkg:pypi/pyyaml@6.0.3"
+    },
+    {
+      "type": "library",
+      "name": "requests",
+      "version": "2.34.2",
+      "bom-ref": "pkg:pypi/requests@2.34.2",
+      "purl": "pkg:pypi/requests@2.34.2"
+    },
+    {
+      "type": "library",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "bom-ref": "pkg:pypi/rpds-py@2026.9.1",
+      "purl": "pkg:pypi/rpds-py@2026.9.1"
+    },
+    {
+      "type": "library",
+      "name": "s3transfer",
+      "version": "0.19.2",
+      "bom-ref": "pkg:pypi/s3transfer@0.19.2",
+      "purl": "pkg:pypi/s3transfer@0.19.2"
+    },
+    {
+      "type": "library",
+      "name": "setuptools",
+      "version": "84.0.0",
+      "bom-ref": "pkg:pypi/setuptools@84.0.0",
+      "purl": "pkg:pypi/setuptools@84.0.0"
+    },
+    {
+      "type": "library",
+      "name": "six",
+      "version": "1.17.0",
+      "bom-ref": "pkg:pypi/six@1.17.0",
+      "purl": "pkg:pypi/six@1.17.0"
+    },
+    {
+      "type": "library",
+      "name": "starlette",
+      "version": "1.8.0",
+      "bom-ref": "pkg:pypi/starlette@1.8.0",
+      "purl": "pkg:pypi/starlette@1.8.0"
+    },
+    {
+      "type": "library",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "bom-ref": "pkg:pypi/typing-extensions@4.16.0",
+      "purl": "pkg:pypi/typing-extensions@4.16.0"
+    },
+    {
+      "type": "library",
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "bom-ref": "pkg:pypi/typing-inspection@0.4.4",
+      "purl": "pkg:pypi/typing-inspection@0.4.4"
+    },
+    {
+      "type": "library",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "bom-ref": "pkg:pypi/urllib3@2.8.0",
+      "purl": "pkg:pypi/urllib3@2.8.0"
+    },
+    {
+      "type": "library",
+      "name": "uvicorn",
+      "version": "0.54.0",
+      "bom-ref": "pkg:pypi/uvicorn@0.54.0",
+      "purl": "pkg:pypi/uvicorn@0.54.0"
+    },
+    {
+      "type": "library",
+      "name": "yarl",
+      "version": "1.25.1",
+      "bom-ref": "pkg:pypi/yarl@1.25.1",
+      "purl": "pkg:pypi/yarl@1.25.1"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:cargo/aho-corasick@1.1.5"
+    },
+    {
+      "ref": "pkg:cargo/autocfg@1.5.1"
+    },
+    {
+      "ref": "pkg:cargo/base64@0.23.1"
+    },
+    {
+      "ref": "pkg:cargo/bitflags@2.13.2"
+    },
+    {
+      "ref": "pkg:cargo/block-buffer@0.12.1"
+    },
+    {
+      "ref": "pkg:cargo/bytes@1.12.1"
+    },
+    {
+      "ref": "pkg:cargo/cc@1.8.0"
+    },
+    {
+      "ref": "pkg:cargo/cfg-if@1.0.5"
+    },
+    {
+      "ref": "pkg:cargo/cpufeatures@0.3.1"
+    },
+    {
+      "ref": "pkg:cargo/crypto-common@0.2.2"
+    },
+    {
+      "ref": "pkg:cargo/digest@0.11.3"
+    },
+    {
+      "ref": "pkg:cargo/getrandom@0.4.3"
+    },
+    {
+      "ref": "pkg:cargo/hashbrown@0.17.1"
+    },
+    {
+      "ref": "pkg:cargo/heck@0.5.0"
+    },
+    {
+      "ref": "pkg:cargo/indexmap@2.14.2"
+    },
+    {
+      "ref": "pkg:cargo/itertools@0.15.0"
+    },
+    {
+      "ref": "pkg:cargo/itoa@1.0.18"
+    },
+    {
+      "ref": "pkg:cargo/libc@0.2.190"
+    },
+    {
+      "ref": "pkg:cargo/linux-raw-sys@0.12.1"
+    },
+    {
+      "ref": "pkg:cargo/log@0.4.34"
+    },
+    {
+      "ref": "pkg:cargo/memchr@2.8.3"
+    },
+    {
+      "ref": "pkg:cargo/mio@1.2.4"
+    },
+    {
+      "ref": "pkg:cargo/once_cell@1.21.4"
+    },
+    {
+      "ref": "pkg:cargo/pin-project-lite@0.2.17"
+    },
+    {
+      "ref": "pkg:cargo/proc-macro2@1.0.107"
+    },
+    {
+      "ref": "pkg:cargo/quote@1.0.47"
+    },
+    {
+      "ref": "pkg:cargo/rand_chacha@0.10.0"
+    },
+    {
+      "ref": "pkg:cargo/rand_core@0.10.1"
+    },
+    {
+      "ref": "pkg:cargo/rand@0.10.3"
+    },
+    {
+      "ref": "pkg:cargo/regex-automata@0.4.18"
+    },
+    {
+      "ref": "pkg:cargo/regex-syntax@0.8.11"
+    },
+    {
+      "ref": "pkg:cargo/regex@1.13.1"
+    },
+    {
+      "ref": "pkg:cargo/rustix@1.1.5"
+    },
+    {
+      "ref": "pkg:cargo/serde_core@1.0.229"
+    },
+    {
+      "ref": "pkg:cargo/serde_derive@1.0.229"
+    },
+    {
+      "ref": "pkg:cargo/serde_json@1.0.154"
+    },
+    {
+      "ref": "pkg:cargo/serde@1.0.229"
+    },
+    {
+      "ref": "pkg:cargo/sha2@0.11.1"
+    },
+    {
+      "ref": "pkg:cargo/shlex@2.0.1"
+    },
+    {
+      "ref": "pkg:cargo/smallvec@1.16.3"
+    },
+    {
+      "ref": "pkg:cargo/socket2@0.6.5"
+    },
+    {
+      "ref": "pkg:cargo/syn@3.0.9"
+    },
+    {
+      "ref": "pkg:cargo/thiserror-impl@2.0.21"
+    },
+    {
+      "ref": "pkg:cargo/thiserror@2.0.21"
+    },
+    {
+      "ref": "pkg:cargo/toml_datetime@1.1.2+spec-1.1.0"
+    },
+    {
+      "ref": "pkg:cargo/unicode-ident@1.0.27"
+    },
+    {
+      "ref": "pkg:cargo/windows-sys@0.61.2"
+    },
+    {
+      "ref": "pkg:cargo/winnow@1.0.4"
+    },
+    {
+      "ref": "pkg:cargo/zerocopy@0.8.62"
+    },
+    {
+      "ref": "pkg:cargo/zmij@1.0.23"
+    },
+    {
+      "ref": "pkg:composer/brick/math@1.0.0"
+    },
+    {
+      "ref": "pkg:composer/doctrine/inflector@2.1.0"
+    },
+    {
+      "ref": "pkg:composer/doctrine/lexer@3.0.3"
+    },
+    {
+      "ref": "pkg:composer/egulias/email-validator@4.0.4"
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/guzzle@8.2.0"
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/promises@3.0.2"
+    },
+    {
+      "ref": "pkg:composer/guzzlehttp/psr7@3.1.0"
+    },
+    {
+      "ref": "pkg:composer/monolog/monolog@3.12.1"
+    },
+    {
+      "ref": "pkg:composer/myclabs/deep-copy@1.14.0"
+    },
+    {
+      "ref": "pkg:composer/nikic/php-parser@v5.9.0"
+    },
+    {
+      "ref": "pkg:composer/phpunit/php-code-coverage@14.4.1"
+    },
+    {
+      "ref": "pkg:composer/phpunit/php-file-iterator@7.0.2"
+    },
+    {
+      "ref": "pkg:composer/phpunit/php-text-template@6.0.1"
+    },
+    {
+      "ref": "pkg:composer/phpunit/phpunit@13.4.2"
+    },
+    {
+      "ref": "pkg:composer/psr/clock@1.0.0"
+    },
+    {
+      "ref": "pkg:composer/psr/container@1.1.2"
+    },
+    {
+      "ref": "pkg:composer/psr/event-dispatcher@1.0.0"
+    },
+    {
+      "ref": "pkg:composer/psr/http-client@1.0.3"
+    },
+    {
+      "ref": "pkg:composer/psr/http-factory@1.1.0"
+    },
+    {
+      "ref": "pkg:composer/psr/http-message@2.0"
+    },
+    {
+      "ref": "pkg:composer/psr/log@3.0.2"
+    },
+    {
+      "ref": "pkg:composer/psr/simple-cache@3.0.0"
+    },
+    {
+      "ref": "pkg:composer/ralouphie/getallheaders@3.0.3"
+    },
+    {
+      "ref": "pkg:composer/ramsey/uuid@4.9.4"
+    },
+    {
+      "ref": "pkg:composer/sebastian/diff@9.0.1"
+    },
+    {
+      "ref": "pkg:composer/sebastian/exporter@4.0.9"
+    },
+    {
+      "ref": "pkg:composer/sebastian/version@7.0.1"
+    },
+    {
+      "ref": "pkg:composer/symfony/console@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/css-selector@v8.1.6"
+    },
+    {
+      "ref": "pkg:composer/symfony/deprecation-contracts@v3.7.1"
+    },
+    {
+      "ref": "pkg:composer/symfony/error-handler@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1"
+    },
+    {
+      "ref": "pkg:composer/symfony/event-dispatcher@v8.1.5"
+    },
+    {
+      "ref": "pkg:composer/symfony/finder@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/http-foundation@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/http-kernel@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/mime@v8.1.7"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-ctype@v1.37.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-grapheme@v1.43.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-idn@v1.43.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-intl-normalizer@v1.43.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-mbstring@v1.43.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/polyfill-php80@v1.43.0"
+    },
+    {
+      "ref": "pkg:composer/symfony/process@v8.1.7"
+    },
+    {
+      "ref": "pkg:composer/symfony/routing@v8.1.8"
+    },
+    {
+      "ref": "pkg:composer/symfony/service-contracts@v3.7.3"
+    },
+    {
+      "ref": "pkg:composer/symfony/string@v8.1.7"
+    },
+    {
+      "ref": "pkg:composer/symfony/translation-contracts@v3.7.1"
+    },
+    {
+      "ref": "pkg:composer/symfony/translation@v8.1.5"
+    },
+    {
+      "ref": "pkg:composer/symfony/var-dumper@v8.1.7"
+    },
+    {
+      "ref": "pkg:gem/actionmailer@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/actionpack@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/actionview@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/activemodel@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/activerecord@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/activesupport@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/addressable@2.9.0"
+    },
+    {
+      "ref": "pkg:gem/ast@2.4.3"
+    },
+    {
+      "ref": "pkg:gem/aws-eventstream@1.4.0"
+    },
+    {
+      "ref": "pkg:gem/aws-partitions@1.1294.0"
+    },
+    {
+      "ref": "pkg:gem/aws-sdk-core@3.257.0"
+    },
+    {
+      "ref": "pkg:gem/aws-sdk-kms@1.132.0"
+    },
+    {
+      "ref": "pkg:gem/aws-sdk-s3@1.233.2"
+    },
+    {
+      "ref": "pkg:gem/aws-sigv4@1.12.1"
+    },
+    {
+      "ref": "pkg:gem/builder@3.3.0"
+    },
+    {
+      "ref": "pkg:gem/bundler@4.0.22"
+    },
+    {
+      "ref": "pkg:gem/concurrent-ruby@1.3.8"
+    },
+    {
+      "ref": "pkg:gem/diff-lcs@2.0.0"
+    },
+    {
+      "ref": "pkg:gem/faraday@2.14.4"
+    },
+    {
+      "ref": "pkg:gem/ffi@1.17.4"
+    },
+    {
+      "ref": "pkg:gem/i18n@1.15.2"
+    },
+    {
+      "ref": "pkg:gem/jmespath@1.6.2"
+    },
+    {
+      "ref": "pkg:gem/json@3.1.0"
+    },
+    {
+      "ref": "pkg:gem/jwt@3.3.0"
+    },
+    {
+      "ref": "pkg:gem/method_source@1.1.0"
+    },
+    {
+      "ref": "pkg:gem/mime-types@3.7.0"
+    },
+    {
+      "ref": "pkg:gem/mini_mime@1.1.5"
+    },
+    {
+      "ref": "pkg:gem/minitest@6.0.6"
+    },
+    {
+      "ref": "pkg:gem/multi_json@1.21.2"
+    },
+    {
+      "ref": "pkg:gem/multipart-post@2.4.1"
+    },
+    {
+      "ref": "pkg:gem/nokogiri@1.19.4"
+    },
+    {
+      "ref": "pkg:gem/parallel@2.3.0"
+    },
+    {
+      "ref": "pkg:gem/parser@3.3.12.0"
+    },
+    {
+      "ref": "pkg:gem/public_suffix@7.0.5"
+    },
+    {
+      "ref": "pkg:gem/rack-test@2.2.0"
+    },
+    {
+      "ref": "pkg:gem/rack@3.2.7"
+    },
+    {
+      "ref": "pkg:gem/rails@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/railties@8.1.4"
+    },
+    {
+      "ref": "pkg:gem/rake@13.4.2"
+    },
+    {
+      "ref": "pkg:gem/rexml@3.4.4"
+    },
+    {
+      "ref": "pkg:gem/rspec-core@3.13.6"
+    },
+    {
+      "ref": "pkg:gem/rspec-expectations@3.13.5"
+    },
+    {
+      "ref": "pkg:gem/rspec-mocks@3.13.8"
+    },
+    {
+      "ref": "pkg:gem/rspec-support@3.13.7"
+    },
+    {
+      "ref": "pkg:gem/rspec@3.13.2"
+    },
+    {
+      "ref": "pkg:gem/rubyzip@3.7.0"
+    },
+    {
+      "ref": "pkg:gem/thor@1.5.0"
+    },
+    {
+      "ref": "pkg:gem/tilt@2.9.0"
+    },
+    {
+      "ref": "pkg:gem/tzinfo@2.0.6"
+    },
+    {
+      "ref": "pkg:gem/unicode-display_width@3.3.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/beorn7/perks@v1.0.1"
+    },
+    {
+      "ref": "pkg:golang/github.com/cespare/xxhash/v2@v2.3.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/davecgh/go-spew@v1.1.1"
+    },
+    {
+      "ref": "pkg:golang/github.com/fatih/color@v1.19.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/fsnotify/fsnotify@v1.10.1"
+    },
+    {
+      "ref": "pkg:golang/github.com/go-logr/logr@v1.4.4"
+    },
+    {
+      "ref": "pkg:golang/github.com/gogo/protobuf@v1.3.2"
+    },
+    {
+      "ref": "pkg:golang/github.com/golang/groupcache@v0.0.0-20241129210726-2c02b8208cf8"
+    },
+    {
+      "ref": "pkg:golang/github.com/golang/protobuf@v1.5.4"
+    },
+    {
+      "ref": "pkg:golang/github.com/golang/snappy@v1.0.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/google/go-cmp@v0.7.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/google/uuid@v1.6.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/gorilla/websocket@v1.5.3"
+    },
+    {
+      "ref": "pkg:golang/github.com/json-iterator/go@v1.1.12"
+    },
+    {
+      "ref": "pkg:golang/github.com/klauspost/compress@v1.20.3"
+    },
+    {
+      "ref": "pkg:golang/github.com/mattn/go-colorable@v0.1.16"
+    },
+    {
+      "ref": "pkg:golang/github.com/mattn/go-isatty@v0.0.24"
+    },
+    {
+      "ref": "pkg:golang/github.com/mitchellh/mapstructure@v1.5.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/modern-go/concurrent@v0.0.0-20180306012644-bacd9c7ef1dd"
+    },
+    {
+      "ref": "pkg:golang/github.com/modern-go/reflect2@v1.0.2"
+    },
+    {
+      "ref": "pkg:golang/github.com/onsi/gomega@v1.44.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/pkg/errors@v0.9.1"
+    },
+    {
+      "ref": "pkg:golang/github.com/pmezard/go-difflib@v1.0.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/prometheus/client_golang@v1.25.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/prometheus/common@v0.72.1"
+    },
+    {
+      "ref": "pkg:golang/github.com/prometheus/procfs@v0.22.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/sirupsen/logrus@v1.10.2"
+    },
+    {
+      "ref": "pkg:golang/github.com/spf13/cast@v1.10.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/spf13/cobra@v1.10.2"
+    },
+    {
+      "ref": "pkg:golang/github.com/spf13/pflag@v1.0.10"
+    },
+    {
+      "ref": "pkg:golang/github.com/spf13/viper@v1.21.0"
+    },
+    {
+      "ref": "pkg:golang/github.com/stretchr/testify@v1.12.1"
+    },
+    {
+      "ref": "pkg:golang/go.uber.org/atomic@v1.12.0"
+    },
+    {
+      "ref": "pkg:golang/go.uber.org/zap@v1.28.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/crypto@v0.58.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/net@v0.61.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/oauth2@v0.37.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/sync@v0.24.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/sys@v0.49.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/text@v0.43.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/time@v0.16.0"
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/tools@v0.52.0"
+    },
+    {
+      "ref": "pkg:golang/google.golang.org/appengine@v1.6.8"
+    },
+    {
+      "ref": "pkg:golang/google.golang.org/genproto@v0.0.0-20261012220534-4341edf3f941"
+    },
+    {
+      "ref": "pkg:golang/google.golang.org/grpc@v1.84.0"
+    },
+    {
+      "ref": "pkg:golang/google.golang.org/protobuf@v1.36.12"
+    },
+    {
+      "ref": "pkg:golang/gopkg.in/check.v1@v1.0.0-20201130134442-10cb98267c6c"
+    },
+    {
+      "ref": "pkg:golang/gopkg.in/ini.v1@v1.67.3"
+    },
+    {
+      "ref": "pkg:golang/gopkg.in/yaml.v2@v2.4.0"
+    },
+    {
+      "ref": "pkg:golang/gopkg.in/yaml.v3@v3.0.1"
+    },
+    {
+      "ref": "pkg:maven/ch.qos.logback/logback-classic@1.6.5"
+    },
+    {
+      "ref": "pkg:maven/com.fasterxml.jackson.core/jackson-annotations@2.22"
+    },
+    {
+      "ref": "pkg:maven/com.fasterxml.jackson.core/jackson-core@2.22.3"
+    },
+    {
+      "ref": "pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.22.3"
+    },
+    {
+      "ref": "pkg:maven/com.google.code.findbugs/jsr305@3.0.2"
+    },
+    {
+      "ref": "pkg:maven/com.google.code.gson/gson@2.14.0"
+    },
+    {
+      "ref": "pkg:maven/com.google.guava/guava@33.7.2-jre"
+    },
+    {
+      "ref": "pkg:maven/com.h2database/h2@2.5.252"
+    },
+    {
+      "ref": "pkg:maven/commons-codec/commons-codec@1.23.0"
+    },
+    {
+      "ref": "pkg:maven/commons-io/commons-io@2.22.0"
+    },
+    {
+      "ref": "pkg:maven/commons-lang/commons-lang@2.6"
+    },
+    {
+      "ref": "pkg:maven/commons-logging/commons-logging@1.4.0"
+    },
+    {
+      "ref": "pkg:maven/javax.servlet/javax.servlet-api@4.0.1"
+    },
+    {
+      "ref": "pkg:maven/javax.servlet/servlet-api@2.5"
+    },
+    {
+      "ref": "pkg:maven/joda-time/joda-time@2.15.0"
+    },
+    {
+      "ref": "pkg:maven/junit/junit@4.13.2"
+    },
+    {
+      "ref": "pkg:maven/log4j/log4j@1.2.17"
+    },
+    {
+      "ref": "pkg:maven/org.apache.commons/commons-lang3@3.21.0"
+    },
+    {
+      "ref": "pkg:maven/org.apache.httpcomponents/httpclient@4.5.14"
+    },
+    {
+      "ref": "pkg:maven/org.apache.logging.log4j/log4j-api@2.26.1"
+    },
+    {
+      "ref": "pkg:maven/org.apache.logging.log4j/log4j-core@2.26.1"
+    },
+    {
+      "ref": "pkg:maven/org.apache.maven/maven-plugin-api@3.10.0"
+    },
+    {
+      "ref": "pkg:maven/org.assertj/assertj-core@3.27.7"
+    },
+    {
+      "ref": "pkg:maven/org.hamcrest/hamcrest-all@1.3"
+    },
+    {
+      "ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-common@2.4.21"
+    },
+    {
+      "ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib-jdk8@2.4.21"
+    },
+    {
+      "ref": "pkg:maven/org.jetbrains.kotlin/kotlin-stdlib@2.4.21"
+    },
+    {
+      "ref": "pkg:maven/org.junit.jupiter/junit-jupiter-api@6.1.3"
+    },
+    {
+      "ref": "pkg:maven/org.junit.jupiter/junit-jupiter-engine@6.1.3"
+    },
+    {
+      "ref": "pkg:maven/org.mockito/mockito-all@1.10.19"
+    },
+    {
+      "ref": "pkg:maven/org.mockito/mockito-core@5.24.0"
+    },
+    {
+      "ref": "pkg:maven/org.projectlombok/lombok@1.18.48"
+    },
+    {
+      "ref": "pkg:maven/org.scala-lang/scala-compiler@2.13.18"
+    },
+    {
+      "ref": "pkg:maven/org.scala-lang/scala-library@3.10.0"
+    },
+    {
+      "ref": "pkg:maven/org.scala-lang/scala-reflect@2.13.18"
+    },
+    {
+      "ref": "pkg:maven/org.scalatest/scalatest_2.11@3.3.0-SNAP4"
+    },
+    {
+      "ref": "pkg:maven/org.scalatest/scalatest_2.12@3.3.0-SNAP4"
+    },
+    {
+      "ref": "pkg:maven/org.slf4j/jcl-over-slf4j@2.0.20"
+    },
+    {
+      "ref": "pkg:maven/org.slf4j/slf4j-api@2.0.20"
+    },
+    {
+      "ref": "pkg:maven/org.slf4j/slf4j-log4j12@2.0.20"
+    },
+    {
+      "ref": "pkg:maven/org.slf4j/slf4j-simple@2.0.20"
+    },
+    {
+      "ref": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@4.1.1"
+    },
+    {
+      "ref": "pkg:maven/org.springframework.boot/spring-boot-configuration-processor@4.1.1"
+    },
+    {
+      "ref": "pkg:maven/org.springframework.boot/spring-boot-starter-test@4.1.1"
+    },
+    {
+      "ref": "pkg:maven/org.springframework.boot/spring-boot-starter-web@4.1.1"
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-context@7.0.9"
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-core@7.0.9"
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-test@7.0.9"
+    },
+    {
+      "ref": "pkg:maven/org.springframework/spring-web@7.0.9"
+    },
+    {
+      "ref": "pkg:maven/org.testng/testng@7.12.0"
+    },
+    {
+      "ref": "pkg:npm/%40types/node@26.6.5"
+    },
+    {
+      "ref": "pkg:npm/ajv@8.20.0"
+    },
+    {
+      "ref": "pkg:npm/ansi-regex@6.4.0"
+    },
+    {
+      "ref": "pkg:npm/ansi-styles@7.0.0"
+    },
+    {
+      "ref": "pkg:npm/balanced-match@4.0.4"
+    },
+    {
+      "ref": "pkg:npm/brace-expansion@5.0.12"
+    },
+    {
+      "ref": "pkg:npm/chalk@6.0.1"
+    },
+    {
+      "ref": "pkg:npm/color-convert@3.1.3"
+    },
+    {
+      "ref": "pkg:npm/color-name@2.1.1"
+    },
+    {
+      "ref": "pkg:npm/commander@15.0.0"
+    },
+    {
+      "ref": "pkg:npm/debug@4.4.3"
+    },
+    {
+      "ref": "pkg:npm/emoji-regex@11.0.0"
+    },
+    {
+      "ref": "pkg:npm/entities@8.1.0"
+    },
+    {
+      "ref": "pkg:npm/escape-string-regexp@5.0.0"
+    },
+    {
+      "ref": "pkg:npm/eslint-visitor-keys@5.0.1"
+    },
+    {
+      "ref": "pkg:npm/find-up@8.0.0"
+    },
+    {
+      "ref": "pkg:npm/glob-parent@6.0.2"
+    },
+    {
+      "ref": "pkg:npm/glob@13.0.6"
+    },
+    {
+      "ref": "pkg:npm/has-flag@5.0.1"
+    },
+    {
+      "ref": "pkg:npm/iconv-lite@0.7.3"
+    },
+    {
+      "ref": "pkg:npm/ignore@7.0.12"
+    },
+    {
+      "ref": "pkg:npm/isexe@4.0.0"
+    },
+    {
+      "ref": "pkg:npm/js-yaml@5.4.3"
+    },
+    {
+      "ref": "pkg:npm/json-schema-traverse@1.0.0"
+    },
+    {
+      "ref": "pkg:npm/locate-path@8.0.0"
+    },
+    {
+      "ref": "pkg:npm/lru-cache@11.5.3"
+    },
+    {
+      "ref": "pkg:npm/minimatch@10.2.6"
+    },
+    {
+      "ref": "pkg:npm/ms@2.1.3"
+    },
+    {
+      "ref": "pkg:npm/p-limit@7.3.3"
+    },
+    {
+      "ref": "pkg:npm/p-locate@7.0.0"
+    },
+    {
+      "ref": "pkg:npm/path-key@4.0.0"
+    },
+    {
+      "ref": "pkg:npm/picomatch@4.0.7"
+    },
+    {
+      "ref": "pkg:npm/postcss@8.5.30"
+    },
+    {
+      "ref": "pkg:npm/react-is@19.3.0"
+    },
+    {
+      "ref": "pkg:npm/readable-stream@4.8.0"
+    },
+    {
+      "ref": "pkg:npm/safe-buffer@5.2.1"
+    },
+    {
+      "ref": "pkg:npm/semver@7.8.5"
+    },
+    {
+      "ref": "pkg:npm/source-map@0.8.0"
+    },
+    {
+      "ref": "pkg:npm/string-width@8.3.0"
+    },
+    {
+      "ref": "pkg:npm/strip-ansi@7.2.0"
+    },
+    {
+      "ref": "pkg:npm/supports-color@11.0.0"
+    },
+    {
+      "ref": "pkg:npm/tslib@2.8.1"
+    },
+    {
+      "ref": "pkg:npm/type-fest@5.10.0"
+    },
+    {
+      "ref": "pkg:npm/typescript@7.0.2"
+    },
+    {
+      "ref": "pkg:npm/undici-types@8.11.2"
+    },
+    {
+      "ref": "pkg:npm/uuid@14.0.3"
+    },
+    {
+      "ref": "pkg:npm/which@7.0.0"
+    },
+    {
+      "ref": "pkg:npm/wrap-ansi@10.0.2"
+    },
+    {
+      "ref": "pkg:npm/yallist@5.0.0"
+    },
+    {
+      "ref": "pkg:npm/zod@4.6.7"
+    },
+    {
+      "ref": "pkg:pypi/aiobotocore@3.9.2"
+    },
+    {
+      "ref": "pkg:pypi/annotated-types@0.8.0"
+    },
+    {
+      "ref": "pkg:pypi/anyio@4.15.1"
+    },
+    {
+      "ref": "pkg:pypi/attrs@26.1.0"
+    },
+    {
+      "ref": "pkg:pypi/boto3@1.43.112"
+    },
+    {
+      "ref": "pkg:pypi/botocore@1.43.112"
+    },
+    {
+      "ref": "pkg:pypi/certifi@2026.7.22"
+    },
+    {
+      "ref": "pkg:pypi/cffi@2.1.1"
+    },
+    {
+      "ref": "pkg:pypi/charset-normalizer@3.5.2"
+    },
+    {
+      "ref": "pkg:pypi/click@8.5.0"
+    },
+    {
+      "ref": "pkg:pypi/cryptography@50.0.2"
+    },
+    {
+      "ref": "pkg:pypi/filelock@4.1.1"
+    },
+    {
+      "ref": "pkg:pypi/fsspec@2026.9.0"
+    },
+    {
+      "ref": "pkg:pypi/h11@0.16.0"
+    },
+    {
+      "ref": "pkg:pypi/httpcore@1.0.9"
+    },
+    {
+      "ref": "pkg:pypi/httpx@0.28.1"
+    },
+    {
+      "ref": "pkg:pypi/idna@3.20"
+    },
+    {
+      "ref": "pkg:pypi/iniconfig@2.3.1"
+    },
+    {
+      "ref": "pkg:pypi/jinja2@3.1.6"
+    },
+    {
+      "ref": "pkg:pypi/jmespath@1.1.0"
+    },
+    {
+      "ref": "pkg:pypi/jsonschema@4.26.0"
+    },
+    {
+      "ref": "pkg:pypi/markupsafe@3.0.4"
+    },
+    {
+      "ref": "pkg:pypi/multidict@7.1.0"
+    },
+    {
+      "ref": "pkg:pypi/numpy@2.5.4"
+    },
+    {
+      "ref": "pkg:pypi/packaging@26.3"
+    },
+    {
+      "ref": "pkg:pypi/pandas@3.0.6"
+    },
+    {
+      "ref": "pkg:pypi/pathspec@1.1.1"
+    },
+    {
+      "ref": "pkg:pypi/platformdirs@4.13.0"
+    },
+    {
+      "ref": "pkg:pypi/pluggy@1.6.0"
+    },
+    {
+      "ref": "pkg:pypi/protobuf@7.36.2"
+    },
+    {
+      "ref": "pkg:pypi/pycparser@3.11"
+    },
+    {
+      "ref": "pkg:pypi/pydantic-core@2.50.1"
+    },
+    {
+      "ref": "pkg:pypi/pydantic@2.14.1"
+    },
+    {
+      "ref": "pkg:pypi/pygments@2.21.0"
+    },
+    {
+      "ref": "pkg:pypi/pyjwt@2.15.1"
+    },
+    {
+      "ref": "pkg:pypi/pytest@9.1.1"
+    },
+    {
+      "ref": "pkg:pypi/python-dateutil@2.9.0.post0"
+    },
+    {
+      "ref": "pkg:pypi/python-dotenv@1.2.4"
+    },
+    {
+      "ref": "pkg:pypi/pyyaml@6.0.3"
+    },
+    {
+      "ref": "pkg:pypi/requests@2.34.2"
+    },
+    {
+      "ref": "pkg:pypi/rpds-py@2026.9.1"
+    },
+    {
+      "ref": "pkg:pypi/s3transfer@0.19.2"
+    },
+    {
+      "ref": "pkg:pypi/setuptools@84.0.0"
+    },
+    {
+      "ref": "pkg:pypi/six@1.17.0"
+    },
+    {
+      "ref": "pkg:pypi/starlette@1.8.0"
+    },
+    {
+      "ref": "pkg:pypi/typing-extensions@4.16.0"
+    },
+    {
+      "ref": "pkg:pypi/typing-inspection@0.4.4"
+    },
+    {
+      "ref": "pkg:pypi/urllib3@2.8.0"
+    },
+    {
+      "ref": "pkg:pypi/uvicorn@0.54.0"
+    },
+    {
+      "ref": "pkg:pypi/yarl@1.25.1"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "bom-ref": "GHSA-2qrg-x229-3v8q",
+      "id": "GHSA-2qrg-x229-3v8q",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-2qrg-x229-3v8q"
+      },
+      "references": [
+        {
+          "id": "CVE-2019-17571",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2019-17571"
+          }
+        }
+      ],
+      "description": "Deserialization of Untrusted Data in Log4j",
+      "published": "2020-01-06T18:43:49.000Z",
+      "updated": "2026-06-09T10:30:14.311Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-65fg-84f6-3jq3",
+      "id": "GHSA-65fg-84f6-3jq3",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-65fg-84f6-3jq3"
+      },
+      "references": [
+        {
+          "id": "CVE-2022-23305",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2022-23305"
+          }
+        }
+      ],
+      "description": "SQL Injection in Log4j 1.2.x",
+      "published": "2022-01-21T23:26:47.000Z",
+      "updated": "2026-06-08T23:39:52.000Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-f7vh-qwp3-x37m",
+      "id": "GHSA-f7vh-qwp3-x37m",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-f7vh-qwp3-x37m"
+      },
+      "references": [
+        {
+          "id": "CVE-2022-23307",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2022-23307"
+          }
+        }
+      ],
+      "description": "Deserialization of Untrusted Data in Apache Log4j",
+      "published": "2022-01-19T00:01:15.000Z",
+      "updated": "2023-11-08T04:08:17.752Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-fp5r-v3w9-4333",
+      "id": "GHSA-fp5r-v3w9-4333",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-fp5r-v3w9-4333"
+      },
+      "references": [
+        {
+          "id": "CVE-2021-4104",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2021-4104"
+          }
+        }
+      ],
+      "description": "JMSAppender in Log4j 1.2 is vulnerable to deserialization of untrusted data",
+      "published": "2021-12-14T19:49:31.000Z",
+      "updated": "2023-11-08T04:06:50.238Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-j288-q9x7-2f5v",
+      "id": "GHSA-j288-q9x7-2f5v",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-j288-q9x7-2f5v"
+      },
+      "references": [
+        {
+          "id": "CVE-2025-48924",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2025-48924"
+          }
+        }
+      ],
+      "description": "Apache Commons Lang is vulnerable to Uncontrolled Recursion when processing long inputs",
+      "published": "2025-07-11T15:31:37.000Z",
+      "updated": "2026-09-10T03:50:26.176Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/commons-lang/commons-lang@2.6"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-vp98-w2p3-mv35",
+      "id": "GHSA-vp98-w2p3-mv35",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-vp98-w2p3-mv35"
+      },
+      "references": [
+        {
+          "id": "CVE-2023-26464",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2023-26464"
+          }
+        }
+      ],
+      "description": "Apache Log4j 1.x (EOL) allows Denial of Service (DoS)",
+      "published": "2023-03-10T15:30:43.000Z",
+      "updated": "2025-09-02T22:25:25.000Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GHSA-w9p3-5cr8-m3jj",
+      "id": "GHSA-w9p3-5cr8-m3jj",
+      "source": {
+        "name": "GHSA",
+        "url": "https://osv.dev/vulnerability/GHSA-w9p3-5cr8-m3jj"
+      },
+      "references": [
+        {
+          "id": "CVE-2022-23302",
+          "source": {
+            "name": "CVE",
+            "url": "https://osv.dev/vulnerability/CVE-2022-23302"
+          }
+        }
+      ],
+      "description": "Deserialization of Untrusted Data in Log4j 1.x",
+      "published": "2022-01-21T23:27:14.000Z",
+      "updated": "2025-07-09T14:59:08.000Z",
+      "affects": [
+        {
+          "ref": "pkg:maven/log4j/log4j@1.2.17"
+        }
+      ]
+    },
+    {
+      "bom-ref": "GO-2026-5932",
+      "id": "GO-2026-5932",
+      "source": {
+        "name": "GO",
+        "url": "https://osv.dev/vulnerability/GO-2026-5932"
+      },
+      "description": "The golang.org/x/crypto/openpgp package is unmaintained, unsafe by design, and has known security issues",
+      "published": "2026-07-07T22:15:29.000Z",
+      "updated": "2026-07-10T05:44:31.101Z",
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.58.0"
+        }
+      ]
+    }
+  ]
+}
