@@ -1369,11 +1369,158 @@
     "sha256": "98ab865f16b3ec782088ecba9dbe982eb2a573fda4a5154afabe1ded39733da7",
     "archive": "sources/archive/cyclonedx.org_capabilities_vdr.md"
   },
+  "pep691": {
+    "fetched": "https://peps.python.org/pep-0691/",
+    "finalUrl": "https://peps.python.org/pep-0691/",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T11:06:53.017Z",
+    "title": "PEP 691 – JSON-based Simple API for Python Package Indexes | peps.python.org",
+    "sha256": "1804e025f5870f2fdf81ec70820d4facdc58d07e286d78d72f2b6b342856a23c",
+    "archive": "sources/archive/peps.python.org_pep-0691.md"
+  },
+  "schorlemmerSigning2024": {
+    "fetched": "https://arxiv.org/html/2401.14635v2",
+    "finalUrl": "https://arxiv.org/html/2401.14635v2",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T11:06:53.018Z",
+    "title": "Signing in Four Public Software Package Registries: Quantity, Quality, and Influencing Factors",
+    "sha256": "f277255c415a4f3eaf1f81883dc4eec57afee1c943d319c4ed5e5a648cd1c382",
+    "archive": "sources/archive/arxiv.org_html_2401.14635v2.md"
+  },
+  "depsDevBigQuery": {
+    "fetched": "https://docs.deps.dev/bigquery/v1/",
+    "finalUrl": "https://docs.deps.dev/bigquery/v1/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-21T08:30:43.980Z",
+    "title": "BigQuery dataset | Open Source Insights",
+    "sha256": "672468944d6dd8d34922f5c69604bfea9e5d1367ecb71d87da29d805294364a0",
+    "archive": "sources/archive/docs.deps.dev_bigquery_v1.md"
+  },
+  "depsDevApi": {
+    "fetched": "https://docs.deps.dev/api/v3/",
+    "finalUrl": "https://docs.deps.dev/api/v3/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-21T08:30:44.984Z",
+    "title": "API | Open Source Insights",
+    "sha256": "010ef93f40c66f0be9c6976d7b27d7fde11034ceaea6c1f5918af2e196642079",
+    "archive": "sources/archive/docs.deps.dev_api_v3.md"
+  },
+  "bigquerySandbox": {
+    "fetched": "https://cloud.google.com/bigquery/docs/sandbox",
+    "finalUrl": "https://docs.cloud.google.com/bigquery/docs/sandbox",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "Try BigQuery using the sandbox",
+    "sha256": "7df078fd8020ebf5685dc2fc120450c4c302e49ec1cf61a708c376ceca6b0897",
+    "archive": "sources/archive/cloud.google.com_bigquery_docs_sandbox.md"
+  },
+  "ecosystemsOpenData": {
+    "fetched": "https://blog.ecosyste.ms/2023/08/24/open-data-releases.html",
+    "finalUrl": "https://blog.ecosyste.ms/2023/08/24/open-data-releases.html",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "Open Data Releases",
+    "sha256": "ddd960f35c624bdd1ff77e8c77fe49fbe3e11d02e01950ca519f007ca806fc2c",
+    "archive": "sources/archive/blog.ecosyste.ms_2023_08_24_open-data-releases.md"
+  },
+  "mavenConsumptionLimits": {
+    "fetched": "https://central.sonatype.org/faq/429-error/",
+    "finalUrl": "https://central.sonatype.org/faq/429-error/",
+    "status": 200,
+    "contentType": "text/html",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "429 Too Many Requests and Maven Central consumption limits",
+    "sha256": "07bb233fae729603ea5277ad010b099ea4da191fc9bd9a1abedffdddce968561",
+    "archive": "sources/archive/central.sonatype.org_faq_429-error.md"
+  },
+  "npmReplicationChanges": {
+    "fetched": "https://github.blog/changelog/2025-02-26-changes-and-deprecation-notice-for-npm-replication-apis/",
+    "finalUrl": "https://github.blog/changelog/2025-02-26-changes-and-deprecation-notice-for-npm-replication-apis/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "Changes and deprecation notice for npm replication APIs",
+    "sha256": "b5c869e794c4a6ecbc3b03e5fca8fd8c83813aed65bc20d8aba2edbe8d6f77fa",
+    "archive": "sources/archive/github.blog_changelog_2025-02-26-changes-and-deprecation-notice-for-npm-replication-apis.md"
+  },
+  "cratesDumpColumns": {
+    "fetched": "https://raw.githubusercontent.com/rust-lang/crates.io/main/crates/crates_io_database_dump/src/dump-db.toml",
+    "finalUrl": "https://raw.githubusercontent.com/rust-lang/crates.io/main/crates/crates_io_database_dump/src/dump-db.toml",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "dump-db.toml",
+    "sha256": "c307a3f0fecb0cf02b0e5944e8e722293ec9cbc146d74b9c786563bc505e7f5d",
+    "archive": "sources/archive/raw.githubusercontent.com_rust-lang_crates.io_main_crates_crates_io_database_dump_src_dump-db.toml"
+  },
+  "goModuleIndex": {
+    "fetched": "https://index.golang.org/",
+    "finalUrl": "https://index.golang.org/",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "Go modules services",
+    "sha256": "b120e51510a24ee1dee038f1f2af56cc6921420f9221ebdb6be534b70eaa37ad",
+    "archive": "sources/archive/index.golang.org.md"
+  },
+  "rubygemsDataDumps": {
+    "fetched": "https://rubygems.org/pages/data",
+    "finalUrl": "https://rubygems.org/pages/data",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "RubyGems.org Data Dumps | RubyGems.org",
+    "sha256": "5006958daff92c5d2e266e32c84b7975056ed22b29454f33b5c6519f00f133a7",
+    "archive": "sources/archive/rubygems.org_pages_data.md"
+  },
+  "packagistApi": {
+    "fetched": "https://packagist.org/apidoc",
+    "finalUrl": "https://packagist.org/apidoc",
+    "status": 200,
+    "contentType": "text/html; charset=UTF-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "Packagist The PHP Package Repository",
+    "sha256": "678e0e12b8080cc6884c4dedce04e727a12578c0066f73c22bbabd3d1452d348",
+    "archive": "sources/archive/packagist.org_apidoc.md"
+  },
+  "githubReleases": {
+    "fetched": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases",
+    "finalUrl": "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:43.981Z",
+    "title": "About releases - GitHub Docs",
+    "sha256": "bff9bfa3a6a0806d79830f01537789b989031d56d455b30cb3bd7c2404ddb857",
+    "archive": "sources/archive/docs.github.com_en_repositories_releasing-projects-on-github_about-releases.md"
+  },
+  "githubLargeFiles": {
+    "fetched": "https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github",
+    "finalUrl": "https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "accessedAt": "2026-10-21T08:30:44.986Z",
+    "title": "About large files on GitHub - GitHub Docs",
+    "sha256": "415040640800bed7e7d460bbe716dfdd51cc2435e8e86f4bf44f56933f852a1b",
+    "archive": "sources/archive/docs.github.com_en_repositories_working-with-files_managing-large-files_about-large-files-on-github.md"
+  },
   "probePqTls": {
     "fetched": "bun run scripts/probe-pq-tls.ts",
     "accessedAt": "2026-10-14T07:20:31.432Z",
     "title": "scripts/probe-pq-tls.ts",
     "sha256": "e8997dbfc5617f987c7f68bde40ae1718163181c969596f0359a97bfb4a3ad17",
     "archive": "sources/archive/probePqTls.txt"
+  },
+  "depsDevAgreement": {
+    "fetched": "bun run scripts/check-depsdev.ts",
+    "accessedAt": "2026-10-21T11:11:50.755Z",
+    "title": "scripts/check-depsdev.ts",
+    "sha256": "f20f48a0a11c77e60116a5fde3dbd9b0c4fdc8a52270a8fd036b70f47926fab8",
+    "archive": "sources/archive/depsDevAgreement.txt"
   }
 }

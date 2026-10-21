@@ -1,0 +1,1023 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "54e3dab5-6da7-41a3-9c3d-379abb13b433",
+  "prevId": "130e1ef8-eca1-4300-a676-e7208f10db23",
+  "tables": {
+    "advisories": {
+      "name": "advisories",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "advisory_id": {
+          "name": "advisory_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "aliases": {
+          "name": "aliases",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        },
+        "published": {
+          "name": "published",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "modified": {
+          "name": "modified",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "withdrawn": {
+          "name": "withdrawn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "malicious": {
+          "name": "malicious",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "response": {
+          "name": "response",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "advisories_snapshot_id_advisory_id_pk": {
+          "columns": [
+            "snapshot_id",
+            "advisory_id"
+          ],
+          "name": "advisories_snapshot_id_advisory_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "advisory_matches": {
+      "name": "advisory_matches",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "advisory_id": {
+          "name": "advisory_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "released_at": {
+          "name": "released_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "responses": {
+          "name": "responses",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        }
+      },
+      "indexes": {
+        "idx_adv_match_advisory": {
+          "name": "idx_adv_match_advisory",
+          "columns": [
+            "snapshot_id",
+            "advisory_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "advisory_matches_package_fk": {
+          "name": "advisory_matches_package_fk",
+          "tableFrom": "advisory_matches",
+          "tableTo": "packages",
+          "columnsFrom": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "advisory_matches_advisory_fk": {
+          "name": "advisory_matches_advisory_fk",
+          "tableFrom": "advisory_matches",
+          "tableTo": "advisories",
+          "columnsFrom": [
+            "snapshot_id",
+            "advisory_id"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "advisory_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "advisory_matches_snapshot_id_ecosystem_package_name_version_advisory_id_pk": {
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "version",
+            "advisory_id"
+          ],
+          "name": "advisory_matches_snapshot_id_ecosystem_package_name_version_advisory_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "advisory_matches_ecosystem": {
+          "name": "advisory_matches_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        }
+      }
+    },
+    "ecosystem_facts": {
+      "name": "ecosystem_facts",
+      "columns": {
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "registry_url": {
+          "name": "registry_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mandates_2fa": {
+          "name": "mandates_2fa",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "mfa_policy_note": {
+          "name": "mfa_policy_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trusted_publishing_ga_date": {
+          "name": "trusted_publishing_ga_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trusted_publishing_mechanism": {
+          "name": "trusted_publishing_mechanism",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sources": {
+          "name": "sources",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ecosystem_facts_ecosystem": {
+          "name": "ecosystem_facts_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        }
+      }
+    },
+    "package_versions": {
+      "name": "package_versions",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_latest": {
+          "name": "is_latest",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "quarter_anchor": {
+          "name": "quarter_anchor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "purl": {
+          "name": "purl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_ver_latest": {
+          "name": "idx_ver_latest",
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "is_latest"
+          ],
+          "isUnique": false
+        },
+        "idx_ver_anchor": {
+          "name": "idx_ver_anchor",
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "quarter_anchor"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "package_versions_package_fk": {
+          "name": "package_versions_package_fk",
+          "tableFrom": "package_versions",
+          "tableTo": "packages",
+          "columnsFrom": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "package_versions_snapshot_id_ecosystem_package_name_version_pk": {
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "version"
+          ],
+          "name": "package_versions_snapshot_id_ecosystem_package_name_version_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "package_versions_ecosystem": {
+          "name": "package_versions_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        }
+      }
+    },
+    "package_withdrawals": {
+      "name": "package_withdrawals",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "versions_in_window": {
+          "name": "versions_in_window",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "withdrawn_count": {
+          "name": "withdrawn_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "withdrawn_versions": {
+          "name": "withdrawn_versions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "package_withdrawals_package_fk": {
+          "name": "package_withdrawals_package_fk",
+          "tableFrom": "package_withdrawals",
+          "tableTo": "packages",
+          "columnsFrom": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "package_withdrawals_snapshot_id_ecosystem_package_name_kind_pk": {
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "kind"
+          ],
+          "name": "package_withdrawals_snapshot_id_ecosystem_package_name_kind_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "package_withdrawals_ecosystem": {
+          "name": "package_withdrawals_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        },
+        "package_withdrawals_kind": {
+          "name": "package_withdrawals_kind",
+          "value": "kind IN ('yanked', 'unpublished', 'deprecated', 'retracted')"
+        },
+        "package_withdrawals_counts": {
+          "name": "package_withdrawals_counts",
+          "value": "withdrawn_count >= 0 AND (versions_in_window IS NULL OR versions_in_window >= withdrawn_count)"
+        }
+      }
+    },
+    "packages": {
+      "name": "packages",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "latest_version": {
+          "name": "latest_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "latest_publish_date": {
+          "name": "latest_publish_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "maintainer_count": {
+          "name": "maintainer_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "maintainer_count_source": {
+          "name": "maintainer_count_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "repository_url": {
+          "name": "repository_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fetch_timestamp": {
+          "name": "fetch_timestamp",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fetch_error": {
+          "name": "fetch_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "extract_error": {
+          "name": "extract_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "osv_queried_at": {
+          "name": "osv_queried_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_pkg_eco": {
+          "name": "idx_pkg_eco",
+          "columns": [
+            "snapshot_id",
+            "ecosystem"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "packages_snapshot_id_snapshots_snapshot_id_fk": {
+          "name": "packages_snapshot_id_snapshots_snapshot_id_fk",
+          "tableFrom": "packages",
+          "tableTo": "snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "snapshot_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "packages_snapshot_id_ecosystem_package_name_pk": {
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "name": "packages_snapshot_id_ecosystem_package_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "packages_ecosystem": {
+          "name": "packages_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        },
+        "packages_maintainer_count_non_negative": {
+          "name": "packages_maintainer_count_non_negative",
+          "value": "maintainer_count IS NULL OR maintainer_count >= 0"
+        }
+      }
+    },
+    "sample_members": {
+      "name": "sample_members",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "layer": {
+          "name": "layer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rank_frame": {
+          "name": "rank_frame",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "download_count": {
+          "name": "download_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dependent_count": {
+          "name": "dependent_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "idx_member_layer": {
+          "name": "idx_member_layer",
+          "columns": [
+            "snapshot_id",
+            "layer",
+            "ecosystem"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "sample_members_package_fk": {
+          "name": "sample_members_package_fk",
+          "tableFrom": "sample_members",
+          "tableTo": "packages",
+          "columnsFrom": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "sample_members_snapshot_id_layer_ecosystem_package_name_pk": {
+          "columns": [
+            "snapshot_id",
+            "layer",
+            "ecosystem",
+            "package_name"
+          ],
+          "name": "sample_members_snapshot_id_layer_ecosystem_package_name_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "sample_members_layer": {
+          "name": "sample_members_layer",
+          "value": "layer IN ('top', 'random')"
+        },
+        "sample_members_ecosystem": {
+          "name": "sample_members_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        },
+        "sample_members_rank_frame": {
+          "name": "sample_members_rank_frame",
+          "value": "rank_frame IN ('downloads', 'dependents', 'random')"
+        },
+        "sample_members_rank_positive": {
+          "name": "sample_members_rank_positive",
+          "value": "rank >= 1"
+        },
+        "sample_members_counts_non_negative": {
+          "name": "sample_members_counts_non_negative",
+          "value": "(download_count IS NULL OR download_count >= 0) AND (dependent_count IS NULL OR dependent_count >= 0)"
+        }
+      }
+    },
+    "signal_availability": {
+      "name": "signal_availability",
+      "columns": {
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "signal_id": {
+          "name": "signal_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "availability": {
+          "name": "availability",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mandatory": {
+          "name": "mandatory",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "detection_method": {
+          "name": "detection_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "signal_availability_ecosystem_signal_id_pk": {
+          "columns": [
+            "ecosystem",
+            "signal_id"
+          ],
+          "name": "signal_availability_ecosystem_signal_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "signal_availability_ecosystem": {
+          "name": "signal_availability_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        },
+        "signal_availability_signal": {
+          "name": "signal_availability_signal",
+          "value": "signal_id IN ('identity_publish', 'artifact_signature', 'registry_integrity', 'build_provenance', 'source_link', 'transparency_log', 'mfa_enforced')"
+        },
+        "signal_availability_value": {
+          "name": "signal_availability_value",
+          "value": "availability IN ('observable', 'inferred', 'not_exposed', 'no_mechanism')"
+        }
+      }
+    },
+    "snapshots": {
+      "name": "snapshots",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tool_version": {
+          "name": "tool_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "config_json": {
+          "name": "config_json",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "version_signals": {
+      "name": "version_signals",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ecosystem": {
+          "name": "ecosystem",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "package_name": {
+          "name": "package_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "signal_id": {
+          "name": "signal_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "signal_source": {
+          "name": "signal_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "responses": {
+          "name": "responses",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'[]'"
+        }
+      },
+      "indexes": {
+        "idx_sig_lookup": {
+          "name": "idx_sig_lookup",
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "signal_id",
+            "value"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "version_signals_version_fk": {
+          "name": "version_signals_version_fk",
+          "tableFrom": "version_signals",
+          "tableTo": "package_versions",
+          "columnsFrom": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "version"
+          ],
+          "columnsTo": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "version"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "version_signals_snapshot_id_ecosystem_package_name_version_signal_id_pk": {
+          "columns": [
+            "snapshot_id",
+            "ecosystem",
+            "package_name",
+            "version",
+            "signal_id"
+          ],
+          "name": "version_signals_snapshot_id_ecosystem_package_name_version_signal_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "version_signals_ecosystem": {
+          "name": "version_signals_ecosystem",
+          "value": "ecosystem IN ('pypi', 'npm', 'crates', 'rubygems', 'go', 'maven', 'packagist')"
+        },
+        "version_signals_signal": {
+          "name": "version_signals_signal",
+          "value": "signal_id IN ('identity_publish', 'artifact_signature', 'registry_integrity', 'build_provenance', 'source_link', 'transparency_log', 'mfa_enforced')"
+        },
+        "version_signals_value": {
+          "name": "version_signals_value",
+          "value": "value IN ('true', 'false', 'unknown')"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

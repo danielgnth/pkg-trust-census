@@ -44,7 +44,7 @@ The OWASP Top 10 2013 contained a new entry: A9-Using Components with Known Vuln
 
 #### Jeremy Long
 
-[Email](mailto:jeremy.long@owasp.org)
+[Email](mailto:redacted@example.invalid)
 
 ### Project Information
 

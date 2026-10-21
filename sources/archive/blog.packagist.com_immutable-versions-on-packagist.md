@@ -100,7 +100,7 @@ Every one of these actions is recorded on the public transparency log for the pa
 
 Immutability is foundational. Analysis and reasoning about versions is hard to impossible if the code behind the versions you track, review, and analyze can change at any time. A security review, an advisory, a malware scan result, or an approval decision in an organization's allow-list all refer to a specific version, and each of these only means something if the version still refers to the same code tomorrow. Making stable versions immutable on Packagist.org gives every one of these processes a fixed point to reason about.
 
-Our next goal for immutability is now to provide immutable artifacts for each version. We intend to accomplish this step in the next months with a combination of hosting artifacts ourselves and publishing info for verification on our transparency log. We still urgently need additional corporate sponsors to push forward with this work: contact us at sponsoring@packagist.org.
+Our next goal for immutability is now to provide immutable artifacts for each version. We intend to accomplish this step in the next months with a combination of hosting artifacts ourselves and publishing info for verification on our transparency log. We still urgently need additional corporate sponsors to push forward with this work: contact us at redacted@example.invalid.
 
 We strongly recommend other Composer repository maintainers introduce immutability on their package versions too, to help bring these improvements to the entire PHP ecosystem.
 

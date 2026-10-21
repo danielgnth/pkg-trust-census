@@ -28,6 +28,7 @@ import {
 } from "../extract/signals.ts";
 import { withdrawalWindowStart } from "../extract/quarters.ts";
 import { isSemverPrerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const DOWNLOADS = "https://api.npmjs.org/downloads/point/last-month";
 
@@ -81,7 +82,7 @@ interface Manifest {
   };
 }
 
-interface Packument {
+export interface Packument {
   "dist-tags"?: { latest?: string };
   time?: Record<string, string>;
   versions?: Record<string, Manifest>;
@@ -127,6 +128,7 @@ export class NpmAdapter extends GatheringAdapter<Raw> {
       .map((p, i) => ({
         ecosystem: this.id,
         name: p.name,
+        layer: "top" as const,
         rank: i + 1,
         rankFrame: this.rankFrame,
         downloadCount: p.downloads,
@@ -276,3 +278,19 @@ function mfaFor(r: NpmRecord): ExtractedSignal {
     ? signal("mfa_enforced", "true", `${downloads} downloads in ${window}`, source, res)
     : signal("mfa_enforced", "unknown", downloads != null ? `${downloads} downloads in ${window}` : null, source, res);
 }
+
+/**
+ * Fields that name people in npm's responses (docs/development.md, Publishing the cache). The
+ * star list's keys are usernames, so it is emptied; `_npmUser` keeps `trustedPublisher`, which
+ * the identity signal reads.
+ */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "npm",
+    endpoint: "registry.npmjs.org/{p} (packument)",
+    matches: (url) => url.startsWith("https://registry.npmjs.org/"),
+    paths: ["author", "maintainers", "contributors", "versions.*.author", "versions.*.maintainers", "versions.*.contributors", "versions.*._npmUser"],
+    keep: ["trustedPublisher"],
+    empty: ["users"],
+  },
+]

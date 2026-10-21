@@ -19,7 +19,7 @@
         "authors": [
           {
             "name": "Jordi Boggiano",
-            "email": "j.boggiano@seld.be",
+            "email": "redacted@example.invalid",
             "homepage": "https://seld.be"
           }
         ],
@@ -1290,7 +1290,7 @@
         "authors": [
           {
             "name": "Jordi Boggiano",
-            "email": "j.boggiano@seld.be",
+            "email": "redacted@example.invalid",
             "homepage": "http://seld.be"
           }
         ],

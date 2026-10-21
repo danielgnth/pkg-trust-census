@@ -24,11 +24,16 @@ export function openDb(path: string = dbPath()): Db {
   const sqlite = new Database(path, { create: true });
   // WAL is a no-op for :memory: but materially faster for the real file during a run.
   if (path !== ":memory:") sqlite.exec("PRAGMA journal_mode = WAL;");
+  const db = drizzle(sqlite, { schema }) as Db;
+  // A migration that rebuilds a parent table (drizzle's `__new_` copy) drops it first, and the
+  // migrator's transaction makes SQLite ignore the migration's own `PRAGMA foreign_keys=OFF`.
+  // So keys are off while migrating, and every key is checked before they are switched on.
+  sqlite.exec("PRAGMA foreign_keys = OFF;");
+  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
+  const broken = sqlite.query("PRAGMA foreign_key_check").all();
+  if (broken.length) throw new Error(`migration left ${broken.length} broken foreign keys, e.g. ${JSON.stringify(broken[0])}`);
   // Off by default in SQLite; the composite FKs are load-bearing here.
   sqlite.exec("PRAGMA foreign_keys = ON;");
-
-  const db = drizzle(sqlite, { schema }) as Db;
-  migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
   return db;
 }
 

@@ -43,6 +43,13 @@
       "when": 1792047959507,
       "tag": "0005_slippery_corsair",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792579112604,
+      "tag": "0006_sample_layers",
+      "breakpoints": true
     }
   ]
 }

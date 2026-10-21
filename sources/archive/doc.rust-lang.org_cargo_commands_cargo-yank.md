@@ -75,7 +75,7 @@ Crates should only be yanked in exceptional circumstances, for example, an accid
 
 A common workflow is to yank a crate having already published a semver compatible version, to reduce the probability of preventing dependent crates from compiling.
 
-When addressing copyright, licensing, or personal data issues with a published crate, simply yanking it may not suffice. In such cases, contact the maintainers of the registry you used. For crates.io, refer to their [policies](https://crates.io/policies) and contact them at [help@crates.io](mailto:help@crates.io).
+When addressing copyright, licensing, or personal data issues with a published crate, simply yanking it may not suffice. In such cases, contact the maintainers of the registry you used. For crates.io, refer to their [policies](https://crates.io/policies) and contact them at [redacted@example.invalid](mailto:redacted@example.invalid).
 
 If credentials have been leaked, the recommended course of action is to revoke them immediately. Once a crate has been published, it is impossible to determine if the leaked credentials have been copied. Yanking only prevents Cargo from selecting this version when resolving dependencies by default. Existing lock files or direct downloads are not affected, so yanking cannot stop further spreading of the leaked credentials.
 

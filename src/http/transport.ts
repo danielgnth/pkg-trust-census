@@ -13,6 +13,8 @@
 export interface Transport {
   readonly name: string;
   fetch(request: Request): Promise<Response>;
+  /** Writes a GET response body straight to `dest`, for transports that would otherwise buffer it. */
+  download?(url: string, dest: string, headers: Record<string, string>): Promise<void>;
 }
 
 export const fetchTransport: Transport = {
@@ -80,6 +82,15 @@ export class CurlTransport implements Transport {
     if (!Number.isInteger(status)) throw new Error(`curl returned no status for ${url}`);
 
     return new Response(body || null, { status, headers: parseHeaderJson(rest.join("\n")) });
+  }
+
+  /** `fetch` above holds the whole body in memory; a multi-gigabyte dump goes straight to disk. */
+  async download(url: string, dest: string, headers: Record<string, string>): Promise<void> {
+    const args = ["-sS", "--fail", "--location", "--retry", "4", "-o", dest];
+    for (const [k, v] of Object.entries(headers)) args.push("-H", `${k}: ${v}`);
+    const proc = Bun.spawn(["curl", ...args, "--url", url], { stdout: "ignore", stderr: "pipe" });
+    const err = await new Response(proc.stderr).text();
+    if ((await proc.exited) !== 0) throw new Error(`curl download failed for ${url}: ${err.trim()}`);
   }
 }
 

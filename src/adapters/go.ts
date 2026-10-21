@@ -18,6 +18,7 @@ import { impliedBy, noMechanism, observed, selectKeptVersions, type KeptVersion,
 import { probeAnchorDates } from "../extract/probe.ts";
 import semver from "semver";
 import { isSemverPrerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const PROXY = "https://proxy.golang.org";
 const SUMDB = "https://sum.golang.org";
@@ -70,6 +71,7 @@ export class GoAdapter extends GatheringAdapter<Raw> {
       .map((r, i) => ({
         ecosystem: this.id,
         name: r.name,
+        layer: "top" as const,
         rank: i + 1,
         rankFrame: this.rankFrame,
         downloadCount: null,
@@ -225,3 +227,6 @@ function forgeRoot(path: string): string | null {
   const m = /^((?:github\.com|gitlab\.com|bitbucket\.org)\/[^/]+\/[^/]+)/.exec(path);
   return m ? `https://${m[1]}` : null;
 }
+
+/** Nothing in the proxy's or checksum database's answers names a person; module paths are the identifiers measured. */
+export const PERSONAL_DATA: PersonalData[] = [];

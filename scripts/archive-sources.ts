@@ -6,9 +6,10 @@
  * Each distinct page is fetched once (sources differing only by #fragment share it). HTML is
  * reduced to its main content as Markdown (Readability + Turndown); GitHub blob links are
  * fetched as raw files; JSON and source files are kept as they are. A measurement source is
- * archived by running its command. sources/manifest.json records, per source, what was
- * fetched, when, its HTTP status and the sha256 of the original body. docs/sources.md is
- * regenerated from the manifest.
+ * archived by running its command. Email addresses are replaced in the archived text (the archive
+ * is committed, and the repository is public); the sha256 is the original body's.
+ * sources/manifest.json records, per source, what was fetched, when, its HTTP status and the
+ * sha256 of the original body. docs/sources.md is regenerated from the manifest.
  *
  *   bun run sources                 # archive sources missing from the manifest
  *   bun run sources --refresh       # re-archive everything
@@ -28,6 +29,7 @@ import { USER_AGENT } from "../src/http/client.ts";
 import { MANIFEST_PATH, SOURCES_DIR, type ArchiveEntry } from "../src/sources/index.ts";
 import { SOURCES, type SourceId } from "../src/sources/registry.ts";
 import { ALL_CITES } from "../src/facts/citations.ts";
+import { redactEmails } from "../src/publish/redact.ts";
 
 const { values: args } = parseArgs({ options: { refresh: { type: "boolean" }, only: { type: "string" } } });
 
@@ -111,7 +113,7 @@ async function archiveUrl(url: string): Promise<Omit<ArchiveEntry, "accessedAt">
   const contentType = res.headers.get("content-type") ?? "";
   const { text, ext, title } = convert(body, contentType, fetched);
   const archive = archiveName(fetched, ext);
-  await Bun.write(archive, text);
+  await Bun.write(archive, redactEmails(text));
   return { fetched, finalUrl: res.url, status: res.status, contentType, accessedAt, title, sha256: sha256(body), archive };
 }
 
@@ -121,7 +123,7 @@ async function archiveCommand(id: SourceId, command: readonly string[], repoPath
   const out = await new Response(proc.stdout).text();
   if ((await proc.exited) !== 0) throw new Error(`${command.join(" ")} failed`);
   const archive = join(SOURCES_DIR, "archive", `${id}.txt`);
-  await Bun.write(archive, out);
+  await Bun.write(archive, redactEmails(out));
   return { fetched: command.join(" "), accessedAt, title: repoPath, sha256: sha256(out), archive };
 }
 

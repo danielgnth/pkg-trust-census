@@ -144,7 +144,7 @@ If you have received this error while attempting to log in or upload to PyPI, th
 All PyPI user events are stored under security history in account settings. If there are any events that seem suspicious, take the following steps:
 
 -   [Reset your password](https://pypi.org/account/request-password-reset/)
--   Contact the PyPI admins about the event at [admin@pypi.org](mailto:admin@pypi.org)
+-   Contact the PyPI admins about the event at [redacted@example.invalid](mailto:redacted@example.invalid)
 
 ### Why is PyPI telling me my API token is compromised?
 
@@ -513,7 +513,7 @@ Projects or individual releases may get placed in quarantine for any number of r
 
 While in quarantine, the project or release is not installable by clients, and cannot be modified by its maintainers. PyPI Administrators will need to review it before it can be restored. When a single release is quarantined, other releases of the same project are unaffected.
 
-If you believe your project or release has mistakenly been flagged for quarantine, contact PyPI via [security@pypi.org](mailto:security@pypi.org) with any details.
+If you believe your project or release has mistakenly been flagged for quarantine, contact PyPI via [redacted@example.invalid](mailto:redacted@example.invalid) with any details.
 
 ## About
 

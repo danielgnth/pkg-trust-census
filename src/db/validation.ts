@@ -13,7 +13,7 @@
 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
+import { ECOSYSTEMS, RANK_FRAMES, SAMPLE_LAYERS, SIGNALS, WITHDRAWAL_KINDS } from "../types.ts";
 import {
   advisories,
   advisoryMatches,
@@ -21,6 +21,7 @@ import {
   packageVersions,
   packageWithdrawals,
   packages,
+  sampleMembers,
   signalAvailability,
   snapshots,
   versionSignals,
@@ -75,14 +76,20 @@ export const signalAvailabilityInsert = createInsertSchema(signalAvailability, {
 export const packageInsert = createInsertSchema(packages, {
   ecosystem: ecosystemEnum,
   packageName: z.string().min(1),
-  rankFrame: z.enum(["downloads", "dependents"]),
-  rank: z.int().min(1),
-  downloadCount: z.int().min(0).nullish(),
-  dependentCount: z.int().min(0).nullish(),
   maintainerCount: z.int().min(0).nullish(),
   latestPublishDate: isoTimestamp.nullish(),
   fetchTimestamp: isoTimestamp.nullish(),
   repositoryUrl: z.url().nullish(),
+});
+
+export const sampleMemberInsert = createInsertSchema(sampleMembers, {
+  layer: z.enum(SAMPLE_LAYERS),
+  ecosystem: ecosystemEnum,
+  packageName: z.string().min(1),
+  rankFrame: z.enum(RANK_FRAMES),
+  rank: z.int().min(1),
+  downloadCount: z.int().min(0).nullish(),
+  dependentCount: z.int().min(0).nullish(),
 }).refine(
   (p) => p.rankFrame !== "downloads" || p.downloadCount != null,
   // A row sampled by downloads with no download count means the ranking source silently
@@ -91,6 +98,11 @@ export const packageInsert = createInsertSchema(packages, {
 ).refine(
   (p) => p.rankFrame !== "dependents" || p.dependentCount != null,
   { error: "rankFrame 'dependents' requires a dependentCount", path: ["dependentCount"] },
+).refine(
+  // The two samples answer different questions; a ranking frame in the random draw (or the
+  // reverse) means the wrong code path wrote the row.
+  (p) => (p.layer === "random") === (p.rankFrame === "random"),
+  { error: "layer 'random' requires rankFrame 'random', and only it", path: ["rankFrame"] },
 );
 
 export const packageVersionInsert = createInsertSchema(packageVersions, {

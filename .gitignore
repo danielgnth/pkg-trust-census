@@ -1,5 +1,10 @@
 node_modules/
 data/cache/**/*.json.gz
+# Published with each snapshot's cache release; data/out/<snapshot>/requests.json is committed instead.
+data/cache/*/manifest.jsonl
+# Name lists and dumps of the random draw, and the staged cache release.
+data/names/
+data/publish/
 data/trust.sqlite-journal
 data/trust.sqlite-wal
 data/trust.sqlite-shm

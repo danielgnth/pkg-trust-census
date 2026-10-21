@@ -14,12 +14,12 @@ process.env.PKG_TRUST_DATA_DIR = TMP;
 const { HttpClient } = await import("../src/http/client.ts");
 const { ResponseCache } = await import("../src/http/cache.ts");
 const { openDb, closeDb } = await import("../src/db/open.ts");
-const { packages, packageVersions, versionSignals, signalAvailability, advisoryMatches } = await import("../src/db/schema.ts");
+const { packages, packageVersions, sampleMembers, versionSignals, signalAvailability, advisoryMatches } = await import("../src/db/schema.ts");
 const { runRank } = await import("../src/stages/rank.ts");
 const { runFetch } = await import("../src/stages/fetch.ts");
 const { runExtract } = await import("../src/stages/extract.ts");
 const { runAggregate } = await import("../src/stages/aggregate.ts");
-const { runReport } = await import("../src/stages/report.ts");
+const { runLayersReport, runReport } = await import("../src/stages/report.ts");
 const { simpleUrl, jsonUrl } = await import("../src/adapters/pypi.ts");
 import { eq, isNotNull } from "drizzle-orm";
 import * as CDX from "@cyclonedx/cyclonedx-library";
@@ -67,6 +67,11 @@ const ROUTES: Record<string, string> = {
     files: [file("plain-0.9.tar.gz", "2022-01-01T00:00:00Z", null)],
   }),
   [jsonUrl("plain")]: JSON.stringify({ info: { version: "0.9" } }),
+  // The random draw's name list, and two packages only it can draw: one active, one not.
+  "https://pypi.org/simple/": JSON.stringify({ projects: ["attested", "plain", "Fresh_Pkg", "ancient"].map((name) => ({ name })) }),
+  [simpleUrl("fresh-pkg")]: JSON.stringify({ name: "fresh-pkg", versions: ["3.0"], files: [file("fresh_pkg-3.0.tar.gz", "2026-03-01T00:00:00Z", null)] }),
+  [jsonUrl("fresh-pkg")]: JSON.stringify({ info: { version: "3.0" } }),
+  [simpleUrl("ancient")]: JSON.stringify({ name: "ancient", versions: ["0.1"], files: [file("ancient-0.1.tar.gz", "2015-01-01T00:00:00Z", null)] }),
 };
 
 /**
@@ -233,6 +238,50 @@ describe("pipeline", () => {
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");
+    closeDb(db);
+  });
+
+  test("a random layer is drawn from active packages, measured once with the top layer, and compared", async () => {
+    const db = openDb(":memory:");
+    const http = new HttpClient({ transport, cache: new ResponseCache() });
+    await runRank(["pypi"], 2, "snap-layers", db, http);
+    const [drawn] = await runRank(["pypi"], 5, "snap-layers", db, http, undefined, { layer: "random", seed: "fixed" });
+    // plain (2022) and ancient (2015) have no release in the 36 months before the snapshot.
+    expect(drawn).toMatchObject({ layer: "random", count: 2 });
+    const random = db.select().from(sampleMembers).where(eq(sampleMembers.layer, "random")).all();
+    expect(random.map((m) => m.packageName).sort()).toEqual(["attested", "fresh-pkg"]);
+    expect(random.every((m) => m.rankFrame === "random" && m.downloadCount === null)).toBe(true);
+    // attested is in both samples but one package row.
+    expect(db.select().from(packages).all().map((p) => p.packageName).sort()).toEqual(["attested", "fresh-pkg", "plain"]);
+
+    await runFetch(["pypi"], "snap-layers", db, http);
+    await http.flush();
+    const [extract] = await runExtract(["pypi"], "snap-layers", db, new ResponseCache());
+    expect(extract).toMatchObject({ packages: 3, extracted: 3 });
+
+    const { aggregate: top } = await runAggregate(db, "snap-layers", "top");
+    const { aggregate: rand } = await runAggregate(db, "snap-layers", "random");
+    expect(top.matrix.find((c) => c.signal === "artifact_signature")).toMatchObject({ n: 2, t: 1 });
+    expect(rand).toMatchObject({ layer: "random" });
+    expect(rand.matrix.find((c) => c.signal === "artifact_signature")).toMatchObject({ n: 2, t: 1, pct: 0.5 });
+    expect(rand.coverage).toMatchObject([{ rankFrame: "random", sampled: 2, extracted: 2 }]);
+
+    await runReport(db, "snap-layers", "top");
+    const { dir } = await runReport(db, "snap-layers", "random");
+    expect(dir).toEndWith(join("snap-layers", "random"));
+    expect(await Bun.file(join(dir, "README.md")).text()).toContain("random active packages");
+    expect((await Bun.file(join(dir, "packages.csv")).text()).split("\n").filter(Boolean)).toHaveLength(3);
+    const compared = await runLayersReport(db, "snap-layers");
+    const layers = await Bun.file(join(compared!.dir, "layers.md")).text();
+    expect(layers).toContain("| Publisher signature | PyPI | 50% [9–91%] (n=2) | 50% [9–91%] (n=2) |");
+    expect(layers).toContain("| PyPI | 2 | 2 | 1 |");
+    expect(layers).toMatch(/\| PyPI \| every project in the Simple API root \(PEP 691 JSON\) \| 4 \| [34] \| 0 \| 2 \|/);
+    expect(layers).toContain("## Method and sources");
+    const draw = JSON.parse(await Bun.file(join(compared!.dir, "random", "draw.json")).text());
+    expect(draw.draws[0]).toMatchObject({ ecosystem: "pypi", seed: "fixed", listed: 4, accepted: 2 });
+    expect(draw.draws[0].files[0]).toMatchObject({ url: "https://pypi.org/simple/" });
+    expect(draw.draws[0].files[0].path).toBeUndefined();
+    expect(await Bun.file(join(compared!.dir, "README.md")).text()).toContain("[compared](layers.md)");
     closeDb(db);
   });
 

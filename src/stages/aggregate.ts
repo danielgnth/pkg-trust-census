@@ -11,12 +11,13 @@
 import { and, eq, isNotNull } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type Availability, type EcosystemId, type SignalId, type WithdrawalKind } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type Availability, type EcosystemId, type SampleLayer, type SignalId, type WithdrawalKind } from "../types.ts";
 import { snapshotAsOf, type Db } from "../db/open.ts";
-import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, signalAvailability, versionSignals } from "../db/schema.ts";
+import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, sampleMembers, signalAvailability, versionSignals } from "../db/schema.ts";
 import { dataDir } from "../http/cache.ts";
 import { quarterBoundaries, withdrawalWindowStart } from "../extract/quarters.ts";
 import { aliasGroups, databaseOf } from "../advisories/osv.ts";
+import { layerMembers } from "./rank.ts";
 
 export interface Counts {
   n: number;
@@ -27,6 +28,9 @@ export interface Counts {
   pct: number | null;
   /** true / (true + false) — unknowns excluded. */
   pctKnown: number | null;
+  /** 95% Wilson interval around `pct`; null when n = 0. */
+  lo: number | null;
+  hi: number | null;
 }
 
 export interface MatrixCell extends Counts {
@@ -105,6 +109,8 @@ export interface ScorePoint {
 
 export interface Aggregate {
   snapshotId: string;
+  /** The sample this aggregate describes; every number below counts its packages only. */
+  layer: SampleLayer;
   asOf: string;
   generatedAt: string;
   quarters: string[];
@@ -253,16 +259,19 @@ function best(category: (typeof CATEGORIES)[number], holds: (s: SignalId) => boo
   return Math.max(0, ...category.levels.filter((l) => holds(l.signal)).map((l) => l.points));
 }
 
-export function outDir(snapshotId: string): string {
-  return join(dataDir(), "out", snapshotId);
+/** The top layer's report is the snapshot's folder; another layer's is a folder inside it. */
+export function outDir(snapshotId: string, layer: SampleLayer = "top"): string {
+  const root = join(dataDir(), "out", snapshotId);
+  return layer === "top" ? root : join(root, layer);
 }
 
-export function aggregatePath(snapshotId: string): string {
-  return join(outDir(snapshotId), "aggregate.json");
+export function aggregatePath(snapshotId: string, layer: SampleLayer = "top"): string {
+  return join(outDir(snapshotId, layer), "aggregate.json");
 }
 
-export function computeAggregate(db: Db, snapshotId: string): Aggregate {
+export function computeAggregate(db: Db, snapshotId: string, layer: SampleLayer = "top"): Aggregate {
   const asOf = snapshotAsOf(db, snapshotId);
+  const members = layerMembers(db, snapshotId, layer);
 
   const availability = new Map(
     db.select().from(signalAvailability).all().map((r) => [`${r.ecosystem}/${r.signalId}`, r]),
@@ -288,7 +297,8 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
       ),
     )
     .where(eq(versionSignals.snapshotId, snapshotId))
-    .all();
+    .all()
+    .filter((r) => members.has(`${r.ecosystem}/${r.packageName}`));
 
   const latestBuckets = new Map<string, string[]>();
   const quarterBuckets = new Map<string, string[]>();
@@ -394,22 +404,24 @@ export function computeAggregate(db: Db, snapshotId: string): Aggregate {
 
   return {
     snapshotId,
+    layer,
     asOf: asOf.toISOString(),
     generatedAt: new Date().toISOString(),
     quarters,
-    coverage: coverage(db, snapshotId),
+    coverage: coverage(db, snapshotId, layer),
     matrix,
     series,
     categories: CATEGORIES,
     scores,
     scoreSeries,
     withdrawalWindowStart: withdrawalWindowStart(asOf).toISOString(),
-    withdrawals: withdrawals(db, snapshotId),
-    advisories: advisorySummary(db, snapshotId, asOf),
+    withdrawals: withdrawals(db, snapshotId, members),
+    advisories: advisorySummary(db, snapshotId, asOf, members),
   };
 }
 
-export function advisorySummary(db: Db, snapshotId: string, asOf: Date): AdvisorySummary {
+/** `members`: the layer's "{ecosystem}/{package}" keys; packages outside it are left out of every count. */
+export function advisorySummary(db: Db, snapshotId: string, asOf: Date, members: Set<string>): AdvisorySummary {
   const records = db.select().from(advisories).where(eq(advisories.snapshotId, snapshotId)).all();
   const group = aliasGroups(records.map((r) => ({ id: r.advisoryId, aliases: r.aliases, published: r.published, withdrawn: r.withdrawn })));
 
@@ -429,7 +441,8 @@ export function advisorySummary(db: Db, snapshotId: string, asOf: Date): Advisor
     .select({ ecosystem: packages.ecosystem, name: packages.packageName, at: packages.osvQueriedAt })
     .from(packages)
     .where(and(eq(packages.snapshotId, snapshotId), isNotNull(packages.osvQueriedAt)))
-    .all();
+    .all()
+    .filter((r) => members.has(`${r.ecosystem}/${r.name}`));
   const checked = new Set(checkedRows.map((r) => `${r.ecosystem}/${r.name}`));
   const queried = checkedRows.map((r) => r.at!).sort();
 
@@ -556,8 +569,8 @@ function median(xs: number[]): number | null {
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 }
 
-function withdrawals(db: Db, snapshotId: string): WithdrawalCell[] {
-  const rows = db.select().from(packageWithdrawals).where(eq(packageWithdrawals.snapshotId, snapshotId)).all();
+function withdrawals(db: Db, snapshotId: string, members: Set<string>): WithdrawalCell[] {
+  const rows = db.select().from(packageWithdrawals).where(eq(packageWithdrawals.snapshotId, snapshotId)).all().filter((r) => members.has(`${r.ecosystem}/${r.packageName}`));
   const cells = new Map<string, WithdrawalCell>();
   for (const r of rows) {
     const key = `${r.ecosystem}/${r.kind}`;
@@ -579,19 +592,19 @@ function withdrawals(db: Db, snapshotId: string): WithdrawalCell[] {
   return [...cells.values()].sort((a, b) => order(a) - order(b));
 }
 
-export async function runAggregate(db: Db, snapshotId: string): Promise<{ aggregate: Aggregate; path: string }> {
-  const aggregate = computeAggregate(db, snapshotId);
-  await mkdir(outDir(snapshotId), { recursive: true });
-  const path = aggregatePath(snapshotId);
+export async function runAggregate(db: Db, snapshotId: string, layer: SampleLayer = "top"): Promise<{ aggregate: Aggregate; path: string }> {
+  const aggregate = computeAggregate(db, snapshotId, layer);
+  await mkdir(outDir(snapshotId, layer), { recursive: true });
+  const path = aggregatePath(snapshotId, layer);
   await Bun.write(path, JSON.stringify(aggregate, null, 2) + "\n");
   return { aggregate, path };
 }
 
-function coverage(db: Db, snapshotId: string): Coverage[] {
+function coverage(db: Db, snapshotId: string, layer: SampleLayer): Coverage[] {
   const rows = db
     .select({
       ecosystem: packages.ecosystem,
-      rankFrame: packages.rankFrame,
+      rankFrame: sampleMembers.rankFrame,
       packageName: packages.packageName,
       fetchTimestamp: packages.fetchTimestamp,
       fetchError: packages.fetchError,
@@ -599,7 +612,11 @@ function coverage(db: Db, snapshotId: string): Coverage[] {
       latestVersion: packages.latestVersion,
     })
     .from(packages)
-    .where(eq(packages.snapshotId, snapshotId))
+    .innerJoin(
+      sampleMembers,
+      and(eq(sampleMembers.snapshotId, packages.snapshotId), eq(sampleMembers.ecosystem, packages.ecosystem), eq(sampleMembers.packageName, packages.packageName)),
+    )
+    .where(and(eq(packages.snapshotId, snapshotId), eq(sampleMembers.layer, layer)))
     .all();
 
   const extracted = new Set(
@@ -635,6 +652,7 @@ export function count(values: string[]): Counts {
   const t = values.filter((v) => v === "true").length;
   const f = values.filter((v) => v === "false").length;
   const u = values.length - t - f;
+  const [lo, hi] = wilson(t, values.length) ?? [null, null];
   return {
     n: values.length,
     t,
@@ -642,5 +660,25 @@ export function count(values: string[]): Counts {
     u,
     pct: values.length ? t / values.length : null,
     pctKnown: t + f ? t / (t + f) : null,
+    lo,
+    hi,
   };
+}
+
+/** z for a two-sided 95% interval. */
+const Z95 = 1.959964;
+
+/**
+ * The Wilson score interval for `k` successes in `n` trials (95% by default). Unlike the
+ * normal approximation it stays inside [0, 1] and is not zero-width at 0% or 100%, which
+ * matters for rare signals and small per-quarter samples.
+ */
+export function wilson(k: number, n: number, z = Z95): [number, number] | null {
+  if (n === 0) return null;
+  const p = k / n;
+  const z2 = z * z;
+  const centre = (p + z2 / (2 * n)) / (1 + z2 / n);
+  const half = (z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n))) / (1 + z2 / n);
+  // Exact at the ends, where rounding would otherwise leave 0.9999… for 10 of 10.
+  return [k === 0 ? 0 : Math.max(0, centre - half), k === n ? 1 : Math.min(1, centre + half)];
 }

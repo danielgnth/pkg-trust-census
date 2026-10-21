@@ -47,7 +47,7 @@ Socket.dev has also [published an updated accounting](https://socket.dev/blog/fo
 
 We welcome and encourage researchers and community members to work with us by reporting issues through these channels:
 
--   **Email:** You can also reach us at [security@rubygems.org](mailto:security@rubygems.org).
+-   **Email:** You can also reach us at [redacted@example.invalid](mailto:redacted@example.invalid).
     
 -   **Slack:** Join the [Bundler Slack](https://join.slack.com/t/bundler/shared_invite/zt-1rrsuuv3m-OmXKWQf8K6iSla4~F1DBjQ) to connect with the RubyGems.org team and community of committers and developers.
     

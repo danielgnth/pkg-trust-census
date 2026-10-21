@@ -21,7 +21,7 @@ Only add people you trust as owners of your gems. Every owner has the same permi
 
 Keep credentials out of the gems you publish. A pushed gem is public and widely mirrored, so a leaked API key or password cannot be recalled by yanking the version. Build the `files` list in your gemspec from an explicit allowlist such as `git ls-files` instead of a broad glob that can pick up local configuration, and review the packaged files with `gem unpack` before pushing. If a secret does ship, revoke it first, then yank the version.
 
-If you suspect your account has been compromised or a malicious version of your gem has been published, [yank the affected versions](/removing-a-published-gem) immediately and report the incident to [security@rubygems.org](mailto:security@rubygems.org).
+If you suspect your account has been compromised or a malicious version of your gem has been published, [yank the affected versions](/removing-a-published-gem) immediately and report the incident to [redacted@example.invalid](mailto:redacted@example.invalid).
 
 ## Securing your dependencies
 
@@ -61,11 +61,11 @@ RubyGems can cryptographically sign gems. Authors create a certificate with `gem
 
 ### In RubyGems, Bundler, or RubyGems.org
 
-Report vulnerabilities in RubyGems, Bundler, or the RubyGems.org service, as well as malicious gems published on RubyGems.org, to [security@rubygems.org](mailto:security@rubygems.org) or through [HackerOne](https://hackerone.com/rubygems). Do not open a public issue.
+Report vulnerabilities in RubyGems, Bundler, or the RubyGems.org service, as well as malicious gems published on RubyGems.org, to [redacted@example.invalid](mailto:redacted@example.invalid) or through [HackerOne](https://hackerone.com/rubygems). Do not open a public issue.
 
 ### In Ruby itself
 
-Vulnerabilities in the Ruby language belong to a separate program. Report them to the Ruby security team through [HackerOne](https://hackerone.com/ruby) or [security@ruby-lang.org](mailto:security@ruby-lang.org). See the [Ruby security page](https://www.ruby-lang.org/en/security/) for the scope of that program.
+Vulnerabilities in the Ruby language belong to a separate program. Report them to the Ruby security team through [HackerOne](https://hackerone.com/ruby) or [redacted@example.invalid](mailto:redacted@example.invalid). See the [Ruby security page](https://www.ruby-lang.org/en/security/) for the scope of that program.
 
 ### In someone else’s gem
 
@@ -73,4 +73,4 @@ First check whether the vulnerability is already known by searching [RubySec](ht
 
 ### In your own gem
 
-Request a CVE identifier by creating a [GitHub Security Advisory](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/about-repository-security-advisories), then release a patched version and tell your users which versions are affected and what to do. Announce the fix on [ruby-security-ann@googlegroups.com](mailto:ruby-security-ann@googlegroups.com) and submit the advisory to [ruby-advisory-db](https://github.com/rubysec/ruby-advisory-db) so that audit tools pick it up.
+Request a CVE identifier by creating a [GitHub Security Advisory](https://docs.github.com/en/code-security/security-advisories/working-with-repository-security-advisories/about-repository-security-advisories), then release a patched version and tell your users which versions are affected and what to do. Announce the fix on [redacted@example.invalid](mailto:redacted@example.invalid) and submit the advisory to [ruby-advisory-db](https://github.com/rubysec/ruby-advisory-db) so that audit tools pick it up.

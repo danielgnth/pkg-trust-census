@@ -3,8 +3,8 @@
 /*
  * This file is part of Packagist.
  *
- * (c) Jordi Boggiano <j.boggiano@seld.be>
- *     Nils Adermann <naderman@naderman.de>
+ * (c) Jordi Boggiano <redacted@example.invalid>
+ *     Nils Adermann <redacted@example.invalid>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.

@@ -297,7 +297,7 @@ class Pusher
              "See also `gem yank` if you want to unpublish the bad release.", 409)
     elsif version.deletion.nil?
       notify("It appears that #{version.full_name} did not finish pushing.\n" \
-             "Please contact support@rubygems.org for assistance if you pushed this gem more than a minute ago.", 409)
+             "Please contact redacted@example.invalid for assistance if you pushed this gem more than a minute ago.", 409)
     else
       different_owner = "pushed by a previous owner of this gem " unless owner.owns_gem?(version.rubygem)
       notify("A yanked version #{different_owner}already exists (#{version.full_name}).\n" \

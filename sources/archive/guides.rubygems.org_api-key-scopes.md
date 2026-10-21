@@ -46,7 +46,7 @@ Running `gem signin` will prompt you for your RubyGems.org credentials, key name
 $ gem signin
 Enter your RubyGems.org credentials.
 Don't have an account yet? Create one at https://rubygems.org/sign_up
-   Email:   john@doe.com
+   Email:   redacted@example.invalid
 Password:
 
 API Key name [4458ffe32b0c-unknown-user-20201231104303]:   docker-push-key
@@ -68,7 +68,7 @@ An API key will automatically be created (default key name: _hostname-whoami-tim
 $ gem yank begone -v 4.1.48
 Yanking gem from https://rubygems.org...
 The existing key doesn't have access of yank_rubygem on https://rubygems.org. Please sign in to update access.
-   Email:   john@doe.com
+   Email:   redacted@example.invalid
 Password:
 Added yank_rubygem scope to the existing API key
 Successfully deleted gem: begone (4.1.48)

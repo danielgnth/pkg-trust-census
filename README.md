@@ -2,8 +2,8 @@
 
 **How widely do package registries actually use their trust mechanisms?**
 
-This tool measures how many of the top packages in seven ecosystems use trusted publishing, signatures,
-provenance and related signals. Each run is a reproducible snapshot, with adoption traced back
+This tool measures how many packages in seven ecosystems use trusted publishing, signatures,
+provenance and related signals: the most-used ones, and a random sample of the active ones. Each run is a reproducible snapshot, with adoption traced back
 quarterly to 2024.
 
 Built for the seminar *Software Supply Chain Security* (WiSe 26/27): *"How can I trust my software
@@ -24,7 +24,7 @@ package managers?"*
 |---|---|
 | **Ecosystems** | PyPI · npm · crates.io · RubyGems · Go · Maven Central · Packagist |
 | **Signals** | identity-bound publish · publisher signature · registry integrity · SLSA provenance · source link · transparency log · MFA enforced |
-| **Sample** | top 250 packages per ecosystem (pilot: 50) |
+| **Sample** | top 500 and a random 1000 active packages per ecosystem (pilot: top 50), each share with its 95% interval; Sigstore attestations across whole registries from deps.dev |
 | **Timeline** | quarterly, back to 2024-01 |
 | **Advisories** | known vulnerabilities and malware reports per sampled release (OSV), with a CycloneDX SBOM of the sample |
 
@@ -39,7 +39,7 @@ Requires [Bun](https://bun.sh).
 ```sh
 bun install
 bun test                  # unit tests, no network
-bun run cli run --n 50    # all seven ecosystems, end to end
+bun run cli run --n 50    # all seven ecosystems, end to end; add --random 1000 for the random sample
 ```
 
 Results land in `data/out/<snapshot>/`. Start with its `README.md`. Runs are rate-limited and take a while.
@@ -50,8 +50,10 @@ database.
 
 ## Etiquette
 
-The tool collects only public metadata from documented public APIs. It uses no authentication, reads
-nothing behind a login, and never works around rate limits.
+The tool collects only public metadata from documented public APIs. It uses no authentication against a
+registry, reads nothing behind a registry login, and never works around rate limits. The one login it uses is
+a Google account for deps.dev's public BigQuery dataset (npm and Maven name lists, the whole-registry layer).
+Personal data in registry responses is removed before anything is published.
 
 - **Paced requests.** Requests are rate-limited per host and honour `Retry-After`. crates.io is held to
   one request per second, as its crawler policy asks ([`src/http/client.ts`](src/http/client.ts)).
@@ -60,8 +62,9 @@ nothing behind a login, and never works around rate limits.
   ```sh
   cp .env.example .env    # then set PKG_TRUST_CONTACT=you@example.org
   ```
-- **No personal data.** Test fixtures are real registry responses with email addresses redacted and
-  npm's per-user star lists removed.
+- **No personal data published.** Fields that name people (maintainers, authors, publishing accounts) and
+  email addresses are removed from test fixtures, archived sources and the published response cache; the
+  cache is published only if the redacted copy yields the same signals.
 
 ## Documentation
 
@@ -70,7 +73,7 @@ nothing behind a login, and never works around rate limits.
 | [Methodology](docs/methodology.md) | Sampling, version selection, signal definitions, detection rules, limitations |
 | [Registry reference](docs/registries.md) | Which endpoint and field each signal is read from, per registry |
 | [Sources](docs/sources.md) | Every source the curated facts cite, with access date and archived copy |
-| [Development](docs/development.md) | Layout, CLI stages, output files, sources workflow, database |
+| [Development](docs/development.md) | Layout, CLI stages, output files, sources workflow, database, BigQuery, publishing the cache |
 
 ## License
 

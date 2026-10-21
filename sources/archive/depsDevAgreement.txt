@@ -1,0 +1,21 @@
+# deps.dev attestations against this project's measurement (snapshot 20261013-0914Z)
+
+deps.dev attestations compared with this project's measurement, for the latest release of every sampled package.
+*Ours* is the signal this project reads for the same mechanism; *deps.dev* counts releases with at least one
+attestation, *verified* those whose every attestation deps.dev verified, *repo + commit* those naming both.
+
+| Registry | Our signal | Releases | Ours | deps.dev | Verified | Repo + commit | Both | Ours only | deps.dev only | Not in deps.dev |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| npm | Sigstore provenance (`dist.attestations`) | 50 | 10 | 10 | 10 | 10 | 10 | 0 | 0 | 0 |
+| PyPI | PEP 740 attestation | 50 | 32 | 32 | 32 | 32 | 32 | 0 | 0 | 0 |
+| RubyGems | Sigstore attestation | 50 | 13 | 13 | 13 | 13 | 13 | 0 | 0 | 0 |
+| Maven Central | `.sigstore.json` bundle | 50 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| crates.io | trusted publishing (no attestation scheme) | 50 | 11 | 0 | 0 | 0 | – | – | – | 0 |
+| Go | checksum database (not an attestation) | 50 | – | 0 | 0 | 0 | – | – | – | 0 |
+
+Packagist is not in deps.dev.
+
+## Disagreements
+
+None.
+

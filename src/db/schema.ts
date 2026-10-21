@@ -19,7 +19,7 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { ECOSYSTEMS, SIGNALS, WITHDRAWAL_KINDS, type ResponseRef } from "../types.ts";
+import { ECOSYSTEMS, RANK_FRAMES, SAMPLE_LAYERS, SIGNALS, WITHDRAWAL_KINDS, type ResponseRef } from "../types.ts";
 
 /** Renders a string[] as a SQL `IN (...)` list for CHECK constraints. */
 const inList = (values: readonly string[]) => values.map((v) => `'${v}'`).join(", ");
@@ -27,6 +27,8 @@ const inList = (values: readonly string[]) => values.map((v) => `'${v}'`).join("
 const ECOSYSTEM_LIST = inList(ECOSYSTEMS);
 const SIGNAL_LIST = inList(SIGNALS);
 const WITHDRAWAL_LIST = inList(WITHDRAWAL_KINDS);
+const LAYER_LIST = inList(SAMPLE_LAYERS);
+const FRAME_LIST = inList(RANK_FRAMES);
 
 export const snapshots = sqliteTable("snapshots", {
   snapshotId: text("snapshot_id").primaryKey(),
@@ -81,6 +83,10 @@ export const signalAvailability = sqliteTable(
   ],
 );
 
+/**
+ * One measured package per snapshot, however many samples drew it: its versions and signals are
+ * the same facts in each. Which sample it belongs to, and at what rank, is in `sample_members`.
+ */
 export const packages = sqliteTable(
   "packages",
   {
@@ -89,10 +95,6 @@ export const packages = sqliteTable(
       .references(() => snapshots.snapshotId),
     ecosystem: text("ecosystem").notNull(),
     packageName: text("package_name").notNull(),
-    rankFrame: text("rank_frame").notNull(),
-    rank: integer("rank").notNull(),
-    downloadCount: integer("download_count"),
-    dependentCount: integer("dependent_count"),
     latestVersion: text("latest_version"),
     latestPublishDate: text("latest_publish_date"),
     maintainerCount: integer("maintainer_count"),
@@ -113,18 +115,48 @@ export const packages = sqliteTable(
     primaryKey({ columns: [t.snapshotId, t.ecosystem, t.packageName] }),
     index("idx_pkg_eco").on(t.snapshotId, t.ecosystem),
     check("packages_ecosystem", sql.raw(`${t.ecosystem.name} IN (${ECOSYSTEM_LIST})`)),
-    check("packages_rank_frame", sql.raw(`${t.rankFrame.name} IN ('downloads', 'dependents')`)),
-    check("packages_rank_positive", sql.raw(`${t.rank.name} >= 1`)),
     check(
-      "packages_counts_non_negative",
+      "packages_maintainer_count_non_negative",
+      sql.raw(`${t.maintainerCount.name} IS NULL OR ${t.maintainerCount.name} >= 0`),
+    ),
+  ],
+);
+
+/**
+ * Which sample (`top`, `random`) drew each package, at what rank and by which frame. A package in
+ * both samples has two rows and one `packages` row, so the overlap is a join, not a copy.
+ */
+export const sampleMembers = sqliteTable(
+  "sample_members",
+  {
+    snapshotId: text("snapshot_id").notNull(),
+    layer: text("layer").notNull(),
+    ecosystem: text("ecosystem").notNull(),
+    packageName: text("package_name").notNull(),
+    rankFrame: text("rank_frame").notNull(),
+    /** Position in the ranking, or in the shuffled draw order among accepted names. */
+    rank: integer("rank").notNull(),
+    downloadCount: integer("download_count"),
+    dependentCount: integer("dependent_count"),
+  },
+  (t) => [
+    primaryKey({ columns: [t.snapshotId, t.layer, t.ecosystem, t.packageName] }),
+    foreignKey({
+      columns: [t.snapshotId, t.ecosystem, t.packageName],
+      foreignColumns: [packages.snapshotId, packages.ecosystem, packages.packageName],
+      name: "sample_members_package_fk",
+    }),
+    index("idx_member_layer").on(t.snapshotId, t.layer, t.ecosystem),
+    check("sample_members_layer", sql.raw(`${t.layer.name} IN (${LAYER_LIST})`)),
+    check("sample_members_ecosystem", sql.raw(`${t.ecosystem.name} IN (${ECOSYSTEM_LIST})`)),
+    check("sample_members_rank_frame", sql.raw(`${t.rankFrame.name} IN (${FRAME_LIST})`)),
+    check("sample_members_rank_positive", sql.raw(`${t.rank.name} >= 1`)),
+    check(
+      "sample_members_counts_non_negative",
       sql.raw(
         `(${t.downloadCount.name} IS NULL OR ${t.downloadCount.name} >= 0) AND ` +
           `(${t.dependentCount.name} IS NULL OR ${t.dependentCount.name} >= 0)`,
       ),
-    ),
-    check(
-      "packages_maintainer_count_non_negative",
-      sql.raw(`${t.maintainerCount.name} IS NULL OR ${t.maintainerCount.name} >= 0`),
     ),
   ],
 );
@@ -199,6 +231,7 @@ export const versionSignals = sqliteTable(
 
 export type SnapshotRow = typeof snapshots.$inferSelect;
 export type PackageRow = typeof packages.$inferSelect;
+export type SampleMemberRow = typeof sampleMembers.$inferSelect;
 export type PackageVersionRow = typeof packageVersions.$inferSelect;
 export type VersionSignalRow = typeof versionSignals.$inferSelect;
 

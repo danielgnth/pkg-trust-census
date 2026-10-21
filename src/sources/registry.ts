@@ -165,8 +165,25 @@ export const SOURCES = {
   purlGolangType: "https://github.com/package-url/purl-spec/blob/main/types/golang-definition.json",
   cyclonedxVdr: "https://cyclonedx.org/capabilities/vdr/",
 
+  // Datasets, bulk access and prior work: the random sample, the whole-registry layer, the cache release
+  pep691: "https://peps.python.org/pep-0691/",
+  schorlemmerSigning2024: "https://arxiv.org/html/2401.14635v2",
+  depsDevBigQuery: "https://docs.deps.dev/bigquery/v1/",
+  depsDevApi: "https://docs.deps.dev/api/v3/",
+  bigquerySandbox: "https://cloud.google.com/bigquery/docs/sandbox",
+  ecosystemsOpenData: "https://blog.ecosyste.ms/2023/08/24/open-data-releases.html",
+  mavenConsumptionLimits: "https://central.sonatype.org/faq/429-error/",
+  npmReplicationChanges: "https://github.blog/changelog/2025-02-26-changes-and-deprecation-notice-for-npm-replication-apis/",
+  cratesDumpColumns: "https://github.com/rust-lang/crates.io/blob/main/crates/crates_io_database_dump/src/dump-db.toml",
+  goModuleIndex: "https://index.golang.org/",
+  rubygemsDataDumps: "https://rubygems.org/pages/data",
+  packagistApi: "https://packagist.org/apidoc",
+  githubReleases: "https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases",
+  githubLargeFiles: "https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github",
+
   // Our own measurements
   probePqTls: { command: ["bun", "run", "scripts/probe-pq-tls.ts"], repoPath: "scripts/probe-pq-tls.ts" },
+  depsDevAgreement: { command: ["bun", "run", "scripts/check-depsdev.ts"], repoPath: "scripts/check-depsdev.ts" },
 } as const satisfies Record<string, SourceDef>;
 
 export type SourceId = keyof typeof SOURCES;

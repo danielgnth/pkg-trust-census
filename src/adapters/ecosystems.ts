@@ -8,6 +8,7 @@
 
 import type { EcosystemId } from "../types.ts";
 import type { HttpClient } from "../http/client.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const BASE = "https://packages.ecosyste.ms/api/v1/registries";
 
@@ -52,3 +53,13 @@ export async function rankFromEcosystems(
     .sort((a, b) => (b[opts.sort] ?? -1) - (a[opts.sort] ?? -1))
     .slice(0, opts.n);
 }
+
+/** ecosyste.ms seeds the top rankings; its package records carry maintainer accounts and the repository owner's profile. */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "any",
+    endpoint: "packages.ecosyste.ms /api/v1/registries/{r}/packages",
+    matches: (url) => url.startsWith("https://packages.ecosyste.ms/"),
+    paths: ["*.maintainers", "*.repo_metadata.owner_record"],
+  },
+]

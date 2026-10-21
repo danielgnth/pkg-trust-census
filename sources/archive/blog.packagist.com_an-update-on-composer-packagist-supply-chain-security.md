@@ -49,7 +49,7 @@ The team operating Packagist.org has been responding to each incident within min
 
 Packagist.org has a public [transparency log](https://packagist.org/transparency-log) (login required) that records security-relevant events across the repository. It covers things like package ownership changes, maintainer additions and removals, user changes, and changes to version references.
 
-The log is a tool for investigative use cases and continuous monitoring for risks. If you're interested in building tools or integrations on top of it, get in touch at [contact@packagist.org](mailto:contact@packagist.org) or GitHub issues and help shape the API for this log.
+The log is a tool for investigative use cases and continuous monitoring for risks. If you're interested in building tools or integrations on top of it, get in touch at [redacted@example.invalid](mailto:redacted@example.invalid) or GitHub issues and help shape the API for this log.
 
 Work on the transparency log was funded by the [German Sovereign Tech Agency](https://blog.packagist.com/strengthening-php-supply-chain-security-with-a-transparency-log-for-packagist-org/) and it has been directly useful in handling the recent attacks. One of the key elements of nearly every recent supply chain attack on Packagist involved attackers modifying existing git tags after the fact. The transparency log accurately recorded each of these modifications, which let us identify exactly what had been manipulated and reconstruct precise timelines of each attack.
 
@@ -151,7 +151,7 @@ These only really make sense in a private repository where one organization cont
 
 This extensive amount of work requires financing. In addition to [Private Packagist](https://packagist.com/) which funds the majority of our work, we would like to thank the [Sovereign Tech Agency](https://www.sovereign.tech/) and [Aikido](https://www.aikido.dev/) for financing many work hours that went into these projects so far.
 
-Financial contributions help us pay our staff for operating Packagist.org and supporting its users, e.g. reacting to supply chain attacks in the middle of the night, and maintaining and building these new supply chain security features for Composer. If your business is interested in joining this new sponsorship program (3 tiers from €2,500/month), please reach out to sponsoring@packagist.org for details and to be included in our launch announcement and new sponsorship website in June!
+Financial contributions help us pay our staff for operating Packagist.org and supporting its users, e.g. reacting to supply chain attacks in the middle of the night, and maintaining and building these new supply chain security features for Composer. If your business is interested in joining this new sponsorship program (3 tiers from €2,500/month), please reach out to redacted@example.invalid for details and to be included in our launch announcement and new sponsorship website in June!
 
 ## Where we stand
 

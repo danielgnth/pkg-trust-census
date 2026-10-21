@@ -7,8 +7,9 @@ import { ECOSYSTEM_FACTS } from "./index.ts";
 import { POLICIES } from "./policies.ts";
 import { PQC } from "./pqc.ts";
 import { SIGSTORE } from "./sigstore.ts";
+import { DATASET_NOTES, SAMPLE_NOTES } from "./samples.ts";
 
 export const ALL_CITES: Cite[] = [
-  ...[...BASELINE, ...POLICIES, ...PQC, ...ECOSYSTEM_FACTS, ...ADVISORY_NOTES].flatMap((f) => f.sources),
+  ...[...BASELINE, ...POLICIES, ...PQC, ...ECOSYSTEM_FACTS, ...ADVISORY_NOTES, ...SAMPLE_NOTES, ...DATASET_NOTES].flatMap((f) => f.sources),
   ...SIGSTORE.flatMap((f) => [...f.sources, ...f.clients.flatMap((c) => c.sources)]),
 ];

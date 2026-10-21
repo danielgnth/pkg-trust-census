@@ -2,8 +2,8 @@
 
 Original authors:
 
--   Oliver Chang (ochang@google.com)
--   Russ Cox (rsc@google.com)
+-   Oliver Chang (redacted@example.invalid)
+-   Russ Cox (redacted@example.invalid)
 
 ## Purpose
 
@@ -259,7 +259,7 @@ Description
 
 [Echo Security Advisory Database](https://advisory.echohq.com/osv/all.json)
 
--   How to contribute: [https://echo.ai](https://echo.ai/) or contact us via [support@echo.ai](mailto:support@echo.ai)
+-   How to contribute: [https://echo.ai](https://echo.ai/) or contact us via [redacted@example.invalid](mailto:redacted@example.invalid)
 -   Source URL: TBD
 -   OSV Formatted URL: `https://advisory.echohq.com/osv/<ID>.json`
 
@@ -507,7 +507,7 @@ Description
 
 [TuxCare Security Advisory](https://security.tuxcare.com/errata/)
 
--   How to contribute: Contact us via [security-advisories@tuxcare.com](mailto:security-advisories@tuxcare.com)
+-   How to contribute: Contact us via [redacted@example.invalid](mailto:redacted@example.invalid)
 -   Source URL: `https://security.tuxcare.com/errata/<component>/<os>/<ID>.html`
 -   OSV Formatted URL: `N/A`
 
@@ -1306,7 +1306,7 @@ Including a URL and an email address in `credits[].contact[]` and a credit type:
 		"name": "Janina Kowalska",
 		"contact": [
 			"https://twitter.com/JaninaKowalska01",
-			"mailto:nina@kowalska-family.net"
+			"mailto:redacted@example.invalid"
 		],
 		"type": "REMEDIATION_DEVELOPER",
 	} ]

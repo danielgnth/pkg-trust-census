@@ -1499,7 +1499,7 @@ Co-authored-by: Jubilee <46493976+workingjubilee@users.noreply.github.com>
 
  [![@lulf](https://avatars.githubusercontent.com/u/19670?s=40&v=4)](/lulf)[![@woodruffw](https://avatars.githubusercontent.com/u/3059210?s=40&v=4)](/woodruffw)
 
-`[Update text/0000-sigstore-integration.md](/rust-lang/rfcs/pull/3403/commits/da1fa851eb7f7b1e1746e795234621ee942cd74e "Update text/0000-sigstore-integration.md Co-authored-by: William Woodruff <william@yossarian.net>")` …
+`[Update text/0000-sigstore-integration.md](/rust-lang/rfcs/pull/3403/commits/da1fa851eb7f7b1e1746e795234621ee942cd74e "Update text/0000-sigstore-integration.md Co-authored-by: William Woodruff <redacted@example.invalid>")` …
 
     
 
@@ -1507,7 +1507,7 @@ Co-authored-by: Jubilee <46493976+workingjubilee@users.noreply.github.com>
 
 `[da1fa85](/rust-lang/rfcs/pull/3403/commits/da1fa851eb7f7b1e1746e795234621ee942cd74e)`
 
-Co-authored-by: William Woodruff <william@yossarian.net>
+Co-authored-by: William Woodruff <redacted@example.invalid>
 
 ![Ulf Lilleengen](https://github.githubassets.com/images/gravatars/gravatar-user-420.png)
 

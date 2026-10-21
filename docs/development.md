@@ -12,6 +12,7 @@ bun run typecheck
 bun run cli status    # snapshots, cache and coverage
 bun run sources       # archive sources missing from sources/manifest.json; --refresh re-archives all
 bun run probe:tls     # which registry hosts negotiate post-quantum TLS (needs OpenSSL ≥ 3.5)
+bun run check:depsdev # deps.dev's attestations against ours, latest snapshot (archived by `bun run sources`)
 bun run cli --help
 ```
 
@@ -24,45 +25,65 @@ bun run cli --help
 | `src/adapters/` | one per registry: ranking, the requests `fetch` makes, and parsing into versions and signals |
 | `src/extract/` | registry-independent helpers: quarter anchors, version rules, signal construction |
 | `src/advisories/` | OSV lookups (run by `fetch`, replayed by `extract`), alias grouping, package URLs |
+| `src/sample/` | the random draw: seeded shuffle, activity rule, each registry's name list and activity check |
+| `src/bigquery/` | deps.dev's BigQuery dataset: client, stored queries, npm/Maven name lists, the whole-registry query |
+| `src/publish/` | redaction of personal data, and the publish stage for the cache release |
 | `src/facts/` | curated tables: availability classes, registry policies, baseline, Sigstore, post-quantum, advisory method notes |
 | `src/sources/` | the source registry, citations and quote matching |
 | `src/http/` | the shared client (ky for retries, p-queue for per-host pacing), the response cache, transports |
-| `src/report/` | labels, the SVG charts (Observable Plot, rendered headlessly through linkedom) and the CycloneDX SBOM |
+| `src/report/` | labels, the SVG charts (Observable Plot, rendered headlessly through linkedom), the CycloneDX SBOM, the sample comparison and the whole-registry page |
 | `src/db/` | Drizzle schema, migrations runner, zod validation |
 | `sources/` | archived sources and their manifest (committed) |
 | `data/out/` | report output per snapshot (committed; the results site is built from it) |
+| `data/bigquery/` | stored BigQuery results per snapshot (committed; aggregates only) |
+| `data/cache/`, `data/names/`, `data/publish/` | responses, draw inputs and the staged cache release, per snapshot (git-ignored) |
 | `.github/workflows/pages.yml` | builds and deploys the results site |
 | `docs/` | methodology, registry reference, this file, and the generated source list |
 
 ## Running the pipeline
 
-Everything in one go (all seven ecosystems, a new snapshot):
+Everything in one go (all seven ecosystems, a new snapshot, the top 500 and a random 1000):
 
 ```sh
-bun run cli run --n 50
+bun run cli run --n 500 --random 1000
 ```
 
 Or stage by stage. Each stage can be re-run on its own and is keyed by snapshot id:
 
 ```sh
-bun run cli rank      --ecosystem pypi,npm --n 50
+bun run cli rank      --ecosystem pypi,npm --n 500
+bun run cli rank      --snapshot <id> --layer random --n 1000   # [--seed s], default: the snapshot id
 bun run cli fetch     --snapshot <id>     # omit --snapshot to continue the latest
 bun run cli extract   --snapshot <id>
 bun run cli aggregate --snapshot <id>
 bun run cli report    --snapshot <id>
 ```
 
-`fetch` is the only stage that touches the network, and it skips anything already cached, so an
-interrupted run resumes for free. After each package's registry responses it asks OSV about that package's
-versions; re-running `fetch` on a snapshot taken before this existed adds only the OSV requests. `extract` is pure, so parsers can be refined and re-run offline
-without re-hitting any registry.
+`rank` and `fetch` are the stages that touch the network (`registry` and `publish --upload` aside), and
+both skip anything already cached, so an interrupted run resumes for free. After each package's registry
+responses, `fetch` asks OSV about that package's versions. `extract` is pure, so parsers can be refined and
+re-run offline without re-hitting any registry.
 
 ### Long runs
 
-A full run is rate-limited by design (crates.io at 1 req/s) and takes a while. On a laptop, keep the
-machine awake (`caffeinate -i bun run cli run --n 50` on macOS). If it sleeps mid-run, requests fail
-with connection errors and are recorded as `fetch_error`. Re-running `fetch --snapshot <id>` retries
+A full run is rate-limited by design (crates.io at 1 req/s) and takes hours. The pilot (*N* = 50) made about
+5,700 requests, some 16 per package; the top 500 and a random 1000 come to about 170,000, plus the draws'
+activity checks. The slowest host, RubyGems at 2 per second, takes three to four hours. On a laptop, keep the
+machine awake (`caffeinate -i bun run cli run --n 500 --random 1000` on macOS). If it sleeps mid-run, requests
+fail with connection errors and are recorded as `fetch_error`. Re-running `fetch --snapshot <id>` retries
 exactly those.
+
+The random draw downloads its inputs once per snapshot into `data/names/{snapshot}/`: PyPI's project list
+(45 MB), Packagist's (12 MB), the crates.io dump (2 GB) and the RubyGems dump (680 MB), and it crawls Go's
+module index over the 36-month window, month by month, four months at a time, which still takes hours.
+Each is stored with its sha256 and reused on a restart, and each month of the Go crawl resumes from its own
+cursor. The draw itself is seeded, so a restarted `rank` repeats it with cache hits. The rank stage writes
+each layer's sample in one transaction, so an interrupted draw leaves no partial sample.
+
+Maven Central enforces consumption limits on its heaviest users and lowers them over time. A run that
+meets HTTP 429 there backs off as `Retry-After` asks. When retries run out during `fetch`, the packages are
+recorded as `fetch_error` and fetched later by re-running `fetch`; during the draw's activity checks, `rank`
+stops and is re-run later, continuing from the cache.
 
 ### Interactive prompts
 
@@ -77,6 +98,11 @@ Results land in `data/out/<snapshot>/`:
 | File | Contents |
 |---|---|
 | `README.md` | Landing page: every chart in reading order, linking to the tables and CSVs |
+| `random/` | The same files for the random sample, when the snapshot has one |
+| `layers.md` / `layers.csv` | Top against random sample, every share with its interval; overlap; the draw per registry |
+| `random/draw.json` | The draw record: seed, name lists with their sha256, every rejected name and why |
+| `registry.md` / `registry.csv` | Whole-registry Sigstore attestations from deps.dev, by quarter (after `cli registry`) |
+| `requests.json` | Responses per host and status, and the sha256 of the full manifest published with the cache |
 | `summary.md` | Coverage, error rate, headline numbers |
 | `matrix.md` / `matrix.csv` | Ecosystem × signal adoption table (paste-ready) |
 | `scores.csv`, `score_series.csv` | Trust summary score per ecosystem (overall and per category), and over time |
@@ -110,6 +136,9 @@ styles are written by the workflow, so the repository holds no site files. While
 chart's SVG in place of its `![](charts/….svg)` link, so the marks keep their hover titles. Links out of
 the site, such as `../src/…` or the source archives, point at the files on GitHub for that commit.
 
+A random sample's pages (`random/`) and the comparison (`layers.md`) join the site's navigation when the
+snapshot has them; links between site pages stay on the site.
+
 In the repository settings, Pages must be set to deploy from GitHub Actions.
 
 ## Configuration
@@ -122,6 +151,8 @@ Set in a git-ignored `.env`, which Bun loads automatically (see [`.env.example`]
 | `PKG_TRUST_UA` | Replaces the whole User-Agent |
 | `PKG_TRUST_TRANSPORT` | `fetch` or `curl`, overriding the automatic choice |
 | `PKG_TRUST_DATA_DIR` | Where the database, cache and output live (default `data`) |
+| `PKG_TRUST_GCP_PROJECT` | Google Cloud project that runs BigQuery queries (npm/Maven name lists, `cli registry`) |
+| `PKG_TRUST_BQ_MAX_GIB` | Bytes one BigQuery query may bill, in GiB (default 100) |
 
 ## Database
 
@@ -163,6 +194,9 @@ To add or change a claim:
 4. `bun test` checks that every quote is in its archive, every source is archived and cited, and no
    source URL appears outside the registry.
 
+Archived text has email addresses replaced (`redactEmails`); the manifest's sha256 is the original
+response's. Archives committed before this redaction still carry addresses in git history.
+
 `bun run sources --refresh` re-fetches everything; a quote that no longer matches means the page changed
 and the claim needs re-checking. A page that moved should get its new URL in the registry, not a redirect.
 
@@ -186,14 +220,56 @@ its exact numbers.
 
 ## Cache
 
-Raw responses are gzipped under `data/cache/` and git-ignored (as is `data/trust.sqlite`), because npm packuments alone run to
-hundreds of megabytes per snapshot. `data/cache/manifest.jsonl` *is* committed. It records the URL,
-sha256, byte size, HTTP status and fetch time of every response, so integrity can be verified without
-the payloads. A POST is keyed `POST {url} {sha256 of the body}` and its entry keeps the body (`requestBody`).
+Raw responses are gzipped under `data/cache/{snapshot}/` and git-ignored (as is `data/trust.sqlite`), because
+npm packuments alone run to hundreds of megabytes per snapshot. Each snapshot has its own
+`manifest.jsonl`, recording the URL, sha256, byte size, HTTP status and fetch time of every response; a
+snapshot never reads another's responses. A POST is keyed `POST {url} {sha256 of the body}` and its entry
+keeps the body (`requestBody`). The manifest is append-only, written by one serialised writer, and a
+truncated last line from an interrupted run is skipped. It is not committed: the report writes
+`requests.json` with its sha256 and per-host counts, and the manifest is published with the cache release.
+
+## Publishing the cache
+
+```sh
+bun run cli publish --snapshot <id>            # stage in data/publish/<id>/ and check
+bun run cli publish --snapshot <id> --upload   # then create or update the GitHub release cache-<id>
+```
+
+The stage redacts every response (`PERSONAL_DATA` in each adapter, plus `src/publish/redact.ts`), stops if a
+listed field or an address survives, extracts the snapshot from both caches into scratch databases and stops
+unless they agree, then packs one `cache-{ecosystem}.tar.gz` per registry beside `manifest.jsonl` (redacted)
+and `manifest.original.jsonl`. GitHub caps release assets at 2 GiB each, with no limit on a release's total,
+and the stage checks the cap. `--upload` runs `gh release create`, or `gh release upload --clobber` when the
+release exists; it needs `gh auth login`. To rebuild a snapshot from a release, unpack every archive into one
+folder with `manifest.jsonl` and run `bun run cli extract --snapshot <id> --cache <folder>`.
+
+A new adapter must list its responses' personal fields in `PERSONAL_DATA`; the publish stage fails on any
+address it leaves, but only the list catches names and handles.
+
+## BigQuery
+
+deps.dev's dataset is the one source read behind a login. Setup, once:
+
+```sh
+gcloud auth login                       # or application-default credentials
+echo PKG_TRUST_GCP_PROJECT=<project> >> .env
+```
+
+The BigQuery sandbox needs no billing account. It grants 1 TiB of processed data a month and 10 GiB of
+storage, and its tables expire after 60 days, so nothing is stored there. Queries read one partition of
+`PackageVersions` (1–7 GB each, never the unpruned `…Latest` views), are dry-run first (an estimate that can
+read 0 for a partition-filtered query), and run with `maximumBytesBilled` (`PKG_TRUST_BQ_MAX_GIB`). Each result is stored in a JSON file with its SQL, parameters,
+deps.dev snapshot, bytes processed and job id, keyed by the hash of SQL, parameters and snapshot; a rerun
+reuses it. Aggregates go to `data/bigquery/{snapshot}/` (committed); the npm and Maven name lists, which are
+row-level, stay in `data/names/` (git-ignored), because deps.dev states no licence for the data. The dataset's
+Analytics Hub listing, where public datasets state their terms, is visible only in the Cloud console.
+
+```sh
+bun run cli registry --snapshot <id>    # the whole-registry layer, then `report`
+```
 
 ## Test fixtures
 
-Fixtures are real registry responses with personal data removed: email addresses are replaced by
-`redacted@example.invalid`, and npm's per-user star lists are dropped.
-[`scripts/capture-fixtures.ts`](../scripts/capture-fixtures.ts) (`bun run fixtures`) applies the same
-redaction on every capture.
+Fixtures are real registry responses with personal data removed by the same redaction as the published cache
+(fields that name people, then email addresses). [`scripts/capture-fixtures.ts`](../scripts/capture-fixtures.ts)
+(`bun run fixtures`) applies it on every capture.

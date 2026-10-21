@@ -107,6 +107,7 @@ describe("PypiAdapter.fetch", () => {
   const candidate = {
     ecosystem: "pypi" as const,
     name: "requests",
+    layer: "top" as const,
     rank: 1,
     rankFrame: "downloads" as const,
     downloadCount: 1,

@@ -11,12 +11,12 @@ import { stringify } from "csv-stringify/sync";
 import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ECOSYSTEMS, SIGNALS, type EcosystemId } from "../types.ts";
+import { ECOSYSTEMS, SIGNALS, type EcosystemId, type SampleLayer } from "../types.ts";
 import type { Db } from "../db/open.ts";
-import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, versionSignals } from "../db/schema.ts";
+import { advisories, advisoryMatches, packageVersions, packageWithdrawals, packages, sampleMembers, versionSignals } from "../db/schema.ts";
 import { CATEGORIES, aggregatePath, outDir, type Aggregate, type Score } from "./aggregate.ts";
 import { adoptionSvg, advisoriesSvg, baselineSvg, matrixSvg, measurable, policiesSvg, pqcSvg, publishAuthSvg, scoresSvg, sigstoreSvg, withdrawalsSvg } from "../report/charts.ts";
-import { CATEGORY_LABEL, ECOSYSTEM_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SHARED_MECHANISM, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText, pointsText } from "../report/labels.ts";
+import { CATEGORY_LABEL, ECOSYSTEM_LABEL, LAYER_LABEL, NO_UPLOAD, PUBLISH_CREDENTIAL, SHARED_MECHANISM, SIGNAL_LABEL, WITHDRAWAL_BLIND, WITHDRAWAL_LABEL, cellText, pctSmall, pctText, pointsText } from "../report/labels.ts";
 import { availabilityOf } from "../facts/index.ts";
 import { BASELINE, BASELINE_PROPERTIES, BASELINE_VERIFIED, baselineOf, type BaselineFact } from "../facts/baseline.ts";
 import { SIGSTORE, SIGSTORE_SIGNAL, bestClient, sigstoreOf, type SigstoreFact } from "../facts/sigstore.ts";
@@ -26,21 +26,30 @@ import { ADVISORY_NOTES } from "../facts/advisories.ts";
 import { aliasGroups, databaseOf } from "../advisories/osv.ts";
 import { purlOf } from "../advisories/purl.ts";
 import { sbomJson } from "../report/sbom.ts";
+import { requestSummary } from "../report/requests.ts";
+import { registryCsv, registryMarkdown } from "../report/registry.ts";
+import { storedRegistryAttestations } from "../bigquery/registry.ts";
+import { layerMembers, snapshotLayers } from "./rank.ts";
+import { LAYERS_FILES, drawJson, drawRecords, layersCsv, layersMarkdown, overlap } from "../report/layers.ts";
 
 export interface ReportResult {
   dir: string;
   files: string[];
 }
 
-export async function runReport(db: Db, snapshotId: string): Promise<ReportResult> {
-  const file = Bun.file(aggregatePath(snapshotId));
-  if (!(await file.exists())) throw new Error(`no aggregate for ${snapshotId} — run \`aggregate\` first`);
+export async function runReport(db: Db, snapshotId: string, layer: SampleLayer = "top"): Promise<ReportResult> {
+  const file = Bun.file(aggregatePath(snapshotId, layer));
+  if (!(await file.exists())) throw new Error(`no ${layer} aggregate for ${snapshotId} — run \`aggregate\` first`);
   const agg = (await file.json()) as Aggregate;
+  const members = layerMembers(db, snapshotId, layer);
 
-  const dir = outDir(snapshotId);
+  const dir = outDir(snapshotId, layer);
   await mkdir(join(dir, "charts"), { recursive: true });
+  const compared = layer === "top" && snapshotLayers(db, snapshotId).includes("random");
+  // The whole-registry layer, when its query has run (`cli registry`, behind a Google login).
+  const registry = layer === "top" ? await storedRegistryAttestations(snapshotId) : null;
   const files: Array<[string, string]> = [
-    ["README.md", readmeMarkdown(agg)],
+    ["README.md", readmeMarkdown(agg, compared, registry != null)],
     ["matrix.md", matrixMarkdown(agg)],
     ["summary.md", summaryMarkdown(agg)],
     ["matrix.csv", matrixCsv(agg)],
@@ -51,12 +60,12 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["policies.md", policiesMarkdown(agg, true)],
     ["policies.csv", policiesCsv()],
     ["charts/policies.svg", policiesSvg(agg)],
-    ["withdrawals.csv", withdrawalsCsv(db, snapshotId)],
+    ["withdrawals.csv", withdrawalsCsv(db, snapshotId, members)],
     ["charts/withdrawals.svg", withdrawalsSvg(agg)],
     ["advisories.md", advisoriesMarkdown(agg, true)],
-    ["advisories.csv", advisoriesCsv(db, snapshotId)],
+    ["advisories.csv", advisoriesCsv(db, snapshotId, members)],
     ["charts/advisories.svg", advisoriesSvg(agg)],
-    ["sbom.cdx.json", sbomJson(db, snapshotId, agg.asOf)],
+    ["sbom.cdx.json", sbomJson(db, snapshotId, agg.asOf, members)],
     ["sigstore.md", sigstoreMarkdown(agg, true)],
     ["sigstore.csv", sigstoreCsv()],
     ["charts/sigstore.svg", sigstoreSvg(agg)],
@@ -66,13 +75,38 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
     ["score_series.csv", scoreSeriesCsv(agg)],
     ["charts/scores.svg", scoresSvg(agg)],
     ["timeseries.csv", seriesCsv(agg)],
-    ["packages.csv", packagesCsv(db, snapshotId)],
-    ["signals.csv", signalsCsv(db, snapshotId)],
+    ["packages.csv", packagesCsv(db, snapshotId, layer)],
+    ["signals.csv", signalsCsv(db, snapshotId, members)],
     ["charts/matrix.svg", matrixSvg(agg)],
     ["charts/publish-auth.svg", publishAuthSvg(agg)],
     ...SIGNALS.map((s): [string, string] => [`charts/adoption-${s}.svg`, adoptionSvg(agg, s)]),
   ];
 
+  if (layer === "top") {
+    const requests = await requestSummary(snapshotId);
+    if (requests) files.push(["requests.json", JSON.stringify(requests, null, 2) + "\n"]);
+    if (registry) {
+      const random = Bun.file(aggregatePath(snapshotId, "random"));
+      const randomAgg = (await random.exists()) ? ((await random.json()) as Aggregate) : null;
+      files.push(["registry.md", registryMarkdown(registry, randomAgg, agg.quarters, snapshotId)], ["registry.csv", registryCsv(registry, csv)]);
+    }
+  }
+  for (const [name, body] of files) await Bun.write(join(dir, name), body);
+  return { dir, files: files.map(([name]) => name) };
+}
+
+/** `layers.md`, `layers.csv` and the draw record, once both samples have been aggregated. */
+export async function runLayersReport(db: Db, snapshotId: string): Promise<ReportResult | null> {
+  const [top, random] = [Bun.file(aggregatePath(snapshotId, "top")), Bun.file(aggregatePath(snapshotId, "random"))];
+  if (!(await top.exists()) || !(await random.exists())) return null;
+  const [t, r] = [(await top.json()) as Aggregate, (await random.json()) as Aggregate];
+  const draws = await drawRecords(db, snapshotId);
+  const dir = outDir(snapshotId);
+  const files: Array<[string, string]> = [
+    [LAYERS_FILES.markdown, layersMarkdown(t, r, overlap(db, snapshotId), draws)],
+    [LAYERS_FILES.csv, layersCsv(t, r, csv)],
+    [LAYERS_FILES.draw, drawJson(snapshotId, draws)],
+  ];
   for (const [name, body] of files) await Bun.write(join(dir, name), body);
   return { dir, files: files.map(([name]) => name) };
 }
@@ -82,13 +116,20 @@ export async function runReport(db: Db, snapshotId: string): Promise<ReportResul
  * Named README.md so GitHub renders it below the folder listing; the results site serves it as
  * its home page, with the charts inlined.
  */
-export function readmeMarkdown(agg: Aggregate): string {
+export function readmeMarkdown(agg: Aggregate, compared = false, registry = false): string {
   const chart = (name: string, alt: string) => [`![${alt}](charts/${name}.svg)`, ""];
+  const sample =
+    agg.layer === "random"
+      ? ["A uniform random sample of each registry's active packages; the method is in the [comparison with the top sample](../layers.md).", ""]
+      : compared
+        ? ["The top packages of each registry. A random sample of active packages is reported [beside it](random/README.md), and the two are [compared](layers.md).", ""]
+        : [];
   return [
-    `# Results — snapshot ${agg.snapshotId}`,
+    `# Results — snapshot ${agg.snapshotId}${agg.layer === "top" ? "" : `, ${LAYER_LABEL[agg.layer]}`}`,
     "",
     `As of ${agg.asOf}. Coverage, error rate and headline numbers are in the [run summary](summary.md).`,
     "",
+    ...sample,
     "> **Note:** This project was developed with AI assistance (Claude Code) under the author's direction.",
     "> Every detection rule is documented in the methodology and traceable to the registry response it was",
     "> read from, and every curated claim quotes an archived source, so results can be checked independently.",
@@ -132,6 +173,7 @@ export function readmeMarkdown(agg: Aggregate): string {
     "",
     ...chart("sigstore", "Sigstore support"),
     "Notes and sources for every cell: [Sigstore](sigstore.md).",
+    ...(registry ? ["Across every package of four registries, from deps.dev: [whole registry](registry.md)."] : []),
     "",
     "## Post-quantum exposure",
     "",
@@ -152,6 +194,7 @@ export function readmeMarkdown(agg: Aggregate): string {
     "| [advisories.csv](advisories.csv) | Every OSV record matched to a sampled or withdrawn version, with its purl and dates |",
     "| [sbom.cdx.json](sbom.cdx.json) | CycloneDX SBOM: the latest version of every sampled package and its known vulnerabilities |",
     "| [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |",
+    ...(agg.layer === "top" ? ["| [requests.json](requests.json) | Responses per host and status, and the sha256 of the full request manifest published with the cache |"] : []),
     "",
   ].join("\n");
 }
@@ -169,13 +212,14 @@ export function matrixMarkdown(agg: Aggregate): string {
   });
 
   return [
-    `### Trust-signal adoption among top packages, latest version (snapshot ${agg.snapshotId})`,
+    `### Trust-signal adoption among ${LAYER_LABEL[agg.layer]}, latest version (snapshot ${agg.snapshotId})`,
     "",
     header,
     rule,
     ...rows,
     "",
     "Percentages are true / all sampled packages with an extracted latest version, so `unknown` counts as not adopted.",
+    "Brackets give the 95% Wilson interval.",
     "`≥` marks an inferred signal, where the figure is a lower bound. *No mechanism*: the ecosystem has no such",
     "feature. *Not exposed*: the feature exists but the registry's public API does not reveal who uses it.",
     "*Mandatory*: required registry-wide by policy.",
@@ -225,7 +269,7 @@ export function summaryMarkdown(agg: Aggregate): string {
   }
 
   return [
-    `# Run summary — snapshot ${agg.snapshotId}`,
+    `# Run summary — snapshot ${agg.snapshotId}${agg.layer === "top" ? "" : `, ${LAYER_LABEL[agg.layer]}`}`,
     "",
     `As of ${agg.asOf} · generated ${agg.generatedAt}`,
     "",
@@ -348,7 +392,7 @@ export function baselineMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = baselineOf(e, p.id);
-      const links = citeLinks(b.sources, outDir(agg.snapshotId));
+      const links = citeLinks(b.sources, outDir(agg.snapshotId, agg.layer));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}. ${b.note} ${links}`);
     }
     lines.push("");
@@ -391,13 +435,13 @@ export function sigstoreMarkdown(agg: Aggregate, withNotes: boolean): string {
   lines.push("#### What is signed, and sources", "");
   for (const e of ecosystems) {
     const f = sigstoreOf(e);
-    const links = citeLinks(f.sources, outDir(agg.snapshotId));
+    const links = citeLinks(f.sources, outDir(agg.snapshotId, agg.layer));
     lines.push(`- **${ECOSYSTEM_LABEL[e]}**: ${f.signs} ${links}`);
   }
   lines.push("", "#### Install clients", "", "| Ecosystem | Client | Checks bundles | Note |", "|---|---|---|---|");
   for (const e of ecosystems) {
     for (const c of sigstoreOf(e).clients) {
-      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} ${citeLinks(c.sources, outDir(agg.snapshotId))} |`);
+      lines.push(`| ${ECOSYSTEM_LABEL[e]} | ${c.client} | ${c.verifies} | ${c.note} ${citeLinks(c.sources, outDir(agg.snapshotId, agg.layer))} |`);
     }
   }
   lines.push("");
@@ -438,7 +482,7 @@ export function pqcMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${l.label}**: ${l.question}`, "");
     for (const e of ecosystems) {
       const p = pqcOf(e, l.id);
-      const links = citeLinks(p.sources, outDir(agg.snapshotId));
+      const links = citeLinks(p.sources, outDir(agg.snapshotId, agg.layer));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${p.primitive} (${p.status}). ${p.note} ${links}`);
     }
     lines.push("");
@@ -490,7 +534,7 @@ export function policiesMarkdown(agg: Aggregate, withNotes: boolean): string {
     lines.push(`**${p.label}**`, "");
     for (const e of ecosystems) {
       const b = policyOf(e, p.id);
-      const links = citeLinks(b.sources, outDir(agg.snapshotId));
+      const links = citeLinks(b.sources, outDir(agg.snapshotId, agg.layer));
       lines.push(`- ${ECOSYSTEM_LABEL[e]}: ${b.value}${b.since ? ` (since ${b.since})` : ""}. ${b.note} ${links}`);
     }
     lines.push("");
@@ -588,13 +632,13 @@ export function advisoriesMarkdown(agg: Aggregate, withNotes: boolean): string {
   if (!withNotes) return lines.join("\n");
 
   lines.push("#### Method and sources", "");
-  for (const n of ADVISORY_NOTES) lines.push(`- **${n.label}**: ${n.note} ${citeLinks(n.sources, outDir(agg.snapshotId))}`);
+  for (const n of ADVISORY_NOTES) lines.push(`- **${n.label}**: ${n.note} ${citeLinks(n.sources, outDir(agg.snapshotId, agg.layer))}`);
   lines.push("");
   return lines.join("\n");
 }
 
 /** One row per version and matched OSV record, with the vulnerability (alias group) it belongs to. */
-function advisoriesCsv(db: Db, snapshotId: string): string {
+function advisoriesCsv(db: Db, snapshotId: string, members: Set<string>): string {
   const records = db.select().from(advisories).where(eq(advisories.snapshotId, snapshotId)).all();
   const byId = new Map(records.map((r) => [r.advisoryId, r]));
   const group = aliasGroups(records.map((r) => ({ id: r.advisoryId, aliases: r.aliases, published: r.published, withdrawn: r.withdrawn })));
@@ -618,7 +662,8 @@ function advisoriesCsv(db: Db, snapshotId: string): string {
     .from(advisoryMatches)
     .where(eq(advisoryMatches.snapshotId, snapshotId))
     .orderBy(asc(advisoryMatches.ecosystem), asc(advisoryMatches.packageName), asc(advisoryMatches.version), asc(advisoryMatches.advisoryId))
-    .all();
+    .all()
+    .filter((m) => members.has(`${m.ecosystem}/${m.packageName}`));
   return csv(
     [
       "ecosystem", "package", "version", "purl", "is_latest", "quarter_anchor", "withdrawn_as", "released_at", "advisory_id", "database",
@@ -638,13 +683,14 @@ function advisoriesCsv(db: Db, snapshotId: string): string {
   );
 }
 
-function withdrawalsCsv(db: Db, snapshotId: string): string {
+function withdrawalsCsv(db: Db, snapshotId: string, members: Set<string>): string {
   const rows = db
     .select()
     .from(packageWithdrawals)
     .where(eq(packageWithdrawals.snapshotId, snapshotId))
     .orderBy(asc(packageWithdrawals.ecosystem), asc(packageWithdrawals.packageName), asc(packageWithdrawals.kind))
-    .all();
+    .all()
+    .filter((r) => members.has(`${r.ecosystem}/${r.packageName}`));
   return csv(
     ["ecosystem", "package", "kind", "versions_in_window", "withdrawn_count", "withdrawn_versions"],
     rows.map((r) => [r.ecosystem, r.packageName, r.kind, r.versionsInWindow, r.withdrawnCount, r.withdrawnVersions]),
@@ -684,38 +730,47 @@ function scoreSeriesCsv(agg: Aggregate): string {
 
 function matrixCsv(agg: Aggregate): string {
   return csv(
-    ["ecosystem", "signal", "availability", "mandatory", "n", "true", "false", "unknown", "pct", "pct_known"],
-    agg.matrix.map((c) => [c.ecosystem, c.signal, c.availability, c.mandatory, c.n, c.t, c.f, c.u, c.pct, c.pctKnown]),
+    ["ecosystem", "signal", "availability", "mandatory", "n", "true", "false", "unknown", "pct", "pct_lo", "pct_hi", "pct_known"],
+    agg.matrix.map((c) => [c.ecosystem, c.signal, c.availability, c.mandatory, c.n, c.t, c.f, c.u, c.pct, c.lo, c.hi, c.pctKnown]),
   );
 }
 
 function seriesCsv(agg: Aggregate): string {
   return csv(
-    ["quarter", "ecosystem", "signal", "n", "true", "false", "unknown", "pct", "pct_known"],
-    agg.series.map((p) => [p.quarter, p.ecosystem, p.signal, p.n, p.t, p.f, p.u, p.pct, p.pctKnown]),
+    ["quarter", "ecosystem", "signal", "n", "true", "false", "unknown", "pct", "pct_lo", "pct_hi", "pct_known"],
+    agg.series.map((p) => [p.quarter, p.ecosystem, p.signal, p.n, p.t, p.f, p.u, p.pct, p.lo, p.hi, p.pctKnown]),
   );
 }
 
-function packagesCsv(db: Db, snapshotId: string): string {
+/** The layer's packages, with `in_layers` naming every sample that drew each one (the overlap). */
+function packagesCsv(db: Db, snapshotId: string, layer: SampleLayer): string {
+  const all = db.select().from(sampleMembers).where(eq(sampleMembers.snapshotId, snapshotId)).all();
+  const layersOf = new Map<string, string[]>();
+  for (const m of all) layersOf.set(`${m.ecosystem}/${m.packageName}`, [...(layersOf.get(`${m.ecosystem}/${m.packageName}`) ?? []), m.layer]);
   const rows = db
     .select()
-    .from(packages)
-    .where(eq(packages.snapshotId, snapshotId))
-    .orderBy(asc(packages.ecosystem), asc(packages.rank))
-    .all();
+    .from(sampleMembers)
+    .innerJoin(
+      packages,
+      and(eq(packages.snapshotId, sampleMembers.snapshotId), eq(packages.ecosystem, sampleMembers.ecosystem), eq(packages.packageName, sampleMembers.packageName)),
+    )
+    .where(and(eq(sampleMembers.snapshotId, snapshotId), eq(sampleMembers.layer, layer)))
+    .orderBy(asc(sampleMembers.ecosystem), asc(sampleMembers.rank))
+    .all()
+    .map(({ sample_members: m, packages: p }) => ({ ...p, ...m }));
   return csv(
     [
-      "ecosystem", "package", "rank", "rank_frame", "download_count", "dependent_count", "latest_version",
+      "ecosystem", "package", "rank", "rank_frame", "download_count", "dependent_count", "in_layers", "latest_version",
       "latest_publish_date", "maintainer_count", "maintainer_count_source", "repository_url", "fetch_error", "extract_error", "osv_queried_at",
     ],
     rows.map((r) => [
-      r.ecosystem, r.packageName, r.rank, r.rankFrame, r.downloadCount, r.dependentCount, r.latestVersion,
+      r.ecosystem, r.packageName, r.rank, r.rankFrame, r.downloadCount, r.dependentCount, (layersOf.get(`${r.ecosystem}/${r.packageName}`) ?? []).sort().join(" "), r.latestVersion,
       r.latestPublishDate, r.maintainerCount, r.maintainerCountSource, r.repositoryUrl, r.fetchError, r.extractError, r.osvQueriedAt,
     ]),
   );
 }
 
-function signalsCsv(db: Db, snapshotId: string): string {
+function signalsCsv(db: Db, snapshotId: string, members: Set<string>): string {
   const rows = db
     .select({
       ecosystem: versionSignals.ecosystem,
@@ -742,7 +797,8 @@ function signalsCsv(db: Db, snapshotId: string): string {
     )
     .where(eq(versionSignals.snapshotId, snapshotId))
     .orderBy(asc(versionSignals.ecosystem), asc(versionSignals.packageName), asc(packageVersions.publishedAt))
-    .all();
+    .all()
+    .filter((r) => members.has(`${r.ecosystem}/${r.packageName}`));
   return csv(
     // A value can rest on several responses (Maven's `.asc` and `.sigstore.json`); they are space-separated, in the same order.
     ["ecosystem", "package", "version", "published_at", "is_latest", "quarter_anchor", "signal", "value", "evidence", "signal_source", "response_urls", "response_sha256s"],

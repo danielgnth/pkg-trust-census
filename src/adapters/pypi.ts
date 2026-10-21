@@ -25,6 +25,7 @@ import {
 import { withdrawalWindowStart } from "../extract/quarters.ts";
 import { fulcioSourceRef } from "../extract/fulcio.ts";
 import { isPep440Prerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 /**
  * Community-maintained daily export of PyPI download counts from Google BigQuery.
@@ -68,7 +69,7 @@ export interface SimpleFile {
   yanked?: boolean | string;
 }
 
-interface SimpleIndex {
+export interface SimpleIndex {
   name?: string;
   versions?: string[];
   files: SimpleFile[];
@@ -163,6 +164,7 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
     return rows.slice(0, n).map((row, i) => ({
       ecosystem: this.id,
       name: normalizeName(row.project),
+      layer: "top" as const,
       rank: i + 1,
       rankFrame: this.rankFrame,
       downloadCount: row.download_count,
@@ -234,7 +236,7 @@ export class PypiAdapter extends GatheringAdapter<Raw> {
   }
 }
 
-function groupByVersion(project: string, simple: SimpleIndex): PypiVersion[] {
+export function groupByVersion(project: string, simple: SimpleIndex): PypiVersion[] {
   const known = new Set(simple.versions ?? []);
   const byVersion = new Map<string, SimpleFile[]>();
   for (const v of known) byVersion.set(v, []);
@@ -350,3 +352,13 @@ function repositoryFrom(json: JsonApi | null): string | null {
   const home = json?.info?.home_page;
   return cleanRepoUrl(labelled?.[1]) ?? cleanRepoUrl(forge) ?? (isForge(home) ? cleanRepoUrl(home) : null);
 }
+
+/** PyPI's JSON API names the author and maintainer; the Simple API and provenance objects name CI workflows only. */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "pypi",
+    endpoint: "pypi.org/pypi/{p}/json",
+    matches: (url) => /^https:\/\/pypi\.org\/pypi\/[^/]+\/json$/.test(url),
+    paths: ["info.author", "info.author_email", "info.maintainer", "info.maintainer_email"],
+  },
+]

@@ -274,7 +274,7 @@ The idea here [\[3\]](#id40) would be to design a general purpose way for client
 
 -   The package was uploaded by a specific organization or user name e.g. `pip install "azure-loganalytics from microsoft"`
 -   The package was uploaded by an owner of a specific domain name e.g. `pip install "google-cloud-compute from cloud.google.com"`
--   The package was uploaded by a user with a specific email address e.g. `pip install "aws-cdk-lib from contact@amazon.com"`
+-   The package was uploaded by a user with a specific email address e.g. `pip install "aws-cdk-lib from redacted@example.invalid"`
 -   The package matching a namespace was uploaded by an authorized party (this PEP)
 
 A fundamental downside is that it doesn’t play well with multiple repositories. For example, say a user wants the `azure-loganalytics` package and wants to ensure it comes from the organization named `microsoft`. If Microsoft’s organization name on PyPI is `microsoft` then a package manager that defaults to PyPI could accept `azure-loganalytics from microsoft`. However, if multiple repositories are used for dependency resolution then the user would have to specify the repository as part of the definition which is unrealistic for reasons outlined in the dedicated section on [asserting package owner names](#asserting-package-owner-names).
@@ -311,7 +311,7 @@ As with the organization scoping idea, a new [syntax](https://packaging.python.o
 
 A unique downside is that names are an implementation detail of repositories. On PyPI, the names of organizations are separate from user names so there is potential for conflicts. In the case of multiple repositories, users might run into cases of dependency confusion similar to the one at the end of the [Encourage Dedicated Package Repositories](#dedicated-repositories) rejected idea.
 
-To ameliorate this, it was suggested that the syntax be expanded to also include the expected repository URL like `microsoft@pypi.org::azure-loganalytics`. This syntax or something like it is so verbose that it could lead to user confusion, and even worse, frustration should it gain increased adoption among those able to maintain dedicated infrastructure (community projects would not benefit).
+To ameliorate this, it was suggested that the syntax be expanded to also include the expected repository URL like `redacted@example.invalid::azure-loganalytics`. This syntax or something like it is so verbose that it could lead to user confusion, and even worse, frustration should it gain increased adoption among those able to maintain dedicated infrastructure (community projects would not benefit).
 
 The expanded syntax is an attempt to standardize resolver behavior and configuration within dependency specifiers. Not only would this be mandating the UX of tools, it lacks precedent in package managers for language ecosystems with or without the concept of package repositories. In such cases, the resolver configuration is separate from the dependency definition.
 

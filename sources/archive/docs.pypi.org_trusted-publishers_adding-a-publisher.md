@@ -42,8 +42,8 @@ Warning
 
 Google Cloud also provides [default service accounts](https://cloud.google.com/iam/docs/service-account-types#default) for various products:
 
--   Compute Engine: `PROJECT_ID-compute@developer.gserviceaccount.com`
--   App Engine: `PROJECT_NAME@appspot.gserviceaccount.com`
+-   Compute Engine: `redacted@example.invalid`
+-   App Engine: `redacted@example.invalid`
 
 However it is **not** recommended that these be used for publishing, as they are provided by default to every service when they are created.
 

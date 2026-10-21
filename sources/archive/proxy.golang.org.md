@@ -38,7 +38,7 @@ See the [go command documentation](https://golang.org/ref/mod#private-module-pri
 
 ### Why is proxy.golang.org sending me so much traffic?
 
-The Go module mirror tries to keep its cache up to date by refreshing recently accessed information before it expires. If your server is seeing too much traffic, we can disable that speculative refresh or work with you to understand the traffic better. Please file a [GitHub issue](https://golang.org/issue/new?title=proxy.golang.org%3A+) or email us at [security@golang.org](mailto:security@golang.org).
+The Go module mirror tries to keep its cache up to date by refreshing recently accessed information before it expires. If your server is seeing too much traffic, we can disable that speculative refresh or work with you to understand the traffic better. Please file a [GitHub issue](https://golang.org/issue/new?title=proxy.golang.org%3A+) or email us at [redacted@example.invalid](mailto:redacted@example.invalid).
 
 ### I committed a new change (or released a new version) to a repository, why isn't it showing up when I run `go get -u` or `go list -m --versions`?
 
@@ -64,4 +64,4 @@ The proxy and checksum database protocols only send module paths and versions to
 
 ### I have discovered a malicious module version in the mirror. Where do I report it?
 
-Following [the security policy](https://golang.org/security#reporting), send an email to [security@golang.org](mailto:security@golang.org) with the word "vulnerability" in the message somewhere.
+Following [the security policy](https://golang.org/security#reporting), send an email to [redacted@example.invalid](mailto:redacted@example.invalid) with the word "vulnerability" in the message somewhere.

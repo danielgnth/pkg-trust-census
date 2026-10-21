@@ -1,26 +1,45 @@
 /**
- * Rank stage: produce the candidate sample per ecosystem.
+ * Rank stage: produce the candidate sample per ecosystem, for one sample layer.
  *
- * Writes the candidate list to `data/rankings/` (the committed record of who was sampled
- * and why) and seeds the `packages` table with rank and count. Later stages fill in the
- * rest of each row.
+ * `top` asks each adapter for its ranking. `random` draws active packages from the registry's
+ * full name list (src/sample/draw.ts). Either way the stage writes the candidate list to
+ * `data/rankings/` (the record of who was sampled and why) and seeds `packages` and
+ * `sample_members`. Later stages fill in the rest of each package row.
  */
 
 import { and, asc, eq } from "drizzle-orm";
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import type { Candidate, EcosystemId } from "../types.ts";
+import { SAMPLE_LAYERS, type Candidate, type EcosystemId, type SampleLayer } from "../types.ts";
 import type { HttpClient } from "../http/client.ts";
 import { getAdapter } from "../adapters/index.ts";
 import { dataDir } from "../http/cache.ts";
-import { ensureSnapshot, type Db } from "../db/open.ts";
-import { packages } from "../db/schema.ts";
-import { packageInsert, validateAll } from "../db/validation.ts";
+import { ensureSnapshot, snapshotAsOf, type Db } from "../db/open.ts";
+import { packages, sampleMembers } from "../db/schema.ts";
+import { sampleMemberInsert, validateAll } from "../db/validation.ts";
+import { drawActive } from "../sample/draw.ts";
+import { getDrawSource } from "../sample/sources.ts";
 
 export interface RankResult {
   ecosystem: EcosystemId;
+  layer: SampleLayer;
   count: number;
   path: string;
+}
+
+export interface RankOptions {
+  layer?: SampleLayer;
+  /** Seed of the random draw; defaults to the snapshot id, so a snapshot names its own draw. */
+  seed?: string | undefined;
+}
+
+export function rankingPath(ecosystem: EcosystemId, snapshotId: string, layer: SampleLayer): string {
+  return join(dataDir(), "rankings", `${ecosystem}_${snapshotId}${layer === "top" ? "" : `_${layer}`}.json`);
+}
+
+/** Where a snapshot's name lists and dumps are stored, with their checksums. */
+export function namesDir(snapshotId: string): string {
+  return join(dataDir(), "names", snapshotId);
 }
 
 export async function runRank(
@@ -30,14 +49,17 @@ export async function runRank(
   db: Db,
   http: HttpClient,
   onProgress?: (message: string) => void,
+  opts: RankOptions = {},
 ): Promise<RankResult[]> {
+  const layer = opts.layer ?? "top";
   const results: RankResult[] = [];
-  const dir = join(dataDir(), "rankings");
-  await mkdir(dir, { recursive: true });
+  await mkdir(join(dataDir(), "rankings"), { recursive: true });
 
   // `rank` is the stage that begins a snapshot, so it owns making the row exist —
   // `packages` has a foreign key onto it.
   ensureSnapshot(db, snapshotId, { n, ecosystems });
+  const seed = opts.seed ?? snapshotId;
+  const ctx = { snapshotId, asOf: snapshotAsOf(db, snapshotId), dir: namesDir(snapshotId), seed };
 
   for (const eco of ecosystems) {
     const adapter = getAdapter(eco);
@@ -46,15 +68,31 @@ export async function runRank(
       continue;
     }
 
-    const candidates = await adapter.rank(n, http);
-    const path = join(dir, `${eco}_${snapshotId}.json`);
+    let candidates: Candidate[];
+    let record: Record<string, unknown>;
+    if (layer === "top") {
+      candidates = await adapter.rank(n, http);
+      record = { rank_frame: adapter.rankFrame };
+    } else {
+      const source = getDrawSource(eco);
+      if (!source) {
+        onProgress?.(`[${eco}] no name list for a random draw yet — skipping`);
+        continue;
+      }
+      const drawn = await drawActive(source, n, seed, http, ctx, onProgress);
+      candidates = drawn.candidates;
+      record = { rank_frame: "random", draw: drawn.record };
+    }
+
+    const path = rankingPath(eco, snapshotId, layer);
     await Bun.write(
       path,
       JSON.stringify(
         {
           ecosystem: eco,
           snapshot_id: snapshotId,
-          rank_frame: adapter.rankFrame,
+          layer,
+          ...record,
           requested_n: n,
           returned: candidates.length,
           generated_at: new Date().toISOString(),
@@ -65,21 +103,22 @@ export async function runRank(
       ) + "\n",
     );
 
-    persistCandidates(db, snapshotId, candidates);
-    results.push({ ecosystem: eco, count: candidates.length, path });
-    onProgress?.(`[${eco}] ranked ${candidates.length} by ${adapter.rankFrame} -> ${path}`);
+    persistCandidates(db, snapshotId, eco, layer, candidates);
+    results.push({ ecosystem: eco, layer, count: candidates.length, path });
+    onProgress?.(`[${eco}] ${layer}: ${candidates.length} -> ${path}`);
   }
 
   return results;
 }
 
-function persistCandidates(db: Db, snapshotId: string, candidates: Candidate[]): void {
+function persistCandidates(db: Db, snapshotId: string, ecosystem: EcosystemId, layer: SampleLayer, candidates: Candidate[]): void {
   // Validated before the transaction opens: a bad row is an adapter bug, and it should
   // abort with a message naming the package rather than a bare CHECK violation mid-write.
   const rows = validateAll(
-    packageInsert,
+    sampleMemberInsert,
     candidates.map((c) => ({
       snapshotId,
+      layer,
       ecosystem: c.ecosystem,
       packageName: c.name,
       rankFrame: c.rankFrame,
@@ -87,53 +126,66 @@ function persistCandidates(db: Db, snapshotId: string, candidates: Candidate[]):
       downloadCount: c.downloadCount,
       dependentCount: c.dependentCount,
     })),
-    "packages",
+    "sample_members",
   );
 
-  // One transaction: a partially-written ranking would misrepresent the sample.
+  // One transaction, replacing the layer's previous sample: a partially-written or half-old
+  // ranking would misrepresent the sample. A package another layer also drew keeps its row.
   db.transaction((tx) => {
+    tx.delete(sampleMembers)
+      .where(and(eq(sampleMembers.snapshotId, snapshotId), eq(sampleMembers.layer, layer), eq(sampleMembers.ecosystem, ecosystem)))
+      .run();
     for (const row of rows) {
-      tx.insert(packages)
-        .values(row)
-        .onConflictDoUpdate({
-          target: [packages.snapshotId, packages.ecosystem, packages.packageName],
-          set: {
-            rankFrame: row.rankFrame,
-            rank: row.rank,
-            downloadCount: row.downloadCount ?? null,
-            dependentCount: row.dependentCount ?? null,
-          },
-        })
-        .run();
+      tx.insert(packages).values({ snapshotId, ecosystem, packageName: row.packageName }).onConflictDoNothing().run();
+      tx.insert(sampleMembers).values(row).run();
     }
   });
 }
 
-/** Reads back the sample for a snapshot, so `fetch` can run as a separate invocation. */
-export function loadCandidates(
-  db: Db,
-  snapshotId: string,
-  ecosystem: EcosystemId,
-): Candidate[] {
+/**
+ * Reads back the sample for a snapshot, so `fetch` can run as a separate invocation. Without a
+ * layer, every package any layer drew, once, as its first layer lists it: `fetch` and `extract`
+ * measure a package once however many samples hold it.
+ */
+export function loadCandidates(db: Db, snapshotId: string, ecosystem: EcosystemId, layer?: SampleLayer): Candidate[] {
   const rows = db
-    .select({
-      name: packages.packageName,
-      rankFrame: packages.rankFrame,
-      rank: packages.rank,
-      downloadCount: packages.downloadCount,
-      dependentCount: packages.dependentCount,
-    })
-    .from(packages)
-    .where(and(eq(packages.snapshotId, snapshotId), eq(packages.ecosystem, ecosystem)))
-    .orderBy(asc(packages.rank))
-    .all();
+    .select()
+    .from(sampleMembers)
+    .where(and(eq(sampleMembers.snapshotId, snapshotId), eq(sampleMembers.ecosystem, ecosystem), layer ? eq(sampleMembers.layer, layer) : undefined))
+    .orderBy(asc(sampleMembers.rank))
+    .all()
+    .sort((a, b) => SAMPLE_LAYERS.indexOf(a.layer as SampleLayer) - SAMPLE_LAYERS.indexOf(b.layer as SampleLayer));
 
-  return rows.map((r) => ({
-    ecosystem,
-    name: r.name,
-    rank: r.rank,
-    rankFrame: r.rankFrame as Candidate["rankFrame"],
-    downloadCount: r.downloadCount,
-    dependentCount: r.dependentCount,
-  }));
+  const seen = new Set<string>();
+  return rows
+    .filter((r) => !seen.has(r.packageName) && seen.add(r.packageName))
+    .map((r) => ({
+      ecosystem,
+      name: r.packageName,
+      layer: r.layer as SampleLayer,
+      rank: r.rank,
+      rankFrame: r.rankFrame as Candidate["rankFrame"],
+      downloadCount: r.downloadCount,
+      dependentCount: r.dependentCount,
+    }));
+}
+
+/** The layers a snapshot holds, in `SAMPLE_LAYERS` order. */
+export function snapshotLayers(db: Db, snapshotId: string): SampleLayer[] {
+  const present = new Set(
+    db.selectDistinct({ layer: sampleMembers.layer }).from(sampleMembers).where(eq(sampleMembers.snapshotId, snapshotId)).all().map((r) => r.layer),
+  );
+  return SAMPLE_LAYERS.filter((l) => present.has(l));
+}
+
+/** "{ecosystem}/{package}" of every package in one layer: the filter every per-layer number goes through. */
+export function layerMembers(db: Db, snapshotId: string, layer: SampleLayer): Set<string> {
+  return new Set(
+    db
+      .select({ ecosystem: sampleMembers.ecosystem, name: sampleMembers.packageName })
+      .from(sampleMembers)
+      .where(and(eq(sampleMembers.snapshotId, snapshotId), eq(sampleMembers.layer, layer)))
+      .all()
+      .map((r) => `${r.ecosystem}/${r.name}`),
+  );
 }

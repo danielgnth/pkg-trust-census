@@ -1,4 +1,4 @@
-import type { EcosystemId, SignalId, WithdrawalKind } from "../types.ts";
+import type { EcosystemId, SampleLayer, SignalId, WithdrawalKind } from "../types.ts";
 import { CATEGORIES, type CategoryId, type MatrixCell } from "../stages/aggregate.ts";
 
 export const SIGNAL_LABEL: Record<SignalId, string> = {
@@ -9,6 +9,12 @@ export const SIGNAL_LABEL: Record<SignalId, string> = {
   source_link: "Source link",
   transparency_log: "Transparency log",
   mfa_enforced: "MFA enforced",
+};
+
+/** What each sample is, as a phrase: "adoption among …". */
+export const LAYER_LABEL: Record<SampleLayer, string> = {
+  top: "top packages",
+  random: "random active packages",
 };
 
 export const CATEGORY_LABEL: Record<CategoryId, string> = {
@@ -129,5 +135,11 @@ export function cellText(c: MatrixCell): string {
   if (c.n === 0) return "no data";
   const bound = c.availability === "inferred" && c.u > 0 ? "≥ " : "";
   const mandatory = c.mandatory ? " · mandatory" : "";
-  return `${bound}${pctText(c.pct)} (${c.t}/${c.n})${mandatory}`;
+  return `${bound}${pctText(c.pct)} (${c.t}/${c.n}) ${intervalText(c.lo, c.hi)}${mandatory}`;
+}
+
+/** A 95% interval as "[8–12%]"; the "≥" of an inferred share stays outside it, since an interval cannot repair a lower bound. */
+export function intervalText(lo: number | null, hi: number | null): string {
+  if (lo == null || hi == null) return "";
+  return `[${Math.round(lo * 100)}–${Math.round(hi * 100)}%]`;
 }
