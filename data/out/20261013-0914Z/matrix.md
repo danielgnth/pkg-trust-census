@@ -2,15 +2,16 @@
 
 | | Identity-bound publish | Publisher signature | Registry integrity | SLSA provenance | Source link | Transparency log | MFA enforced |
 |---|---|---|---|---|---|---|---|
-| **PyPI** | ≥ 64% (32/50) | 64% (32/50) | — no mechanism | 0% (0/50) | 64% (32/50) | 64% (32/50) | 100% (50/50) · mandatory |
-| **npm** | 20% (10/50) | 20% (10/50) | 100% (50/50) · mandatory | 20% (10/50) | 20% (10/50) | 20% (10/50) | ≥ 86% (43/50) |
-| **crates.io** | 22% (11/50) | — no mechanism | — no mechanism | — no mechanism | 22% (11/50) | — no mechanism | — no mechanism |
-| **RubyGems** | 32% (16/50) | ≥ 26% (13/50) | — no mechanism | 0% (0/50) | 26% (13/50) | 26% (13/50) | 50% (25/50) |
-| **Go** | — no mechanism | — no mechanism | 100% (50/50) · mandatory | — no mechanism | ≥ 76% (38/50) | 100% (50/50) · mandatory | — no mechanism |
-| **Maven Central** | — no mechanism | 98% (49/50) · mandatory | — no mechanism | 0% (0/50) | 0% (0/50) | 0% (0/50) | — no mechanism |
-| **Packagist** | — no mechanism | — no mechanism | — no mechanism | — no mechanism | 100% (50/50) | — no mechanism | — no mechanism |
+| **PyPI** | ≥ 64% (32/50) [50–76%] | 64% (32/50) [50–76%] | — no mechanism | 0% (0/50) [0–7%] | 64% (32/50) [50–76%] | 64% (32/50) [50–76%] | 100% (50/50) [93–100%] · mandatory |
+| **npm** | 20% (10/50) [11–33%] | 20% (10/50) [11–33%] | 100% (50/50) [93–100%] · mandatory | 20% (10/50) [11–33%] | 20% (10/50) [11–33%] | 20% (10/50) [11–33%] | ≥ 86% (43/50) [74–93%] |
+| **crates.io** | 22% (11/50) [13–35%] | — no mechanism | — no mechanism | — no mechanism | 22% (11/50) [13–35%] | — no mechanism | — no mechanism |
+| **RubyGems** | 32% (16/50) [21–46%] | ≥ 26% (13/50) [16–40%] | — no mechanism | 0% (0/50) [0–7%] | 26% (13/50) [16–40%] | 26% (13/50) [16–40%] | 50% (25/50) [37–63%] |
+| **Go** | — no mechanism | — no mechanism | 100% (50/50) [93–100%] · mandatory | — no mechanism | ≥ 76% (38/50) [63–86%] | 100% (50/50) [93–100%] · mandatory | — no mechanism |
+| **Maven Central** | — no mechanism | 98% (49/50) [90–100%] · mandatory | — no mechanism | 0% (0/50) [0–7%] | 0% (0/50) [0–7%] | 0% (0/50) [0–7%] | — no mechanism |
+| **Packagist** | — no mechanism | — no mechanism | — no mechanism | — no mechanism | 100% (50/50) [93–100%] | — no mechanism | — no mechanism |
 
 Percentages are true / all sampled packages with an extracted latest version, so `unknown` counts as not adopted.
+Brackets give the 95% Wilson interval.
 `≥` marks an inferred signal, where the figure is a lower bound. *No mechanism*: the ecosystem has no such
 feature. *Not exposed*: the feature exists but the registry's public API does not reveal who uses it.
 *Mandatory*: required registry-wide by policy.

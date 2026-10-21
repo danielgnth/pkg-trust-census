@@ -66,6 +66,7 @@ Malware reports, which databases list each vulnerability and how late, and the m
 ![Sigstore support](charts/sigstore.svg)
 
 Notes and sources for every cell: [Sigstore](sigstore.md).
+Across every package of four registries, from deps.dev: [whole registry](registry.md).
 
 ## Post-quantum exposure
 
@@ -87,3 +88,4 @@ Notes and sources for every cell: [post-quantum exposure](pqc.md).
 | [advisories.csv](advisories.csv) | Every OSV record matched to a sampled or withdrawn version, with its purl and dates |
 | [sbom.cdx.json](sbom.cdx.json) | CycloneDX SBOM: the latest version of every sampled package and its known vulnerabilities |
 | [aggregate.json](aggregate.json) | Everything above, as the report stage reads it |
+| [requests.json](requests.json) | Responses per host and status, and the sha256 of the full request manifest published with the cache |

@@ -1,351 +1,351 @@
-ecosystem,package,rank,rank_frame,download_count,dependent_count,latest_version,latest_publish_date,maintainer_count,maintainer_count_source,repository_url,fetch_error,extract_error,osv_queried_at
-crates,hashbrown,1,downloads,738242092,,0.17.1,2026-05-09T04:35:04.251Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/hashbrown,,,2026-10-15T07:14:41.712Z
-crates,syn,2,downloads,701492586,,3.0.9,2026-10-12T15:04:09.212573Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/syn,,,2026-10-15T07:14:41.998Z
-crates,getrandom,3,downloads,644650028,,0.4.3,2026-06-17T18:01:59.979552Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/getrandom,,,2026-10-15T07:14:42.277Z
-crates,rand,4,downloads,505271468,,0.10.3,2026-09-20T06:37:47.850624Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/rand,,,2026-10-15T07:14:42.609Z
-crates,rand_core,5,downloads,496846267,,0.10.1,2026-04-13T15:26:43.049921Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang-nursery/rand,,,2026-10-15T07:14:43.486Z
-crates,bitflags,6,downloads,483863584,,2.13.2,2026-09-10T01:11:38.500809Z,2,crates.io owners (users; teams excluded),https://github.com/bitflags/bitflags,,,2026-10-15T07:14:44.281Z
-crates,windows-sys,7,downloads,449943053,,0.61.2,2025-10-06T19:18:30.163595Z,1,crates.io owners (users; teams excluded),https://github.com/microsoft/windows-rs,,,2026-10-15T07:14:44.565Z
-crates,thiserror,8,downloads,420199769,,2.0.21,2026-09-23T20:24:07.771104Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/thiserror,,,2026-10-15T07:14:44.838Z
-crates,thiserror-impl,9,downloads,420144623,,2.0.21,2026-09-23T20:24:05.038819Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/thiserror,,,2026-10-15T07:14:45.067Z
-crates,quote,10,downloads,412035927,,1.0.47,2026-07-19T00:16:57.083778Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/quote,,,2026-10-15T07:14:45.366Z
-crates,libc,11,downloads,406337872,,0.2.190,2026-10-02T19:33:19.966421Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/libc,,,2026-10-15T07:14:45.644Z
-crates,proc-macro2,12,downloads,401925506,,1.0.107,2026-07-19T00:18:25.189787Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/proc-macro2,,,2026-10-15T07:14:45.903Z
-crates,indexmap,13,downloads,400275518,,2.14.2,2026-09-05T01:53:48.019655Z,2,crates.io owners (users; teams excluded),https://github.com/indexmap-rs/indexmap,,,2026-10-15T07:14:46.185Z
-crates,memchr,14,downloads,396166138,,2.8.3,2026-07-08T00:49:54.408285Z,1,crates.io owners (users; teams excluded),https://github.com/BurntSushi/memchr,,,2026-10-15T07:14:46.396Z
-crates,base64,15,downloads,386189321,,0.23.1,2026-08-04T12:34:31.976297Z,2,crates.io owners (users; teams excluded),https://github.com/marshallpierce/rust-base64,,,2026-10-15T07:14:46.707Z
-crates,itertools,16,downloads,373680839,,0.15.0,2026-06-16T15:09:28.880416Z,2,crates.io owners (users; teams excluded),https://github.com/rust-itertools/itertools,,,2026-10-15T07:14:46.972Z
-crates,unicode-ident,17,downloads,373153471,,1.0.27,2026-10-12T04:20:27.796258Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/unicode-ident,,,2026-10-15T07:14:47.232Z
-crates,cfg-if,18,downloads,361642347,,1.0.5,2026-09-16T17:36:11.278420Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/cfg-if,,,2026-10-15T07:14:47.453Z
-crates,serde,19,downloads,356210408,,1.0.229,2026-07-18T23:05:13.266456Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:47.713Z
-crates,serde_json,20,downloads,355839640,,1.0.154,2026-10-11T15:31:46.076577Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/json,,,2026-10-15T07:14:48.021Z
-crates,itoa,21,downloads,352885015,,1.0.18,2026-03-20T00:12:37.043881Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/itoa,,,2026-10-15T07:14:48.295Z
-crates,cpufeatures,22,downloads,348720086,,0.3.1,2026-08-26T18:39:59.636708Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/utils,,,2026-10-15T07:14:48.567Z
-crates,serde_derive,23,downloads,343471733,,1.0.229,2026-07-18T23:05:07.504375Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:48.796Z
-crates,rand_chacha,24,downloads,334793258,,0.10.0,2026-02-02T08:15:02.537641Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/rand,,,2026-10-15T07:14:49.036Z
-crates,digest,25,downloads,327598356,,0.11.3,2026-05-03T12:54:48.023505Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/traits,,,2026-10-15T07:14:49.298Z
-crates,socket2,26,downloads,325414202,,0.6.5,2026-07-13T19:45:58.436336Z,3,crates.io owners (users; teams excluded),https://github.com/rust-lang/socket2,,,2026-10-15T07:14:49.605Z
-crates,block-buffer,27,downloads,323289265,,0.12.1,2026-06-11T15:40:05.682576Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/utils,,,2026-10-15T07:14:49.824Z
-crates,log,28,downloads,319204829,,0.4.34,2026-08-22T11:44:27.941626Z,4,crates.io owners (users; teams excluded),https://github.com/rust-lang/log,,,2026-10-15T07:14:50.130Z
-crates,crypto-common,29,downloads,317971063,,0.2.2,2026-05-19T16:01:22.304187Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/traits,,,2026-10-15T07:14:50.353Z
-crates,smallvec,30,downloads,317200830,,1.16.3,2026-10-10T02:25:27.052021Z,2,crates.io owners (users; teams excluded),https://github.com/servo/rust-smallvec,,,2026-10-15T07:14:50.657Z
-crates,heck,31,downloads,314448016,,0.5.0,2024-03-12T22:42:23.303234Z,2,crates.io owners (users; teams excluded),https://github.com/withoutboats/heck,,,2026-10-15T07:14:50.882Z
-crates,autocfg,32,downloads,314363121,,1.5.1,2026-05-22T11:03:04.576867Z,2,crates.io owners (users; teams excluded),https://github.com/cuviper/autocfg,,,2026-10-15T07:14:51.175Z
-crates,serde_core,33,downloads,313422262,,1.0.229,2026-07-18T23:05:10.896830Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:51.400Z
-crates,once_cell,34,downloads,312645336,,1.21.4,2026-03-12T10:59:52.512992Z,2,crates.io owners (users; teams excluded),https://github.com/matklad/once_cell,,,2026-10-15T07:14:51.688Z
-crates,cc,35,downloads,311156343,,1.8.0,2026-10-11T14:17:35.305208Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/cc-rs,,,2026-10-15T07:14:51.957Z
-crates,regex-syntax,36,downloads,310402857,,0.8.11,2026-06-09T15:00:25.566550Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:52.221Z
-crates,winnow,37,downloads,301467057,,1.0.4,2026-07-13T14:31:41.405838Z,1,crates.io owners (users; teams excluded),https://github.com/winnow-rs/winnow,,,2026-10-15T07:14:52.493Z
-crates,sha2,38,downloads,298282275,,0.11.1,2026-10-12T18:58:22.836567Z,2,crates.io owners (users; teams excluded),https://github.com/RustCrypto/hashes,,,2026-10-15T07:14:52.763Z
-crates,regex-automata,39,downloads,298278976,,0.4.18,2026-08-04T13:10:37.385020Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:53.030Z
-crates,rustix,40,downloads,290479766,,1.1.5,2026-09-16T23:05:02.319690Z,1,crates.io owners (users; teams excluded),https://github.com/bytecodealliance/rustix,,,2026-10-15T07:14:53.306Z
-crates,zmij,41,downloads,284615273,,1.0.23,2026-07-13T12:58:53.705886Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/zmij,,,2026-10-15T07:14:53.536Z
-crates,shlex,42,downloads,279717708,,2.0.1,2026-05-17T18:56:12.775983Z,2,crates.io owners (users; teams excluded),https://github.com/comex/rust-shlex,,,2026-10-15T07:14:53.785Z
-crates,linux-raw-sys,43,downloads,278545213,,0.12.1,2025-12-23T00:00:07.059646Z,1,crates.io owners (users; teams excluded),https://github.com/sunfishcode/linux-raw-sys,,,2026-10-15T07:14:54.040Z
-crates,bytes,44,downloads,277967942,,1.12.1,2026-07-08T10:01:28.616466Z,2,crates.io owners (users; teams excluded),https://github.com/tokio-rs/bytes,,,2026-10-15T07:14:54.505Z
-crates,regex,45,downloads,276625196,,1.13.1,2026-07-15T20:19:35.162139Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:55.322Z
-crates,aho-corasick,46,downloads,276478697,,1.1.5,2026-08-03T11:44:11.111398Z,1,crates.io owners (users; teams excluded),https://github.com/BurntSushi/aho-corasick,,,2026-10-15T07:14:55.578Z
-crates,zerocopy,47,downloads,275176604,,0.8.62,2026-10-08T10:04:10.669172Z,2,crates.io owners (users; teams excluded),https://github.com/google/zerocopy,,,2026-10-15T07:14:55.865Z
-crates,toml_datetime,48,downloads,273537917,,1.1.2+spec-1.1.0,2026-10-08T00:54:03.238939Z,1,crates.io owners (users; teams excluded),https://github.com/toml-rs/toml,,,2026-10-15T07:14:56.140Z
-crates,mio,49,downloads,270904722,,1.2.4,2026-10-03T16:33:10.183266Z,1,crates.io owners (users; teams excluded),https://github.com/tokio-rs/mio,,,2026-10-15T07:14:56.366Z
-crates,pin-project-lite,50,downloads,269113352,,0.2.17,2026-02-27T15:19:08.132543Z,1,crates.io owners (users; teams excluded),https://github.com/taiki-e/pin-project-lite,,,2026-10-15T07:14:56.619Z
-go,golang.org/x/sys,1,dependents,,179073,v0.49.0,2026-10-06T18:35:47Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/sys,,,2026-10-15T07:15:31.066Z
-go,github.com/stretchr/testify,2,dependents,,146490,v1.12.1,2026-08-17T08:24:05Z,,unavailable: Go has no publisher accounts,https://github.com/stretchr/testify,,,2026-10-15T07:15:31.581Z
-go,golang.org/x/crypto,3,dependents,,125672,v0.58.0,2026-10-09T16:24:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/crypto,,,2026-10-15T07:15:32.053Z
-go,github.com/golang/protobuf,4,dependents,,123672,v1.5.4,2024-03-06T06:45:40Z,,unavailable: Go has no publisher accounts,https://github.com/golang/protobuf,,,2026-10-15T07:15:42.208Z
-go,github.com/davecgh/go-spew,5,dependents,,118813,v1.1.1,2018-02-21T23:26:28Z,,unavailable: Go has no publisher accounts,https://github.com/davecgh/go-spew,,,2026-10-15T07:15:42.423Z
-go,golang.org/x/text,6,dependents,,113820,v0.43.0,2026-10-09T15:18:32Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/text,,,2026-10-15T07:15:42.790Z
-go,golang.org/x/net,7,dependents,,112044,v0.61.0,2026-10-09T17:07:24Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/net,,,2026-10-15T07:15:43.778Z
-go,github.com/pkg/errors,8,dependents,,98949,v0.9.1,2020-01-14T19:47:44Z,,unavailable: Go has no publisher accounts,https://github.com/pkg/errors,,,2026-10-15T07:15:49.817Z
-go,gopkg.in/yaml.v3,9,dependents,,91103,v3.0.1,2022-05-27T08:35:30Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:50.072Z
-go,gopkg.in/yaml.v2,10,dependents,,89653,v2.4.0,2020-11-17T15:46:20Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:50.321Z
-go,google.golang.org/protobuf,11,dependents,,86079,v1.36.12,2026-08-10T13:29:45Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/protobuf,,,2026-10-15T07:15:50.595Z
-go,github.com/google/go-cmp,12,dependents,,71578,v0.7.0,2025-01-14T18:15:44Z,,unavailable: Go has no publisher accounts,https://github.com/google/go-cmp,,,2026-10-15T07:15:50.816Z
-go,github.com/pmezard/go-difflib,13,dependents,,69104,v1.0.0,2016-01-10T10:55:54Z,,unavailable: Go has no publisher accounts,https://github.com/pmezard/go-difflib,,,2026-10-15T07:15:51.118Z
-go,github.com/sirupsen/logrus,14,dependents,,62999,v1.10.2,2026-08-25T18:05:09Z,,unavailable: Go has no publisher accounts,https://github.com/sirupsen/logrus,,,2026-10-15T07:15:51.380Z
-go,github.com/fsnotify/fsnotify,15,dependents,,60404,v1.10.1,2026-05-04T10:39:17Z,,unavailable: Go has no publisher accounts,https://github.com/fsnotify/fsnotify,,,2026-10-15T07:15:51.664Z
-go,github.com/gogo/protobuf,16,dependents,,59168,v1.3.2,2021-01-10T08:01:47Z,,unavailable: Go has no publisher accounts,https://github.com/gogo/protobuf,,,2026-10-15T07:15:51.888Z
-go,github.com/spf13/pflag,17,dependents,,57644,v1.0.10,2025-09-02T06:08:29Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/pflag,,,2026-10-15T07:15:52.167Z
-go,google.golang.org/grpc,18,dependents,,56663,v1.84.0,2026-09-17T20:03:25Z,,unavailable: Go has no publisher accounts,https://github.com/grpc/grpc-go,,,2026-10-15T07:15:52.505Z
-go,golang.org/x/tools,19,dependents,,55832,v0.52.0,2026-10-10T19:29:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/tools,,,2026-10-15T07:15:55.313Z
-go,github.com/google/uuid,20,dependents,,55031,v1.6.0,2024-01-23T18:54:04Z,,unavailable: Go has no publisher accounts,https://github.com/google/uuid,,,2026-10-15T07:15:55.535Z
-go,github.com/mattn/go-colorable,21,dependents,,50869,v0.1.16,2026-10-06T09:17:33Z,,unavailable: Go has no publisher accounts,https://github.com/mattn/go-colorable,,,2026-10-15T07:15:55.839Z
-go,github.com/spf13/cobra,22,dependents,,50282,v1.10.2,2025-12-03T23:51:15Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/cobra,,,2026-10-15T07:15:56.112Z
-go,github.com/mattn/go-isatty,23,dependents,,49465,v0.0.24,2026-07-23T16:45:22Z,,unavailable: Go has no publisher accounts,https://github.com/mattn/go-isatty,,,2026-10-15T07:15:56.390Z
-go,golang.org/x/sync,24,dependents,,48746,v0.24.0,2026-09-23T16:28:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/sync,,,2026-10-15T07:15:56.664Z
-go,github.com/json-iterator/go,25,dependents,,48676,v1.1.12,2021-09-11T02:17:26Z,,unavailable: Go has no publisher accounts,https://github.com/json-iterator/go,,,2026-10-15T07:15:56.894Z
-go,github.com/cespare/xxhash/v2,26,dependents,,47719,v2.3.0,2024-04-04T20:00:10Z,,unavailable: Go has no publisher accounts,https://github.com/cespare/xxhash,,,2026-10-15T07:15:57.153Z
-go,google.golang.org/genproto,27,dependents,,47144,v0.0.0-20261012220534-4341edf3f941,2026-10-12T22:05:34Z,,unavailable: Go has no publisher accounts,https://github.com/googleapis/go-genproto,,,2026-10-15T07:15:57.413Z
-go,github.com/modern-go/reflect2,28,dependents,,46474,v1.0.2,2021-09-11T02:10:30Z,,unavailable: Go has no publisher accounts,https://github.com/modern-go/reflect2,,,2026-10-15T07:15:57.650Z
-go,google.golang.org/appengine,29,dependents,,44102,v1.6.8,2023-08-30T01:12:52Z,,unavailable: Go has no publisher accounts,https://github.com/golang/appengine,,,2026-10-15T07:15:57.934Z
-go,github.com/modern-go/concurrent,30,dependents,,43683,v0.0.0-20180306012644-bacd9c7ef1dd,2018-03-06T01:26:44Z,,unavailable: Go has no publisher accounts,https://github.com/modern-go/concurrent,,,2026-10-15T07:15:58.158Z
-go,go.uber.org/atomic,31,dependents,,43007,v1.12.0,2026-09-17T21:29:09Z,,unavailable: Go has no publisher accounts,https://github.com/uber-go/atomic,,,2026-10-15T07:15:58.466Z
-go,github.com/golang/snappy,32,dependents,,41684,v1.0.0,2023-12-25T22:57:46Z,,unavailable: Go has no publisher accounts,https://github.com/golang/snappy,,,2026-10-15T07:15:58.684Z
-go,github.com/golang/groupcache,33,dependents,,41252,v0.0.0-20241129210726-2c02b8208cf8,2024-11-29T21:07:26Z,,unavailable: Go has no publisher accounts,https://github.com/golang/groupcache,,,2026-10-15T07:15:58.983Z
-go,github.com/fatih/color,34,dependents,,39081,v1.19.0,2026-03-20T08:53:23Z,,unavailable: Go has no publisher accounts,https://github.com/fatih/color,,,2026-10-15T07:15:59.211Z
-go,github.com/prometheus/common,35,dependents,,38694,v0.72.1,2026-10-11T08:43:15Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/common,,,2026-10-15T07:15:59.566Z
-go,gopkg.in/check.v1,36,dependents,,38591,v1.0.0-20201130134442-10cb98267c6c,2020-11-30T13:44:42Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:59.799Z
-go,golang.org/x/time,37,dependents,,38441,v0.16.0,2026-08-19T17:16:18Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/time,,,2026-10-15T07:16:00.036Z
-go,github.com/beorn7/perks,38,dependents,,37625,v1.0.1,2019-07-31T12:00:54Z,,unavailable: Go has no publisher accounts,https://github.com/beorn7/perks,,,2026-10-15T07:16:00.292Z
-go,github.com/gorilla/websocket,39,dependents,,37531,v1.5.3,2024-06-14T03:18:03Z,,unavailable: Go has no publisher accounts,https://github.com/gorilla/websocket,,,2026-10-15T07:16:00.643Z
-go,github.com/spf13/viper,40,dependents,,37067,v1.21.0,2025-09-08T16:56:14Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/viper,,,2026-10-15T07:16:01.416Z
-go,github.com/go-logr/logr,41,dependents,,36835,v1.4.4,2026-07-20T18:51:02Z,,unavailable: Go has no publisher accounts,https://github.com/go-logr/logr,,,2026-10-15T07:16:01.684Z
-go,github.com/prometheus/client_golang,42,dependents,,36473,v1.25.0,2026-10-08T13:00:24Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/client_golang,,,2026-10-15T07:16:01.966Z
-go,golang.org/x/oauth2,43,dependents,,36322,v0.37.0,2026-08-25T21:41:43Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/oauth2,,,2026-10-15T07:16:02.356Z
-go,go.uber.org/zap,44,dependents,,35840,v1.28.0,2026-04-28T02:13:09Z,,unavailable: Go has no publisher accounts,https://github.com/uber-go/zap,,,2026-10-15T07:16:03.176Z
-go,github.com/prometheus/procfs,45,dependents,,34604,v0.22.0,2026-08-28T13:53:50Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/procfs,,,2026-10-15T07:16:03.450Z
-go,github.com/klauspost/compress,46,dependents,,34277,v1.20.3,2026-10-12T09:19:21Z,,unavailable: Go has no publisher accounts,https://github.com/klauspost/compress,,,2026-10-15T07:16:03.834Z
-go,github.com/mitchellh/mapstructure,47,dependents,,32864,v1.5.0,2022-04-20T22:31:31Z,,unavailable: Go has no publisher accounts,https://github.com/mitchellh/mapstructure,,,2026-10-15T07:16:04.342Z
-go,gopkg.in/ini.v1,48,dependents,,32703,v1.67.3,2026-06-08T12:12:57Z,,unavailable: Go has no publisher accounts,https://gopkg.in/ini.v1,,,2026-10-15T07:16:04.623Z
-go,github.com/spf13/cast,49,dependents,,31940,v1.10.0,2025-09-08T16:45:31Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/cast,,,2026-10-15T07:16:04.858Z
-go,github.com/onsi/gomega,50,dependents,,31033,v1.44.0,2026-09-24T17:34:06Z,,unavailable: Go has no publisher accounts,https://github.com/onsi/gomega,,,2026-10-15T07:16:05.160Z
-maven,junit:junit,1,dependents,,97532,4.13.2,2021-02-13T16:31:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.409Z
-maven,org.scala-lang:scala-library,2,dependents,,71160,3.10.0,2026-10-05T09:26:12.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.695Z
-maven,org.slf4j:slf4j-api,3,dependents,,54638,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.926Z
-maven,com.google.guava:guava,4,dependents,,29526,33.7.2-jre,2026-09-29T14:47:28.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.226Z
-maven,ch.qos.logback:logback-classic,5,dependents,,26735,1.6.5,2026-09-30T19:40:19.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.543Z
-maven,org.mockito:mockito-core,6,dependents,,25205,5.24.0,2026-09-23T14:06:33.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.849Z
-maven,com.fasterxml.jackson.core:jackson-databind,7,dependents,,23566,2.22.3,2026-09-21T20:56:19.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:07.214Z
-maven,org.apache.commons:commons-lang3,8,dependents,,22625,3.21.0,2026-09-25T20:01:05.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:11.575Z
-maven,commons-io:commons-io,9,dependents,,21919,2.22.0,2026-04-19T12:01:24.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.105Z
-maven,org.jetbrains.kotlin:kotlin-stdlib-common,10,dependents,,20233,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.383Z
-maven,org.projectlombok:lombok,11,dependents,,16498,1.18.48,2026-09-01T20:40:56.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.658Z
-maven,org.jetbrains.kotlin:kotlin-stdlib-jdk8,12,dependents,,16439,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.944Z
-maven,javax.servlet:javax.servlet-api,13,dependents,,14401,4.0.1,2018-04-20T07:19:20.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:13.160Z
-maven,org.assertj:assertj-core,14,dependents,,14394,3.27.7,2026-01-24T19:07:20.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:13.569Z
-maven,log4j:log4j,15,dependents,,13845,1.2.17,2012-05-26T09:43:39.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:14.189Z
-maven,org.slf4j:slf4j-log4j12,16,dependents,,13700,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.021Z
-maven,com.google.code.gson:gson,17,dependents,,13676,2.14.0,2026-04-23T19:01:47.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.309Z
-maven,com.fasterxml.jackson.core:jackson-core,18,dependents,,12374,2.22.3,2026-09-21T20:38:01.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.654Z
-maven,org.mockito:mockito-all,19,dependents,,12283,1.10.19,2014-12-31T16:43:36.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:17.886Z
-maven,org.slf4j:slf4j-simple,20,dependents,,12084,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.180Z
-maven,org.junit.jupiter:junit-jupiter-api,21,dependents,,12039,6.1.3,2026-08-07T12:27:00.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.457Z
-maven,org.apache.httpcomponents:httpclient,22,dependents,,11971,4.5.14,2022-11-30T18:40:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.679Z
-maven,org.junit.jupiter:junit-jupiter-engine,23,dependents,,11720,6.1.3,2026-08-07T12:27:00.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.984Z
-maven,com.fasterxml.jackson.core:jackson-annotations,24,dependents,,11535,2.22,2026-05-31T04:44:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.235Z
-maven,com.google.code.findbugs:jsr305,25,dependents,,11503,3.0.2,2017-03-31T04:55:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.455Z
-maven,commons-codec:commons-codec,26,dependents,,11225,1.23.0,2026-10-04T13:04:17.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.715Z
-maven,org.scala-lang:scala-reflect,27,dependents,,11154,2.13.18,2025-11-17T08:48:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.067Z
-maven,org.jetbrains.kotlin:kotlin-stdlib,28,dependents,,11122,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.355Z
-maven,org.springframework:spring-context,29,dependents,,10396,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.654Z
-maven,org.testng:testng,30,dependents,,10062,7.12.0,2026-01-22T05:19:41.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:21.426Z
-maven,commons-lang:commons-lang,31,dependents,,9449,2.6,2011-01-16T22:21:47.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:21.712Z
-maven,org.springframework.boot:spring-boot-starter-test,32,dependents,,9077,4.1.1,2026-08-20T12:51:49.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.059Z
-maven,joda-time:joda-time,33,dependents,,8984,2.15.0,2026-10-01T07:36:16.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.300Z
-maven,org.apache.logging.log4j:log4j-core,34,dependents,,8839,2.26.1,2026-06-29T07:44:53.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.608Z
-maven,commons-logging:commons-logging,35,dependents,,8711,1.4.0,2026-06-11T20:49:26.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:23.883Z
-maven,org.springframework.boot:spring-boot-starter-web,36,dependents,,8658,4.1.1,2026-08-20T12:51:49.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.183Z
-maven,org.scalatest:scalatest_2.12,37,dependents,,8554,3.3.0-SNAP4,2023-04-11T13:23:22.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.476Z
-maven,javax.servlet:servlet-api,38,dependents,,8267,2.5,2006-07-17T11:09:57.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.701Z
-maven,org.scalatest:scalatest_2.11,39,dependents,,7880,3.3.0-SNAP4,2023-04-11T13:26:45.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.960Z
-maven,com.h2database:h2,40,dependents,,7857,2.5.252,2026-09-26T14:39:29.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.249Z
-maven,org.slf4j:jcl-over-slf4j,41,dependents,,7757,2.0.20,2026-09-22T14:50:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.539Z
-maven,org.springframework:spring-test,42,dependents,,7391,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.827Z
-maven,org.apache.logging.log4j:log4j-api,43,dependents,,7277,2.26.1,2026-06-29T07:47:30.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:26.247Z
-maven,org.springframework.boot:spring-boot-configuration-processor,44,dependents,,7252,4.1.1,2026-08-20T12:51:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:26.771Z
-maven,org.apache.maven:maven-plugin-api,45,dependents,,6755,3.10.0,2026-09-27T20:39:59.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:27.054Z
-maven,org.springframework:spring-core,46,dependents,,6691,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:27.417Z
-maven,org.springframework:spring-web,47,dependents,,6673,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:28.345Z
-maven,org.scala-lang:scala-compiler,48,dependents,,6623,2.13.18,2025-11-17T08:48:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:29.916Z
-maven,org.springframework.boot:spring-boot-autoconfigure,49,dependents,,6483,4.1.1,2026-08-20T12:51:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:30.291Z
-maven,org.hamcrest:hamcrest-all,50,dependents,,6476,1.3,2012-07-09T21:11:44.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:30.761Z
-npm,semver,1,downloads,3871999785,,7.8.5,2026-06-19T18:32:48.972Z,4,packument maintainers[],https://github.com/npm/node-semver,,,2026-10-15T07:14:16.870Z
-npm,minimatch,2,downloads,3193521359,,10.2.6,2026-07-27T19:00:09.469Z,1,packument maintainers[],https://github.com/isaacs/minimatch,,,2026-10-15T07:14:17.268Z
-npm,ansi-styles,3,downloads,3092443982,,7.0.0,2026-07-26T14:57:36.835Z,1,packument maintainers[],https://github.com/chalk/ansi-styles,,,2026-10-15T07:14:18.318Z
-npm,debug,4,downloads,3069998996,,4.4.3,2025-09-13T17:25:19.732Z,2,packument maintainers[],https://github.com/debug-js/debug,,,2026-10-15T07:14:18.899Z
-npm,brace-expansion,5,downloads,2774179410,,5.0.12,2026-09-14T21:59:00.288Z,2,packument maintainers[],https://github.com/juliangruber/brace-expansion,,,2026-10-15T07:14:19.768Z
-npm,lru-cache,6,downloads,2571580839,,11.5.3,2026-09-18T23:46:33.023Z,1,packument maintainers[],https://github.com/isaacs/node-lru-cache,,,2026-10-15T07:14:22.009Z
-npm,ms,7,downloads,2485023539,,2.1.3,2020-12-08T13:54:35.223Z,6,packument maintainers[],https://github.com/vercel/ms,,,2026-10-15T07:14:22.278Z
-npm,strip-ansi,8,downloads,2340065011,,7.2.0,2026-02-26T13:51:11.099Z,1,packument maintainers[],https://github.com/chalk/strip-ansi,,,2026-10-15T07:14:22.619Z
-npm,commander,9,downloads,2315473221,,15.0.0,2026-05-29T09:16:23.076Z,2,packument maintainers[],https://github.com/tj/commander.js,,,2026-10-15T07:14:23.133Z
-npm,string-width,10,downloads,2282897275,,8.3.0,2026-09-24T14:37:52.226Z,1,packument maintainers[],https://github.com/sindresorhus/string-width,,,2026-10-15T07:14:23.405Z
-npm,chalk,11,downloads,2277720874,,6.0.1,2026-09-27T03:40:44.397Z,1,packument maintainers[],https://github.com/chalk/chalk,,,2026-10-15T07:14:23.734Z
-npm,picomatch,12,downloads,2254168182,,4.0.7,2026-08-24T14:36:23.690Z,4,packument maintainers[],https://github.com/micromatch/picomatch,,,2026-10-15T07:14:25.137Z
-npm,ansi-regex,13,downloads,2240580097,,6.4.0,2026-09-27T03:34:44.568Z,1,packument maintainers[],https://github.com/chalk/ansi-regex,,,2026-10-15T07:14:25.977Z
-npm,supports-color,14,downloads,2193871951,,11.0.0,2026-07-26T15:13:36.815Z,1,packument maintainers[],https://github.com/chalk/supports-color,,,2026-10-15T07:14:26.491Z
-npm,@types/node,15,downloads,1991263062,,26.6.5,2026-10-09T18:46:47.657Z,1,packument maintainers[],https://github.com/DefinitelyTyped/DefinitelyTyped,,,2026-10-15T07:14:27.070Z
-npm,wrap-ansi,16,downloads,1951600488,,10.0.2,2026-09-21T04:09:32.260Z,1,packument maintainers[],https://github.com/chalk/wrap-ansi,,,2026-10-15T07:14:27.391Z
-npm,emoji-regex,17,downloads,1915550224,,11.0.0,2026-09-15T17:11:44.000Z,2,packument maintainers[],https://github.com/mathiasbynens/emoji-regex,,,2026-10-15T07:14:27.869Z
-npm,tslib,18,downloads,1910652385,,2.8.1,2024-10-31T22:42:48.624Z,7,packument maintainers[],https://github.com/Microsoft/tslib,,,2026-10-15T07:14:28.160Z
-npm,balanced-match,19,downloads,1829936258,,4.0.4,2026-02-22T11:38:25.951Z,1,packument maintainers[],https://github.com/juliangruber/balanced-match,,,2026-10-15T07:14:28.387Z
-npm,eslint-visitor-keys,20,downloads,1787713832,,5.0.1,2026-02-20T14:40:47.824Z,2,packument maintainers[],https://github.com/eslint/js,,,2026-10-15T07:14:28.628Z
-npm,glob,21,downloads,1766273183,,13.0.6,2026-02-19T17:26:33.269Z,1,packument maintainers[],https://github.com/isaacs/node-glob,,,2026-10-15T07:14:29.048Z
-npm,ajv,22,downloads,1726330501,,8.20.0,2026-04-24T15:22:16.529Z,2,packument maintainers[],https://github.com/ajv-validator/ajv,,,2026-10-15T07:14:29.765Z
-npm,type-fest,23,downloads,1719445698,,5.10.0,2026-09-17T09:11:18.201Z,1,packument maintainers[],https://github.com/sindresorhus/type-fest,,,2026-10-15T07:14:30.381Z
-npm,source-map,24,downloads,1673760871,,0.8.0,2026-07-20T05:45:25.965Z,25,packument maintainers[],https://github.com/mozilla/source-map,,,2026-10-15T07:14:30.605Z
-npm,react-is,25,downloads,1636919311,,19.3.0,2026-09-09T17:17:33.743Z,2,packument maintainers[],https://github.com/react/react,,,2026-10-15T07:14:30.903Z
-npm,escape-string-regexp,26,downloads,1624568710,,5.0.0,2021-04-17T15:45:50.334Z,1,packument maintainers[],https://github.com/sindresorhus/escape-string-regexp,,,2026-10-15T07:14:31.157Z
-npm,color-name,27,downloads,1591762476,,2.1.1,2026-07-22T15:38:35.512Z,3,packument maintainers[],https://github.com/colorjs/color-name,,,2026-10-15T07:14:31.464Z
-npm,readable-stream,28,downloads,1585269689,,4.8.0,2026-10-08T08:21:05.681Z,3,packument maintainers[],https://github.com/nodejs/readable-stream,,,2026-10-15T07:14:32.228Z
-npm,which,29,downloads,1563983623,,7.0.0,2026-05-08T18:30:58.733Z,4,packument maintainers[],https://github.com/npm/node-which,,,2026-10-15T07:14:32.501Z
-npm,color-convert,30,downloads,1557304789,,3.1.3,2025-11-14T18:29:11.565Z,1,packument maintainers[],https://github.com/Qix-/color-convert,,,2026-10-15T07:14:32.827Z
-npm,undici-types,31,downloads,1508965403,,8.11.2,2026-09-24T08:41:03.829Z,2,packument maintainers[],https://github.com/nodejs/undici,,,2026-10-15T07:14:33.554Z
-npm,json-schema-traverse,32,downloads,1497928739,,1.0.0,2020-12-13T10:56:54.719Z,1,packument maintainers[],https://github.com/epoberezkin/json-schema-traverse,,,2026-10-15T07:14:33.792Z
-npm,find-up,33,downloads,1472520547,,8.0.0,2025-09-16T01:13:57.112Z,1,packument maintainers[],https://github.com/sindresorhus/find-up,,,2026-10-15T07:14:34.057Z
-npm,glob-parent,34,downloads,1469990284,,6.0.2,2021-09-29T22:14:24.467Z,4,packument maintainers[],https://github.com/gulpjs/glob-parent,,,2026-10-15T07:14:34.315Z
-npm,has-flag,35,downloads,1461851307,,5.0.1,2021-07-19T17:30:54.122Z,1,packument maintainers[],https://github.com/sindresorhus/has-flag,,,2026-10-15T07:14:34.572Z
-npm,ignore,36,downloads,1453557178,,7.0.12,2026-10-02T12:24:54.844Z,1,packument maintainers[],https://github.com/kaelzhang/node-ignore,,,2026-10-15T07:14:34.870Z
-npm,p-limit,37,downloads,1447097137,,7.3.3,2026-09-18T18:27:54.962Z,1,packument maintainers[],https://github.com/sindresorhus/p-limit,,,2026-10-15T07:14:35.145Z
-npm,locate-path,38,downloads,1434892019,,8.0.0,2025-09-15T23:17:38.813Z,1,packument maintainers[],https://github.com/sindresorhus/locate-path,,,2026-10-15T07:14:35.378Z
-npm,p-locate,39,downloads,1428242770,,7.0.0,2026-02-03T07:57:49.916Z,1,packument maintainers[],https://github.com/sindresorhus/p-locate,,,2026-10-15T07:14:35.666Z
-npm,yallist,40,downloads,1423577909,,5.0.0,2024-04-09T19:21:44.844Z,1,packument maintainers[],https://github.com/isaacs/yallist,,,2026-10-15T07:14:35.899Z
-npm,safe-buffer,41,downloads,1413001369,,5.2.1,2020-05-10T16:37:30.776Z,2,packument maintainers[],https://github.com/feross/safe-buffer,,,2026-10-15T07:14:36.151Z
-npm,zod,42,downloads,1398180056,,4.6.7,2026-10-12T16:29:37.778Z,1,packument maintainers[],https://github.com/colinhacks/zod,,,2026-10-15T07:14:36.534Z
-npm,entities,43,downloads,1380015191,,8.1.0,2026-09-07T22:42:04.929Z,1,packument maintainers[],https://github.com/fb55/entities,,,2026-10-15T07:14:36.808Z
-npm,js-yaml,44,downloads,1341906393,,5.4.3,2026-10-05T22:13:55.389Z,1,packument maintainers[],https://github.com/nodeca/js-yaml,,,2026-10-15T07:14:37.194Z
-npm,path-key,45,downloads,1334668521,,4.0.0,2021-04-09T12:04:51.822Z,1,packument maintainers[],https://github.com/sindresorhus/path-key,,,2026-10-15T07:14:38.675Z
-npm,iconv-lite,46,downloads,1332298765,,0.7.3,2026-07-03T17:53:11.119Z,3,packument maintainers[],https://github.com/pillarjs/iconv-lite,,,2026-10-15T07:14:39.027Z
-npm,isexe,47,downloads,1331144474,,4.0.0,2026-02-09T16:28:02.924Z,1,packument maintainers[],https://github.com/isaacs/isexe,,,2026-10-15T07:14:39.299Z
-npm,postcss,48,downloads,1331035707,,8.5.30,2026-10-12T20:38:43.212Z,1,packument maintainers[],https://github.com/postcss/postcss,,,2026-10-15T07:14:39.589Z
-npm,uuid,49,downloads,1319053972,,14.0.3,2026-10-10T00:30:19.423Z,2,packument maintainers[],https://github.com/uuidjs/uuid,,,2026-10-15T07:14:40.875Z
-npm,typescript,50,downloads,1316755551,,7.0.2,2026-07-08T15:55:18.431Z,7,packument maintainers[],https://github.com/microsoft/TypeScript,,,2026-10-15T07:14:41.445Z
-packagist,symfony/deprecation-contracts,1,downloads,969781281,,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/deprecation-contracts,,,2026-10-15T07:16:31.059Z
-packagist,symfony/polyfill-mbstring,2,downloads,1307730517,,v1.43.0,2026-09-24T15:19:04+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-mbstring,,,2026-10-15T07:16:31.334Z
-packagist,psr/log,3,downloads,1306457746,,3.0.2,2024-09-11T13:17:53+00:00,3,packagist maintainers[],https://github.com/php-fig/log,,,2026-10-15T07:16:31.550Z
-packagist,psr/http-message,4,downloads,1163371681,,2.0,2023-04-04T09:54:51+00:00,3,packagist maintainers[],https://github.com/php-fig/http-message,,,2026-10-15T07:16:31.806Z
-packagist,symfony/console,5,downloads,1225517049,,v8.1.8,2026-09-18T16:00:27+00:00,1,packagist maintainers[],https://github.com/symfony/console,,,2026-10-15T07:16:32.110Z
-packagist,psr/container,6,downloads,1139414045,,1.1.2,2021-11-05T16:50:12+00:00,3,packagist maintainers[],https://github.com/php-fig/container,,,2026-10-15T07:16:32.329Z
-packagist,symfony/polyfill-intl-normalizer,7,downloads,963373290,,v1.43.0,2026-09-23T22:02:09+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-normalizer,,,2026-10-15T07:16:32.716Z
-packagist,guzzlehttp/psr7,8,downloads,1153179200,,3.1.0,2026-08-24T11:02:13+00:00,6,packagist maintainers[],https://github.com/guzzle/psr7,,,2026-10-15T07:16:33.062Z
-packagist,symfony/polyfill-php80,9,downloads,945693261,,v1.43.0,2026-09-25T15:50:05+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-php80,,,2026-10-15T07:16:34.315Z
-packagist,symfony/service-contracts,10,downloads,993035817,,v3.7.3,2026-07-27T15:39:01+00:00,1,packagist maintainers[],https://github.com/symfony/service-contracts,,,2026-10-15T07:16:34.634Z
-packagist,psr/http-factory,11,downloads,824230552,,1.1.0,2024-04-15T12:06:14+00:00,3,packagist maintainers[],https://github.com/php-fig/http-factory,,,2026-10-15T07:16:34.848Z
-packagist,symfony/finder,12,downloads,1129698434,,v8.1.8,2026-09-26T06:33:49+00:00,1,packagist maintainers[],https://github.com/symfony/finder,,,2026-10-15T07:16:35.177Z
-packagist,symfony/string,13,downloads,853505252,,v8.1.7,2026-09-11T14:51:16+00:00,1,packagist maintainers[],https://github.com/symfony/string,,,2026-10-15T07:16:35.457Z
-packagist,nikic/php-parser,14,downloads,1029273905,,v5.9.0,2026-09-13T18:51:52+00:00,1,packagist maintainers[],https://github.com/nikic/PHP-Parser,,,2026-10-15T07:16:35.683Z
-packagist,symfony/polyfill-intl-grapheme,15,downloads,829293775,,v1.43.0,2026-09-25T15:46:47+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-grapheme,,,2026-10-15T07:16:35.947Z
-packagist,guzzlehttp/promises,16,downloads,1102871502,,3.0.2,2026-08-24T10:00:26+00:00,4,packagist maintainers[],https://github.com/guzzle/promises,,,2026-10-15T07:16:36.208Z
-packagist,guzzlehttp/guzzle,17,downloads,1122971793,,8.2.0,2026-09-06T13:55:09+00:00,5,packagist maintainers[],https://github.com/guzzle/guzzle,,,2026-10-15T07:16:36.542Z
-packagist,symfony/polyfill-ctype,18,downloads,1111620450,,v1.37.0,2026-04-10T16:19:22+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-ctype,,,2026-10-15T07:16:39.038Z
-packagist,symfony/process,19,downloads,1101448865,,v8.1.7,2026-09-02T12:40:29+00:00,1,packagist maintainers[],https://github.com/symfony/process,,,2026-10-15T07:16:39.429Z
-packagist,symfony/event-dispatcher,20,downloads,1111778260,,v8.1.5,2026-08-21T17:47:34+00:00,1,packagist maintainers[],https://github.com/symfony/event-dispatcher,,,2026-10-15T07:16:40.203Z
-packagist,psr/http-client,21,downloads,804065068,,1.0.3,2023-09-23T14:17:50+00:00,2,packagist maintainers[],https://github.com/php-fig/http-client,,,2026-10-15T07:16:40.426Z
-packagist,symfony/event-dispatcher-contracts,22,downloads,878998011,,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/event-dispatcher-contracts,,,2026-10-15T07:16:40.720Z
-packagist,monolog/monolog,23,downloads,1086071658,,3.12.1,2026-09-29T19:21:12+00:00,1,packagist maintainers[],https://github.com/Seldaek/monolog,,,2026-10-15T07:16:40.943Z
-packagist,psr/event-dispatcher,24,downloads,736299418,,1.0.0,2019-01-08T18:20:26+00:00,3,packagist maintainers[],https://github.com/php-fig/event-dispatcher,,,2026-10-15T07:16:41.180Z
-packagist,doctrine/lexer,25,downloads,1026958796,,3.0.3,2026-10-01T06:59:29+00:00,1,packagist maintainers[],https://github.com/doctrine/lexer,,,2026-10-15T07:16:41.452Z
-packagist,symfony/http-foundation,26,downloads,997851790,,v8.1.8,2026-09-24T07:13:53+00:00,1,packagist maintainers[],https://github.com/symfony/http-foundation,,,2026-10-15T07:16:41.800Z
-packagist,symfony/var-dumper,27,downloads,975647766,,v8.1.7,2026-09-03T16:02:27+00:00,1,packagist maintainers[],https://github.com/symfony/var-dumper,,,2026-10-15T07:16:42.820Z
-packagist,symfony/polyfill-intl-idn,28,downloads,891398158,,v1.43.0,2026-09-23T14:40:04+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-idn,,,2026-10-15T07:16:43.191Z
-packagist,symfony/translation-contracts,29,downloads,816480954,,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/translation-contracts,,,2026-10-15T07:16:43.711Z
-packagist,ralouphie/getallheaders,30,downloads,1001902262,,3.0.3,2019-03-08T08:55:37+00:00,1,packagist maintainers[],https://github.com/ralouphie/getallheaders,,,2026-10-15T07:16:43.926Z
-packagist,symfony/http-kernel,31,downloads,936639752,,v8.1.8,2026-09-29T14:08:01+00:00,1,packagist maintainers[],https://github.com/symfony/http-kernel,,,2026-10-15T07:16:44.334Z
-packagist,symfony/mime,32,downloads,784241415,,v8.1.7,2026-09-04T11:02:17+00:00,1,packagist maintainers[],https://github.com/symfony/mime,,,2026-10-15T07:16:44.984Z
-packagist,symfony/error-handler,33,downloads,764121991,,v8.1.8,2026-09-22T18:58:53+00:00,1,packagist maintainers[],https://github.com/symfony/error-handler,,,2026-10-15T07:16:45.746Z
-packagist,psr/clock,34,downloads,444903586,,1.0.0,2022-11-25T14:36:26+00:00,2,packagist maintainers[],https://github.com/php-fig/clock,,,2026-10-15T07:16:45.975Z
-packagist,symfony/routing,35,downloads,901302387,,v8.1.8,2026-09-28T19:13:15+00:00,1,packagist maintainers[],https://github.com/symfony/routing,,,2026-10-15T07:16:46.368Z
-packagist,symfony/translation,36,downloads,949850962,,v8.1.5,2026-08-21T17:47:34+00:00,1,packagist maintainers[],https://github.com/symfony/translation,,,2026-10-15T07:16:47.094Z
-packagist,psr/simple-cache,37,downloads,838961555,,3.0.0,2021-10-29T13:26:27+00:00,3,packagist maintainers[],https://github.com/php-fig/simple-cache,,,2026-10-15T07:16:47.353Z
-packagist,myclabs/deep-copy,38,downloads,958988381,,1.14.0,2026-08-11T10:17:44+00:00,2,packagist maintainers[],https://github.com/myclabs/DeepCopy,,,2026-10-15T07:16:47.599Z
-packagist,brick/math,39,downloads,612977775,,1.0.0,2026-09-12T10:28:18+00:00,1,packagist maintainers[],https://github.com/brick/math,,,2026-10-15T07:16:47.884Z
-packagist,sebastian/diff,40,downloads,1010488270,,9.0.1,2026-08-25T15:38:55+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/diff,,,2026-10-15T07:16:48.147Z
-packagist,ramsey/uuid,41,downloads,810163269,,4.9.4,2026-09-16T11:39:30+00:00,1,packagist maintainers[],https://github.com/ramsey/uuid,,,2026-10-15T07:16:48.371Z
-packagist,phpunit/phpunit,42,downloads,1019123383,,13.4.2,2026-10-12T15:29:04+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/phpunit,,,2026-10-15T07:16:48.790Z
-packagist,doctrine/inflector,43,downloads,964633367,,2.1.0,2025-08-10T19:31:58+00:00,1,packagist maintainers[],https://github.com/doctrine/inflector,,,2026-10-15T07:16:49.314Z
-packagist,phpunit/php-code-coverage,44,downloads,998683095,,14.4.1,2026-10-03T14:05:38+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-code-coverage,,,2026-10-15T07:16:49.593Z
-packagist,egulias/email-validator,45,downloads,798096892,,4.0.4,2025-03-06T22:45:56+00:00,1,packagist maintainers[],https://github.com/egulias/EmailValidator,,,2026-10-15T07:16:49.840Z
-packagist,sebastian/version,46,downloads,970369361,,7.0.1,2026-10-04T05:51:14+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/version,,,2026-10-15T07:16:50.065Z
-packagist,symfony/css-selector,47,downloads,861279699,,v8.1.6,2026-08-23T10:06:25+00:00,1,packagist maintainers[],https://github.com/symfony/css-selector,,,2026-10-15T07:16:50.372Z
-packagist,phpunit/php-file-iterator,48,downloads,985275438,,7.0.2,2026-08-25T14:47:43+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-file-iterator,,,2026-10-15T07:16:50.653Z
-packagist,phpunit/php-text-template,49,downloads,973098716,,6.0.1,2026-10-03T04:54:24+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-text-template,,,2026-10-15T07:16:50.932Z
-packagist,sebastian/exporter,50,downloads,989091624,,4.0.9,2026-08-11T04:55:59+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/exporter,,,2026-10-15T07:16:51.234Z
-pypi,boto3,1,downloads,2460723068,,1.43.112,2026-10-12T19:26:58.514Z,,unavailable,https://github.com/boto/boto3,,,2026-10-15T07:13:24.464Z
-pypi,packaging,2,downloads,1550430820,,26.3,2026-08-04T18:15:27.159Z,,unavailable,https://github.com/pypa/packaging,,,2026-10-15T07:13:24.697Z
-pypi,typing-extensions,3,downloads,1396876439,,4.16.0,2026-07-02T08:40:04.659Z,,unavailable,https://github.com/python/typing_extensions,,,2026-10-15T07:13:25.004Z
-pypi,idna,4,downloads,1339499236,,3.20,2026-09-17T14:11:03.168Z,,unavailable,https://github.com/kjd/idna,,,2026-10-15T07:13:25.363Z
-pypi,urllib3,5,downloads,1324020131,,2.8.0,2026-09-15T19:29:34.577Z,,unavailable,https://github.com/urllib3/urllib3,,,2026-10-15T07:13:26.777Z
-pypi,certifi,6,downloads,1290239262,,2026.7.22,2026-07-22T03:35:11.276Z,,unavailable,https://github.com/certifi/python-certifi,,,2026-10-15T07:13:32.637Z
-pypi,requests,7,downloads,1208056002,,2.34.2,2026-05-14T19:25:26.443Z,,unavailable,https://github.com/psf/requests,,,2026-10-15T07:13:33.432Z
-pypi,charset-normalizer,8,downloads,1186581556,,3.5.2,2026-09-30T04:34:42.843Z,,unavailable,https://github.com/jawah/charset_normalizer,,,2026-10-15T07:13:35.226Z
-pypi,cryptography,9,downloads,1070154291,,50.0.2,2026-09-30T14:43:44.339Z,,unavailable,https://github.com/pyca/cryptography,,,2026-10-15T07:13:35.688Z
-pypi,setuptools,10,downloads,973493203,,84.0.0,2026-08-08T18:27:56.719Z,,unavailable,https://github.com/pypa/setuptools,,,2026-10-15T07:13:40.159Z
-pypi,cffi,11,downloads,949615436,,2.1.1,2026-08-03T21:19:15.602Z,,unavailable,https://github.com/python-cffi/cffi,,,2026-10-15T07:13:41.945Z
-pypi,pygments,12,downloads,931583890,,2.21.0,2026-08-17T08:02:44.912Z,,unavailable,https://github.com/pygments/pygments,,,2026-10-15T07:13:42.255Z
-pypi,pyyaml,13,downloads,910851659,,6.0.3,2025-09-25T21:31:46.040Z,,unavailable,https://github.com/yaml/pyyaml,,,2026-10-15T07:13:43.045Z
-pypi,python-dateutil,14,downloads,904912826,,2.9.0.post0,2024-03-01T18:36:18.570Z,,unavailable,https://github.com/dateutil/dateutil,,,2026-10-15T07:13:43.308Z
-pypi,six,15,downloads,894556866,,1.17.0,2024-12-04T17:35:26.475Z,,unavailable,https://github.com/benjaminp/six,,,2026-10-15T07:13:43.527Z
-pypi,pluggy,16,downloads,877688356,,1.6.0,2025-05-15T12:30:06.134Z,,unavailable,,,,2026-10-15T07:13:43.828Z
-pypi,botocore,17,downloads,853428832,,1.43.112,2026-10-12T19:26:50.658Z,,unavailable,https://github.com/boto/botocore,,,2026-10-15T07:13:44.179Z
-pypi,pydantic,18,downloads,842605827,,2.14.1,2026-10-11T18:37:53.437Z,,unavailable,https://github.com/pydantic/pydantic,,,2026-10-15T07:13:44.484Z
-pypi,pycparser,19,downloads,837756809,,3.11,2026-10-09T12:56:58.131Z,,unavailable,https://github.com/eliben/pycparser,,,2026-10-15T07:13:44.750Z
-pypi,click,20,downloads,817239080,,8.5.0,2026-08-26T13:33:12.928Z,,unavailable,https://github.com/pallets/click,,,2026-10-15T07:13:44.982Z
-pypi,pydantic-core,21,downloads,808518099,,2.50.1,2026-10-11T18:31:38.345Z,,unavailable,https://github.com/pydantic/pydantic,,,2026-10-15T07:13:45.442Z
-pypi,anyio,22,downloads,803361854,,4.15.1,2026-09-05T10:42:37.923Z,,unavailable,https://github.com/agronholm/anyio,,,2026-10-15T07:13:45.775Z
-pypi,numpy,23,downloads,801552837,,2.5.4,2026-10-10T20:02:40.843Z,,unavailable,https://github.com/numpy/numpy,,,2026-10-15T07:13:47.640Z
-pypi,pytest,24,downloads,780160913,,9.1.1,2026-06-19T10:58:31.347Z,,unavailable,https://github.com/pytest-dev/pytest,,,2026-10-15T07:13:47.942Z
-pypi,iniconfig,25,downloads,755640889,,2.3.1,2026-10-06T22:48:36.959Z,,unavailable,https://github.com/pytest-dev/iniconfig,,,2026-10-15T07:13:48.708Z
-pypi,annotated-types,26,downloads,724456796,,0.8.0,2026-07-23T20:16:12.938Z,,unavailable,https://github.com/annotated-types/annotated-types,,,2026-10-15T07:13:48.951Z
-pypi,h11,27,downloads,710837874,,0.16.0,2025-04-24T03:35:24.344Z,,unavailable,https://github.com/python-hyper/h11,,,2026-10-15T07:13:49.237Z
-pypi,typing-inspection,28,downloads,695426964,,0.4.4,2026-08-12T12:37:24.648Z,,unavailable,https://github.com/pydantic/typing-inspection,,,2026-10-15T07:13:49.998Z
-pypi,attrs,29,downloads,692326327,,26.1.0,2026-03-19T14:22:23.645Z,,unavailable,https://github.com/python-attrs/attrs,,,2026-10-15T07:13:50.294Z
-pypi,s3transfer,30,downloads,645004335,,0.19.2,2026-07-22T19:30:43.251Z,,unavailable,https://github.com/boto/s3transfer,,,2026-10-15T07:13:50.569Z
-pypi,aiobotocore,31,downloads,619208081,,3.9.2,2026-10-01T02:01:57.883Z,,unavailable,https://github.com/aio-libs/aiobotocore,,,2026-10-15T07:13:50.848Z
-pypi,protobuf,32,downloads,619205877,,7.36.2,2026-09-17T20:07:51.542Z,,unavailable,,,,2026-10-15T07:13:51.243Z
-pypi,httpx,33,downloads,616760679,,0.28.1,2024-12-06T15:37:21.509Z,,unavailable,https://github.com/encode/httpx,,,2026-10-15T07:13:52.629Z
-pypi,markupsafe,34,downloads,614567882,,3.0.4,2026-10-02T23:04:20.141Z,,unavailable,https://github.com/pallets/markupsafe,,,2026-10-15T07:13:52.865Z
-pypi,httpcore,35,downloads,613832681,,1.0.9,2025-04-24T22:06:20.566Z,,unavailable,https://github.com/encode/httpcore,,,2026-10-15T07:13:53.148Z
-pypi,python-dotenv,36,downloads,574103823,,1.2.4,2026-10-01T05:36:08.633Z,,unavailable,https://github.com/theskumar/python-dotenv,,,2026-10-15T07:13:53.490Z
-pypi,pyjwt,37,downloads,565103517,,2.15.1,2026-09-28T18:40:41.429Z,,unavailable,https://github.com/jpadilla/pyjwt,,,2026-10-15T07:13:54.435Z
-pypi,platformdirs,38,downloads,563826118,,4.13.0,2026-10-11T02:05:22.776Z,,unavailable,https://github.com/tox-dev/platformdirs,,,2026-10-15T07:14:05.083Z
-pypi,fsspec,39,downloads,563154338,,2026.9.0,2026-09-18T17:50:41.341Z,,unavailable,https://github.com/fsspec/filesystem_spec,,,2026-10-15T07:14:05.420Z
-pypi,pandas,40,downloads,547072268,,3.0.6,2026-09-17T23:20:20.960Z,,unavailable,https://github.com/pandas-dev/pandas,,,2026-10-15T07:14:05.995Z
-pypi,jinja2,41,downloads,537719814,,3.1.6,2025-03-05T20:05:00.369Z,,unavailable,https://github.com/pallets/jinja,,,2026-10-15T07:14:06.371Z
-pypi,jmespath,42,downloads,509823585,,1.1.0,2026-01-22T16:35:24.919Z,,unavailable,https://github.com/jmespath/jmespath.py,,,2026-10-15T07:14:08.679Z
-pypi,pathspec,43,downloads,509699191,,1.1.1,2026-04-27T01:46:07.060Z,,unavailable,https://github.com/cpburnz/python-pathspec,,,2026-10-15T07:14:08.952Z
-pypi,filelock,44,downloads,499529209,,4.1.1,2026-10-11T16:11:52.753Z,,unavailable,https://github.com/tox-dev/py-filelock,,,2026-10-15T07:14:09.296Z
-pypi,starlette,45,downloads,494803667,,1.8.0,2026-10-13T07:54:38.019Z,,unavailable,https://github.com/Kludex/starlette,,,2026-10-15T07:14:10.617Z
-pypi,uvicorn,46,downloads,493237088,,0.54.0,2026-09-25T06:52:35.829Z,,unavailable,https://github.com/Kludex/uvicorn,,,2026-10-15T07:14:14.926Z
-pypi,multidict,47,downloads,472045565,,7.1.0,2026-10-09T13:58:50.692Z,,unavailable,https://github.com/aio-libs/multidict/actions,,,2026-10-15T07:14:15.332Z
-pypi,jsonschema,48,downloads,465214053,,4.26.0,2026-01-07T13:41:05.306Z,,unavailable,https://github.com/python-jsonschema/jsonschema,,,2026-10-15T07:14:15.848Z
-pypi,rpds-py,49,downloads,463583334,,2026.9.1,2026-10-04T16:28:55.207Z,,unavailable,https://github.com/crate-py/rpds,,,2026-10-15T07:14:16.216Z
-pypi,yarl,50,downloads,459889343,,1.25.1,2026-09-15T19:29:53.114Z,,unavailable,https://github.com/aio-libs/yarl/actions?query=branch:master,,,2026-10-15T07:14:16.580Z
-rubygems,bundler,1,downloads,3822414517,,4.0.22,2026-09-30T07:52:13.912Z,1,rubygems.org owners.json,https://github.com/ruby/rubygems,,,2026-10-15T07:14:56.917Z
-rubygems,aws-sdk-core,2,downloads,1768154250,,3.257.0,2026-09-14T20:25:02.732Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.219Z
-rubygems,aws-sigv4,3,downloads,1569573510,,1.12.1,2025-06-10T19:12:23.144Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.490Z
-rubygems,aws-partitions,4,downloads,1536044072,,1.1294.0,2026-10-12T21:15:14.140Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.786Z
-rubygems,i18n,5,downloads,1452834098,,1.15.2,2026-06-19T21:55:59.425Z,9,rubygems.org owners.json,https://github.com/ruby-i18n/i18n,,,2026-10-15T07:14:58.063Z
-rubygems,jmespath,6,downloads,1451862801,,1.6.2,2022-11-25T16:46:38.780Z,0,rubygems.org owners.json,https://github.com/trevorrowe/jmespath.rb,,,2026-10-15T07:14:58.292Z
-rubygems,activesupport,7,downloads,1449905134,,8.1.4,2026-09-24T14:21:18.068Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:14:58.691Z
-rubygems,rake,8,downloads,1435050999,,13.4.2,2026-04-16T04:47:46.997Z,3,rubygems.org owners.json,https://github.com/ruby/rake,,,2026-10-15T07:14:59.738Z
-rubygems,json,9,downloads,1400237838,,3.1.0,2026-10-13T08:04:46.273Z,5,rubygems.org owners.json,https://github.com/ruby/json,,,2026-10-15T07:15:00.136Z
-rubygems,concurrent-ruby,10,downloads,1391646101,,1.3.8,2026-07-19T13:35:54.097Z,5,rubygems.org owners.json,https://github.com/ruby-concurrency/concurrent-ruby,,,2026-10-15T07:15:01.207Z
-rubygems,aws-eventstream,11,downloads,1373177894,,1.4.0,2025-06-02T19:13:46.065Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:02.180Z
-rubygems,rack,12,downloads,1364343878,,3.2.7,2026-08-13T06:57:35.545Z,6,rubygems.org owners.json,https://github.com/rack/rack,,,2026-10-15T07:15:02.637Z
-rubygems,tzinfo,13,downloads,1333963275,,2.0.6,2023-01-28T20:27:53.927Z,1,rubygems.org owners.json,https://github.com/tzinfo/tzinfo,,,2026-10-15T07:15:09.921Z
-rubygems,minitest,14,downloads,1316440105,,6.0.6,2026-05-01T00:19:41.365Z,1,rubygems.org owners.json,https://github.com/minitest/minitest,,,2026-10-15T07:15:10.222Z
-rubygems,addressable,15,downloads,1282213187,,2.9.0,2026-04-05T03:41:55.596Z,3,rubygems.org owners.json,https://github.com/sporkmonger/addressable,,,2026-10-15T07:15:10.557Z
-rubygems,nokogiri,16,downloads,1277349699,,1.19.4,2026-06-18T15:18:13.773Z,3,rubygems.org owners.json,https://github.com/sparklemotion/nokogiri,,,2026-10-15T07:15:11.273Z
-rubygems,faraday,17,downloads,1275468821,,2.14.4,2026-09-15T13:16:49.550Z,3,rubygems.org owners.json,https://github.com/lostisland/faraday,,,2026-10-15T07:15:15.591Z
-rubygems,public_suffix,18,downloads,1254607929,,7.0.5,2026-03-03T08:27:05.269Z,1,rubygems.org owners.json,https://github.com/weppos/publicsuffix-ruby,,,2026-10-15T07:15:16.634Z
-rubygems,diff-lcs,19,downloads,1242695874,,2.0.0,2026-02-02T04:49:06.712Z,1,rubygems.org owners.json,https://github.com/halostatue/diff-lcs,,,2026-10-15T07:15:16.898Z
-rubygems,rspec-core,20,downloads,1210634904,,3.13.6,2025-10-19T12:41:03.629Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.172Z
-rubygems,rspec-expectations,21,downloads,1210018234,,3.13.5,2025-05-27T12:04:40.851Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.400Z
-rubygems,rspec-mocks,22,downloads,1204768261,,3.13.8,2026-02-27T18:04:08.645Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.654Z
-rubygems,rspec-support,23,downloads,1197438130,,3.13.7,2026-01-28T22:30:11.889Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.970Z
-rubygems,multi_json,24,downloads,1175571444,,1.21.2,2026-09-07T19:39:07.240Z,4,rubygems.org owners.json,https://github.com/sferik/multi_json,,,2026-10-15T07:15:18.205Z
-rubygems,thor,25,downloads,1165926956,,1.5.0,2026-01-06T22:32:36.590Z,10,rubygems.org owners.json,https://github.com/rails/thor,,,2026-10-15T07:15:18.504Z
-rubygems,aws-sdk-s3,26,downloads,1119127608,,1.233.2,2026-10-06T23:27:54.509Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:18.934Z
-rubygems,ffi,27,downloads,1102157396,,1.17.4,2026-03-26T13:22:38.528Z,4,rubygems.org owners.json,https://github.com/ffi/ffi,,,2026-10-15T07:15:19.454Z
-rubygems,aws-sdk-kms,28,downloads,1083094070,,1.132.0,2026-09-11T19:40:26.745Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:19.747Z
-rubygems,rspec,29,downloads,1028250321,,3.13.2,2025-10-21T09:50:39.502Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:19.985Z
-rubygems,unicode-display_width,30,downloads,1000534956,,3.3.0,2026-09-20T08:01:05.610Z,1,rubygems.org owners.json,https://github.com/janlelis/unicode-display_width,,,2026-10-15T07:15:20.235Z
-rubygems,builder,31,downloads,941692729,,3.3.0,2024-06-06T16:22:32.091Z,11,rubygems.org owners.json,https://github.com/rails/builder,,,2026-10-15T07:15:20.474Z
-rubygems,mime-types,32,downloads,935668400,,3.7.0,2025-05-07T03:54:04.236Z,1,rubygems.org owners.json,https://github.com/mime-types/ruby-mime-types,,,2026-10-15T07:15:20.738Z
-rubygems,multipart-post,33,downloads,933571936,,2.4.1,2024-05-07T10:09:00.468Z,1,rubygems.org owners.json,https://github.com/socketry/multipart-post,,,2026-10-15T07:15:21.032Z
-rubygems,activemodel,34,downloads,905862252,,8.1.4,2026-09-24T14:21:22.191Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:21.410Z
-rubygems,mini_mime,35,downloads,897450812,,1.1.5,2023-08-08T09:46:39.225Z,2,rubygems.org owners.json,https://github.com/discourse/mini_mime,,,2026-10-15T07:15:21.664Z
-rubygems,parser,36,downloads,854198852,,3.3.12.0,2026-07-16T07:54:42.683Z,5,rubygems.org owners.json,https://github.com/whitequark/parser,,,2026-10-15T07:15:22.028Z
-rubygems,activerecord,37,downloads,849845141,,8.1.4,2026-09-24T14:21:25.471Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:22.429Z
-rubygems,rexml,38,downloads,840414527,,3.4.4,2025-09-10T11:56:10.245Z,4,rubygems.org owners.json,https://github.com/ruby/rexml,,,2026-10-15T07:15:23.016Z
-rubygems,actionpack,39,downloads,837693041,,8.1.4,2026-09-24T14:21:32.114Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:25.120Z
-rubygems,parallel,40,downloads,837309820,,2.3.0,2026-10-03T03:23:32.278Z,1,rubygems.org owners.json,https://github.com/grosser/parallel,,,2026-10-15T07:15:26.742Z
-rubygems,jwt,41,downloads,824742226,,3.3.0,2026-09-11T20:34:50.521Z,2,rubygems.org owners.json,https://github.com/jwt/ruby-jwt,,,2026-10-15T07:15:27.077Z
-rubygems,rack-test,42,downloads,822392364,,2.2.0,2024-12-23T18:51:11.601Z,2,rubygems.org owners.json,https://github.com/rack/rack-test,,,2026-10-15T07:15:27.569Z
-rubygems,ast,43,downloads,809167364,,2.4.3,2025-03-19T18:49:27.350Z,3,rubygems.org owners.json,https://github.com/whitequark/ast,,,2026-10-15T07:15:27.803Z
-rubygems,tilt,44,downloads,800771185,,2.9.0,2026-08-17T19:38:53.829Z,1,rubygems.org owners.json,https://github.com/jeremyevans/tilt,,,2026-10-15T07:15:28.101Z
-rubygems,rails,45,downloads,799969084,,8.1.4,2026-09-24T14:22:14.180Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:28.403Z
-rubygems,rubyzip,46,downloads,799112391,,3.7.0,2026-09-18T18:59:58.749Z,4,rubygems.org owners.json,https://github.com/rubyzip/rubyzip,,,2026-10-15T07:15:28.735Z
-rubygems,railties,47,downloads,799030239,,8.1.4,2026-09-24T14:22:10.007Z,12,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:29.259Z
-rubygems,actionview,48,downloads,788747848,,8.1.4,2026-09-24T14:21:28.881Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:29.623Z
-rubygems,actionmailer,49,downloads,784588404,,8.1.4,2026-09-24T14:21:38.739Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:30.198Z
-rubygems,method_source,50,downloads,782253260,,1.1.0,2024-04-15T14:20:45.879Z,4,rubygems.org owners.json,,,,2026-10-15T07:15:30.674Z
+ecosystem,package,rank,rank_frame,download_count,dependent_count,in_layers,latest_version,latest_publish_date,maintainer_count,maintainer_count_source,repository_url,fetch_error,extract_error,osv_queried_at
+crates,hashbrown,1,downloads,738242092,,top,0.17.1,2026-05-09T04:35:04.251Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/hashbrown,,,2026-10-15T07:14:41.712Z
+crates,syn,2,downloads,701492586,,top,3.0.9,2026-10-12T15:04:09.212573Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/syn,,,2026-10-15T07:14:41.998Z
+crates,getrandom,3,downloads,644650028,,top,0.4.3,2026-06-17T18:01:59.979552Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/getrandom,,,2026-10-15T07:14:42.277Z
+crates,rand,4,downloads,505271468,,top,0.10.3,2026-09-20T06:37:47.850624Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/rand,,,2026-10-15T07:14:42.609Z
+crates,rand_core,5,downloads,496846267,,top,0.10.1,2026-04-13T15:26:43.049921Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang-nursery/rand,,,2026-10-15T07:14:43.486Z
+crates,bitflags,6,downloads,483863584,,top,2.13.2,2026-09-10T01:11:38.500809Z,2,crates.io owners (users; teams excluded),https://github.com/bitflags/bitflags,,,2026-10-15T07:14:44.281Z
+crates,windows-sys,7,downloads,449943053,,top,0.61.2,2025-10-06T19:18:30.163595Z,1,crates.io owners (users; teams excluded),https://github.com/microsoft/windows-rs,,,2026-10-15T07:14:44.565Z
+crates,thiserror,8,downloads,420199769,,top,2.0.21,2026-09-23T20:24:07.771104Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/thiserror,,,2026-10-15T07:14:44.838Z
+crates,thiserror-impl,9,downloads,420144623,,top,2.0.21,2026-09-23T20:24:05.038819Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/thiserror,,,2026-10-15T07:14:45.067Z
+crates,quote,10,downloads,412035927,,top,1.0.47,2026-07-19T00:16:57.083778Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/quote,,,2026-10-15T07:14:45.366Z
+crates,libc,11,downloads,406337872,,top,0.2.190,2026-10-02T19:33:19.966421Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/libc,,,2026-10-15T07:14:45.644Z
+crates,proc-macro2,12,downloads,401925506,,top,1.0.107,2026-07-19T00:18:25.189787Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/proc-macro2,,,2026-10-15T07:14:45.903Z
+crates,indexmap,13,downloads,400275518,,top,2.14.2,2026-09-05T01:53:48.019655Z,2,crates.io owners (users; teams excluded),https://github.com/indexmap-rs/indexmap,,,2026-10-15T07:14:46.185Z
+crates,memchr,14,downloads,396166138,,top,2.8.3,2026-07-08T00:49:54.408285Z,1,crates.io owners (users; teams excluded),https://github.com/BurntSushi/memchr,,,2026-10-15T07:14:46.396Z
+crates,base64,15,downloads,386189321,,top,0.23.1,2026-08-04T12:34:31.976297Z,2,crates.io owners (users; teams excluded),https://github.com/marshallpierce/rust-base64,,,2026-10-15T07:14:46.707Z
+crates,itertools,16,downloads,373680839,,top,0.15.0,2026-06-16T15:09:28.880416Z,2,crates.io owners (users; teams excluded),https://github.com/rust-itertools/itertools,,,2026-10-15T07:14:46.972Z
+crates,unicode-ident,17,downloads,373153471,,top,1.0.27,2026-10-12T04:20:27.796258Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/unicode-ident,,,2026-10-15T07:14:47.232Z
+crates,cfg-if,18,downloads,361642347,,top,1.0.5,2026-09-16T17:36:11.278420Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/cfg-if,,,2026-10-15T07:14:47.453Z
+crates,serde,19,downloads,356210408,,top,1.0.229,2026-07-18T23:05:13.266456Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:47.713Z
+crates,serde_json,20,downloads,355839640,,top,1.0.154,2026-10-11T15:31:46.076577Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/json,,,2026-10-15T07:14:48.021Z
+crates,itoa,21,downloads,352885015,,top,1.0.18,2026-03-20T00:12:37.043881Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/itoa,,,2026-10-15T07:14:48.295Z
+crates,cpufeatures,22,downloads,348720086,,top,0.3.1,2026-08-26T18:39:59.636708Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/utils,,,2026-10-15T07:14:48.567Z
+crates,serde_derive,23,downloads,343471733,,top,1.0.229,2026-07-18T23:05:07.504375Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:48.796Z
+crates,rand_chacha,24,downloads,334793258,,top,0.10.0,2026-02-02T08:15:02.537641Z,1,crates.io owners (users; teams excluded),https://github.com/rust-random/rand,,,2026-10-15T07:14:49.036Z
+crates,digest,25,downloads,327598356,,top,0.11.3,2026-05-03T12:54:48.023505Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/traits,,,2026-10-15T07:14:49.298Z
+crates,socket2,26,downloads,325414202,,top,0.6.5,2026-07-13T19:45:58.436336Z,3,crates.io owners (users; teams excluded),https://github.com/rust-lang/socket2,,,2026-10-15T07:14:49.605Z
+crates,block-buffer,27,downloads,323289265,,top,0.12.1,2026-06-11T15:40:05.682576Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/utils,,,2026-10-15T07:14:49.824Z
+crates,log,28,downloads,319204829,,top,0.4.34,2026-08-22T11:44:27.941626Z,4,crates.io owners (users; teams excluded),https://github.com/rust-lang/log,,,2026-10-15T07:14:50.130Z
+crates,crypto-common,29,downloads,317971063,,top,0.2.2,2026-05-19T16:01:22.304187Z,1,crates.io owners (users; teams excluded),https://github.com/RustCrypto/traits,,,2026-10-15T07:14:50.353Z
+crates,smallvec,30,downloads,317200830,,top,1.16.3,2026-10-10T02:25:27.052021Z,2,crates.io owners (users; teams excluded),https://github.com/servo/rust-smallvec,,,2026-10-15T07:14:50.657Z
+crates,heck,31,downloads,314448016,,top,0.5.0,2024-03-12T22:42:23.303234Z,2,crates.io owners (users; teams excluded),https://github.com/withoutboats/heck,,,2026-10-15T07:14:50.882Z
+crates,autocfg,32,downloads,314363121,,top,1.5.1,2026-05-22T11:03:04.576867Z,2,crates.io owners (users; teams excluded),https://github.com/cuviper/autocfg,,,2026-10-15T07:14:51.175Z
+crates,serde_core,33,downloads,313422262,,top,1.0.229,2026-07-18T23:05:10.896830Z,1,crates.io owners (users; teams excluded),https://github.com/serde-rs/serde,,,2026-10-15T07:14:51.400Z
+crates,once_cell,34,downloads,312645336,,top,1.21.4,2026-03-12T10:59:52.512992Z,2,crates.io owners (users; teams excluded),https://github.com/matklad/once_cell,,,2026-10-15T07:14:51.688Z
+crates,cc,35,downloads,311156343,,top,1.8.0,2026-10-11T14:17:35.305208Z,1,crates.io owners (users; teams excluded),https://github.com/rust-lang/cc-rs,,,2026-10-15T07:14:51.957Z
+crates,regex-syntax,36,downloads,310402857,,top,0.8.11,2026-06-09T15:00:25.566550Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:52.221Z
+crates,winnow,37,downloads,301467057,,top,1.0.4,2026-07-13T14:31:41.405838Z,1,crates.io owners (users; teams excluded),https://github.com/winnow-rs/winnow,,,2026-10-15T07:14:52.493Z
+crates,sha2,38,downloads,298282275,,top,0.11.1,2026-10-12T18:58:22.836567Z,2,crates.io owners (users; teams excluded),https://github.com/RustCrypto/hashes,,,2026-10-15T07:14:52.763Z
+crates,regex-automata,39,downloads,298278976,,top,0.4.18,2026-08-04T13:10:37.385020Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:53.030Z
+crates,rustix,40,downloads,290479766,,top,1.1.5,2026-09-16T23:05:02.319690Z,1,crates.io owners (users; teams excluded),https://github.com/bytecodealliance/rustix,,,2026-10-15T07:14:53.306Z
+crates,zmij,41,downloads,284615273,,top,1.0.23,2026-07-13T12:58:53.705886Z,1,crates.io owners (users; teams excluded),https://github.com/dtolnay/zmij,,,2026-10-15T07:14:53.536Z
+crates,shlex,42,downloads,279717708,,top,2.0.1,2026-05-17T18:56:12.775983Z,2,crates.io owners (users; teams excluded),https://github.com/comex/rust-shlex,,,2026-10-15T07:14:53.785Z
+crates,linux-raw-sys,43,downloads,278545213,,top,0.12.1,2025-12-23T00:00:07.059646Z,1,crates.io owners (users; teams excluded),https://github.com/sunfishcode/linux-raw-sys,,,2026-10-15T07:14:54.040Z
+crates,bytes,44,downloads,277967942,,top,1.12.1,2026-07-08T10:01:28.616466Z,2,crates.io owners (users; teams excluded),https://github.com/tokio-rs/bytes,,,2026-10-15T07:14:54.505Z
+crates,regex,45,downloads,276625196,,top,1.13.1,2026-07-15T20:19:35.162139Z,2,crates.io owners (users; teams excluded),https://github.com/rust-lang/regex,,,2026-10-15T07:14:55.322Z
+crates,aho-corasick,46,downloads,276478697,,top,1.1.5,2026-08-03T11:44:11.111398Z,1,crates.io owners (users; teams excluded),https://github.com/BurntSushi/aho-corasick,,,2026-10-15T07:14:55.578Z
+crates,zerocopy,47,downloads,275176604,,top,0.8.62,2026-10-08T10:04:10.669172Z,2,crates.io owners (users; teams excluded),https://github.com/google/zerocopy,,,2026-10-15T07:14:55.865Z
+crates,toml_datetime,48,downloads,273537917,,top,1.1.2+spec-1.1.0,2026-10-08T00:54:03.238939Z,1,crates.io owners (users; teams excluded),https://github.com/toml-rs/toml,,,2026-10-15T07:14:56.140Z
+crates,mio,49,downloads,270904722,,top,1.2.4,2026-10-03T16:33:10.183266Z,1,crates.io owners (users; teams excluded),https://github.com/tokio-rs/mio,,,2026-10-15T07:14:56.366Z
+crates,pin-project-lite,50,downloads,269113352,,top,0.2.17,2026-02-27T15:19:08.132543Z,1,crates.io owners (users; teams excluded),https://github.com/taiki-e/pin-project-lite,,,2026-10-15T07:14:56.619Z
+go,golang.org/x/sys,1,dependents,,179073,top,v0.49.0,2026-10-06T18:35:47Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/sys,,,2026-10-15T07:15:31.066Z
+go,github.com/stretchr/testify,2,dependents,,146490,top,v1.12.1,2026-08-17T08:24:05Z,,unavailable: Go has no publisher accounts,https://github.com/stretchr/testify,,,2026-10-15T07:15:31.581Z
+go,golang.org/x/crypto,3,dependents,,125672,top,v0.58.0,2026-10-09T16:24:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/crypto,,,2026-10-15T07:15:32.053Z
+go,github.com/golang/protobuf,4,dependents,,123672,top,v1.5.4,2024-03-06T06:45:40Z,,unavailable: Go has no publisher accounts,https://github.com/golang/protobuf,,,2026-10-15T07:15:42.208Z
+go,github.com/davecgh/go-spew,5,dependents,,118813,top,v1.1.1,2018-02-21T23:26:28Z,,unavailable: Go has no publisher accounts,https://github.com/davecgh/go-spew,,,2026-10-15T07:15:42.423Z
+go,golang.org/x/text,6,dependents,,113820,top,v0.43.0,2026-10-09T15:18:32Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/text,,,2026-10-15T07:15:42.790Z
+go,golang.org/x/net,7,dependents,,112044,top,v0.61.0,2026-10-09T17:07:24Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/net,,,2026-10-15T07:15:43.778Z
+go,github.com/pkg/errors,8,dependents,,98949,top,v0.9.1,2020-01-14T19:47:44Z,,unavailable: Go has no publisher accounts,https://github.com/pkg/errors,,,2026-10-15T07:15:49.817Z
+go,gopkg.in/yaml.v3,9,dependents,,91103,top,v3.0.1,2022-05-27T08:35:30Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:50.072Z
+go,gopkg.in/yaml.v2,10,dependents,,89653,top,v2.4.0,2020-11-17T15:46:20Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:50.321Z
+go,google.golang.org/protobuf,11,dependents,,86079,top,v1.36.12,2026-08-10T13:29:45Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/protobuf,,,2026-10-15T07:15:50.595Z
+go,github.com/google/go-cmp,12,dependents,,71578,top,v0.7.0,2025-01-14T18:15:44Z,,unavailable: Go has no publisher accounts,https://github.com/google/go-cmp,,,2026-10-15T07:15:50.816Z
+go,github.com/pmezard/go-difflib,13,dependents,,69104,top,v1.0.0,2016-01-10T10:55:54Z,,unavailable: Go has no publisher accounts,https://github.com/pmezard/go-difflib,,,2026-10-15T07:15:51.118Z
+go,github.com/sirupsen/logrus,14,dependents,,62999,top,v1.10.2,2026-08-25T18:05:09Z,,unavailable: Go has no publisher accounts,https://github.com/sirupsen/logrus,,,2026-10-15T07:15:51.380Z
+go,github.com/fsnotify/fsnotify,15,dependents,,60404,top,v1.10.1,2026-05-04T10:39:17Z,,unavailable: Go has no publisher accounts,https://github.com/fsnotify/fsnotify,,,2026-10-15T07:15:51.664Z
+go,github.com/gogo/protobuf,16,dependents,,59168,top,v1.3.2,2021-01-10T08:01:47Z,,unavailable: Go has no publisher accounts,https://github.com/gogo/protobuf,,,2026-10-15T07:15:51.888Z
+go,github.com/spf13/pflag,17,dependents,,57644,top,v1.0.10,2025-09-02T06:08:29Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/pflag,,,2026-10-15T07:15:52.167Z
+go,google.golang.org/grpc,18,dependents,,56663,top,v1.84.0,2026-09-17T20:03:25Z,,unavailable: Go has no publisher accounts,https://github.com/grpc/grpc-go,,,2026-10-15T07:15:52.505Z
+go,golang.org/x/tools,19,dependents,,55832,top,v0.52.0,2026-10-10T19:29:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/tools,,,2026-10-15T07:15:55.313Z
+go,github.com/google/uuid,20,dependents,,55031,top,v1.6.0,2024-01-23T18:54:04Z,,unavailable: Go has no publisher accounts,https://github.com/google/uuid,,,2026-10-15T07:15:55.535Z
+go,github.com/mattn/go-colorable,21,dependents,,50869,top,v0.1.16,2026-10-06T09:17:33Z,,unavailable: Go has no publisher accounts,https://github.com/mattn/go-colorable,,,2026-10-15T07:15:55.839Z
+go,github.com/spf13/cobra,22,dependents,,50282,top,v1.10.2,2025-12-03T23:51:15Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/cobra,,,2026-10-15T07:15:56.112Z
+go,github.com/mattn/go-isatty,23,dependents,,49465,top,v0.0.24,2026-07-23T16:45:22Z,,unavailable: Go has no publisher accounts,https://github.com/mattn/go-isatty,,,2026-10-15T07:15:56.390Z
+go,golang.org/x/sync,24,dependents,,48746,top,v0.24.0,2026-09-23T16:28:17Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/sync,,,2026-10-15T07:15:56.664Z
+go,github.com/json-iterator/go,25,dependents,,48676,top,v1.1.12,2021-09-11T02:17:26Z,,unavailable: Go has no publisher accounts,https://github.com/json-iterator/go,,,2026-10-15T07:15:56.894Z
+go,github.com/cespare/xxhash/v2,26,dependents,,47719,top,v2.3.0,2024-04-04T20:00:10Z,,unavailable: Go has no publisher accounts,https://github.com/cespare/xxhash,,,2026-10-15T07:15:57.153Z
+go,google.golang.org/genproto,27,dependents,,47144,top,v0.0.0-20261012220534-4341edf3f941,2026-10-12T22:05:34Z,,unavailable: Go has no publisher accounts,https://github.com/googleapis/go-genproto,,,2026-10-15T07:15:57.413Z
+go,github.com/modern-go/reflect2,28,dependents,,46474,top,v1.0.2,2021-09-11T02:10:30Z,,unavailable: Go has no publisher accounts,https://github.com/modern-go/reflect2,,,2026-10-15T07:15:57.650Z
+go,google.golang.org/appengine,29,dependents,,44102,top,v1.6.8,2023-08-30T01:12:52Z,,unavailable: Go has no publisher accounts,https://github.com/golang/appengine,,,2026-10-15T07:15:57.934Z
+go,github.com/modern-go/concurrent,30,dependents,,43683,top,v0.0.0-20180306012644-bacd9c7ef1dd,2018-03-06T01:26:44Z,,unavailable: Go has no publisher accounts,https://github.com/modern-go/concurrent,,,2026-10-15T07:15:58.158Z
+go,go.uber.org/atomic,31,dependents,,43007,top,v1.12.0,2026-09-17T21:29:09Z,,unavailable: Go has no publisher accounts,https://github.com/uber-go/atomic,,,2026-10-15T07:15:58.466Z
+go,github.com/golang/snappy,32,dependents,,41684,top,v1.0.0,2023-12-25T22:57:46Z,,unavailable: Go has no publisher accounts,https://github.com/golang/snappy,,,2026-10-15T07:15:58.684Z
+go,github.com/golang/groupcache,33,dependents,,41252,top,v0.0.0-20241129210726-2c02b8208cf8,2024-11-29T21:07:26Z,,unavailable: Go has no publisher accounts,https://github.com/golang/groupcache,,,2026-10-15T07:15:58.983Z
+go,github.com/fatih/color,34,dependents,,39081,top,v1.19.0,2026-03-20T08:53:23Z,,unavailable: Go has no publisher accounts,https://github.com/fatih/color,,,2026-10-15T07:15:59.211Z
+go,github.com/prometheus/common,35,dependents,,38694,top,v0.72.1,2026-10-11T08:43:15Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/common,,,2026-10-15T07:15:59.566Z
+go,gopkg.in/check.v1,36,dependents,,38591,top,v1.0.0-20201130134442-10cb98267c6c,2020-11-30T13:44:42Z,,unavailable: Go has no publisher accounts,,,,2026-10-15T07:15:59.799Z
+go,golang.org/x/time,37,dependents,,38441,top,v0.16.0,2026-08-19T17:16:18Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/time,,,2026-10-15T07:16:00.036Z
+go,github.com/beorn7/perks,38,dependents,,37625,top,v1.0.1,2019-07-31T12:00:54Z,,unavailable: Go has no publisher accounts,https://github.com/beorn7/perks,,,2026-10-15T07:16:00.292Z
+go,github.com/gorilla/websocket,39,dependents,,37531,top,v1.5.3,2024-06-14T03:18:03Z,,unavailable: Go has no publisher accounts,https://github.com/gorilla/websocket,,,2026-10-15T07:16:00.643Z
+go,github.com/spf13/viper,40,dependents,,37067,top,v1.21.0,2025-09-08T16:56:14Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/viper,,,2026-10-15T07:16:01.416Z
+go,github.com/go-logr/logr,41,dependents,,36835,top,v1.4.4,2026-07-20T18:51:02Z,,unavailable: Go has no publisher accounts,https://github.com/go-logr/logr,,,2026-10-15T07:16:01.684Z
+go,github.com/prometheus/client_golang,42,dependents,,36473,top,v1.25.0,2026-10-08T13:00:24Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/client_golang,,,2026-10-15T07:16:01.966Z
+go,golang.org/x/oauth2,43,dependents,,36322,top,v0.37.0,2026-08-25T21:41:43Z,,unavailable: Go has no publisher accounts,https://go.googlesource.com/oauth2,,,2026-10-15T07:16:02.356Z
+go,go.uber.org/zap,44,dependents,,35840,top,v1.28.0,2026-04-28T02:13:09Z,,unavailable: Go has no publisher accounts,https://github.com/uber-go/zap,,,2026-10-15T07:16:03.176Z
+go,github.com/prometheus/procfs,45,dependents,,34604,top,v0.22.0,2026-08-28T13:53:50Z,,unavailable: Go has no publisher accounts,https://github.com/prometheus/procfs,,,2026-10-15T07:16:03.450Z
+go,github.com/klauspost/compress,46,dependents,,34277,top,v1.20.3,2026-10-12T09:19:21Z,,unavailable: Go has no publisher accounts,https://github.com/klauspost/compress,,,2026-10-15T07:16:03.834Z
+go,github.com/mitchellh/mapstructure,47,dependents,,32864,top,v1.5.0,2022-04-20T22:31:31Z,,unavailable: Go has no publisher accounts,https://github.com/mitchellh/mapstructure,,,2026-10-15T07:16:04.342Z
+go,gopkg.in/ini.v1,48,dependents,,32703,top,v1.67.3,2026-06-08T12:12:57Z,,unavailable: Go has no publisher accounts,https://gopkg.in/ini.v1,,,2026-10-15T07:16:04.623Z
+go,github.com/spf13/cast,49,dependents,,31940,top,v1.10.0,2025-09-08T16:45:31Z,,unavailable: Go has no publisher accounts,https://github.com/spf13/cast,,,2026-10-15T07:16:04.858Z
+go,github.com/onsi/gomega,50,dependents,,31033,top,v1.44.0,2026-09-24T17:34:06Z,,unavailable: Go has no publisher accounts,https://github.com/onsi/gomega,,,2026-10-15T07:16:05.160Z
+maven,junit:junit,1,dependents,,97532,top,4.13.2,2021-02-13T16:31:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.409Z
+maven,org.scala-lang:scala-library,2,dependents,,71160,top,3.10.0,2026-10-05T09:26:12.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.695Z
+maven,org.slf4j:slf4j-api,3,dependents,,54638,top,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:05.926Z
+maven,com.google.guava:guava,4,dependents,,29526,top,33.7.2-jre,2026-09-29T14:47:28.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.226Z
+maven,ch.qos.logback:logback-classic,5,dependents,,26735,top,1.6.5,2026-09-30T19:40:19.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.543Z
+maven,org.mockito:mockito-core,6,dependents,,25205,top,5.24.0,2026-09-23T14:06:33.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:06.849Z
+maven,com.fasterxml.jackson.core:jackson-databind,7,dependents,,23566,top,2.22.3,2026-09-21T20:56:19.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:07.214Z
+maven,org.apache.commons:commons-lang3,8,dependents,,22625,top,3.21.0,2026-09-25T20:01:05.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:11.575Z
+maven,commons-io:commons-io,9,dependents,,21919,top,2.22.0,2026-04-19T12:01:24.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.105Z
+maven,org.jetbrains.kotlin:kotlin-stdlib-common,10,dependents,,20233,top,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.383Z
+maven,org.projectlombok:lombok,11,dependents,,16498,top,1.18.48,2026-09-01T20:40:56.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.658Z
+maven,org.jetbrains.kotlin:kotlin-stdlib-jdk8,12,dependents,,16439,top,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:12.944Z
+maven,javax.servlet:javax.servlet-api,13,dependents,,14401,top,4.0.1,2018-04-20T07:19:20.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:13.160Z
+maven,org.assertj:assertj-core,14,dependents,,14394,top,3.27.7,2026-01-24T19:07:20.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:13.569Z
+maven,log4j:log4j,15,dependents,,13845,top,1.2.17,2012-05-26T09:43:39.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:14.189Z
+maven,org.slf4j:slf4j-log4j12,16,dependents,,13700,top,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.021Z
+maven,com.google.code.gson:gson,17,dependents,,13676,top,2.14.0,2026-04-23T19:01:47.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.309Z
+maven,com.fasterxml.jackson.core:jackson-core,18,dependents,,12374,top,2.22.3,2026-09-21T20:38:01.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:16.654Z
+maven,org.mockito:mockito-all,19,dependents,,12283,top,1.10.19,2014-12-31T16:43:36.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:17.886Z
+maven,org.slf4j:slf4j-simple,20,dependents,,12084,top,2.0.20,2026-09-22T14:50:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.180Z
+maven,org.junit.jupiter:junit-jupiter-api,21,dependents,,12039,top,6.1.3,2026-08-07T12:27:00.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.457Z
+maven,org.apache.httpcomponents:httpclient,22,dependents,,11971,top,4.5.14,2022-11-30T18:40:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.679Z
+maven,org.junit.jupiter:junit-jupiter-engine,23,dependents,,11720,top,6.1.3,2026-08-07T12:27:00.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:18.984Z
+maven,com.fasterxml.jackson.core:jackson-annotations,24,dependents,,11535,top,2.22,2026-05-31T04:44:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.235Z
+maven,com.google.code.findbugs:jsr305,25,dependents,,11503,top,3.0.2,2017-03-31T04:55:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.455Z
+maven,commons-codec:commons-codec,26,dependents,,11225,top,1.23.0,2026-10-04T13:04:17.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:19.715Z
+maven,org.scala-lang:scala-reflect,27,dependents,,11154,top,2.13.18,2025-11-17T08:48:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.067Z
+maven,org.jetbrains.kotlin:kotlin-stdlib,28,dependents,,11122,top,2.4.21,2026-10-08T07:57:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.355Z
+maven,org.springframework:spring-context,29,dependents,,10396,top,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:20.654Z
+maven,org.testng:testng,30,dependents,,10062,top,7.12.0,2026-01-22T05:19:41.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:21.426Z
+maven,commons-lang:commons-lang,31,dependents,,9449,top,2.6,2011-01-16T22:21:47.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:21.712Z
+maven,org.springframework.boot:spring-boot-starter-test,32,dependents,,9077,top,4.1.1,2026-08-20T12:51:49.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.059Z
+maven,joda-time:joda-time,33,dependents,,8984,top,2.15.0,2026-10-01T07:36:16.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.300Z
+maven,org.apache.logging.log4j:log4j-core,34,dependents,,8839,top,2.26.1,2026-06-29T07:44:53.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:22.608Z
+maven,commons-logging:commons-logging,35,dependents,,8711,top,1.4.0,2026-06-11T20:49:26.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:23.883Z
+maven,org.springframework.boot:spring-boot-starter-web,36,dependents,,8658,top,4.1.1,2026-08-20T12:51:49.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.183Z
+maven,org.scalatest:scalatest_2.12,37,dependents,,8554,top,3.3.0-SNAP4,2023-04-11T13:23:22.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.476Z
+maven,javax.servlet:servlet-api,38,dependents,,8267,top,2.5,2006-07-17T11:09:57.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.701Z
+maven,org.scalatest:scalatest_2.11,39,dependents,,7880,top,3.3.0-SNAP4,2023-04-11T13:26:45.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:24.960Z
+maven,com.h2database:h2,40,dependents,,7857,top,2.5.252,2026-09-26T14:39:29.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.249Z
+maven,org.slf4j:jcl-over-slf4j,41,dependents,,7757,top,2.0.20,2026-09-22T14:50:54.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.539Z
+maven,org.springframework:spring-test,42,dependents,,7391,top,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:25.827Z
+maven,org.apache.logging.log4j:log4j-api,43,dependents,,7277,top,2.26.1,2026-06-29T07:47:30.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:26.247Z
+maven,org.springframework.boot:spring-boot-configuration-processor,44,dependents,,7252,top,4.1.1,2026-08-20T12:51:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:26.771Z
+maven,org.apache.maven:maven-plugin-api,45,dependents,,6755,top,3.10.0,2026-09-27T20:39:59.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:27.054Z
+maven,org.springframework:spring-core,46,dependents,,6691,top,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:27.417Z
+maven,org.springframework:spring-web,47,dependents,,6673,top,7.0.9,2026-08-20T09:37:50.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:28.345Z
+maven,org.scala-lang:scala-compiler,48,dependents,,6623,top,2.13.18,2025-11-17T08:48:55.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:29.916Z
+maven,org.springframework.boot:spring-boot-autoconfigure,49,dependents,,6483,top,4.1.1,2026-08-20T12:51:48.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:30.291Z
+maven,org.hamcrest:hamcrest-all,50,dependents,,6476,top,1.3,2012-07-09T21:11:44.000Z,,unavailable: Maven Central exposes no publisher list,,,,2026-10-15T07:16:30.761Z
+npm,semver,1,downloads,3871999785,,top,7.8.5,2026-06-19T18:32:48.972Z,4,packument maintainers[],https://github.com/npm/node-semver,,,2026-10-15T07:14:16.870Z
+npm,minimatch,2,downloads,3193521359,,top,10.2.6,2026-07-27T19:00:09.469Z,1,packument maintainers[],https://github.com/isaacs/minimatch,,,2026-10-15T07:14:17.268Z
+npm,ansi-styles,3,downloads,3092443982,,top,7.0.0,2026-07-26T14:57:36.835Z,1,packument maintainers[],https://github.com/chalk/ansi-styles,,,2026-10-15T07:14:18.318Z
+npm,debug,4,downloads,3069998996,,top,4.4.3,2025-09-13T17:25:19.732Z,2,packument maintainers[],https://github.com/debug-js/debug,,,2026-10-15T07:14:18.899Z
+npm,brace-expansion,5,downloads,2774179410,,top,5.0.12,2026-09-14T21:59:00.288Z,2,packument maintainers[],https://github.com/juliangruber/brace-expansion,,,2026-10-15T07:14:19.768Z
+npm,lru-cache,6,downloads,2571580839,,top,11.5.3,2026-09-18T23:46:33.023Z,1,packument maintainers[],https://github.com/isaacs/node-lru-cache,,,2026-10-15T07:14:22.009Z
+npm,ms,7,downloads,2485023539,,top,2.1.3,2020-12-08T13:54:35.223Z,6,packument maintainers[],https://github.com/vercel/ms,,,2026-10-15T07:14:22.278Z
+npm,strip-ansi,8,downloads,2340065011,,top,7.2.0,2026-02-26T13:51:11.099Z,1,packument maintainers[],https://github.com/chalk/strip-ansi,,,2026-10-15T07:14:22.619Z
+npm,commander,9,downloads,2315473221,,top,15.0.0,2026-05-29T09:16:23.076Z,2,packument maintainers[],https://github.com/tj/commander.js,,,2026-10-15T07:14:23.133Z
+npm,string-width,10,downloads,2282897275,,top,8.3.0,2026-09-24T14:37:52.226Z,1,packument maintainers[],https://github.com/sindresorhus/string-width,,,2026-10-15T07:14:23.405Z
+npm,chalk,11,downloads,2277720874,,top,6.0.1,2026-09-27T03:40:44.397Z,1,packument maintainers[],https://github.com/chalk/chalk,,,2026-10-15T07:14:23.734Z
+npm,picomatch,12,downloads,2254168182,,top,4.0.7,2026-08-24T14:36:23.690Z,4,packument maintainers[],https://github.com/micromatch/picomatch,,,2026-10-15T07:14:25.137Z
+npm,ansi-regex,13,downloads,2240580097,,top,6.4.0,2026-09-27T03:34:44.568Z,1,packument maintainers[],https://github.com/chalk/ansi-regex,,,2026-10-15T07:14:25.977Z
+npm,supports-color,14,downloads,2193871951,,top,11.0.0,2026-07-26T15:13:36.815Z,1,packument maintainers[],https://github.com/chalk/supports-color,,,2026-10-15T07:14:26.491Z
+npm,@types/node,15,downloads,1991263062,,top,26.6.5,2026-10-09T18:46:47.657Z,1,packument maintainers[],https://github.com/DefinitelyTyped/DefinitelyTyped,,,2026-10-15T07:14:27.070Z
+npm,wrap-ansi,16,downloads,1951600488,,top,10.0.2,2026-09-21T04:09:32.260Z,1,packument maintainers[],https://github.com/chalk/wrap-ansi,,,2026-10-15T07:14:27.391Z
+npm,emoji-regex,17,downloads,1915550224,,top,11.0.0,2026-09-15T17:11:44.000Z,2,packument maintainers[],https://github.com/mathiasbynens/emoji-regex,,,2026-10-15T07:14:27.869Z
+npm,tslib,18,downloads,1910652385,,top,2.8.1,2024-10-31T22:42:48.624Z,7,packument maintainers[],https://github.com/Microsoft/tslib,,,2026-10-15T07:14:28.160Z
+npm,balanced-match,19,downloads,1829936258,,top,4.0.4,2026-02-22T11:38:25.951Z,1,packument maintainers[],https://github.com/juliangruber/balanced-match,,,2026-10-15T07:14:28.387Z
+npm,eslint-visitor-keys,20,downloads,1787713832,,top,5.0.1,2026-02-20T14:40:47.824Z,2,packument maintainers[],https://github.com/eslint/js,,,2026-10-15T07:14:28.628Z
+npm,glob,21,downloads,1766273183,,top,13.0.6,2026-02-19T17:26:33.269Z,1,packument maintainers[],https://github.com/isaacs/node-glob,,,2026-10-15T07:14:29.048Z
+npm,ajv,22,downloads,1726330501,,top,8.20.0,2026-04-24T15:22:16.529Z,2,packument maintainers[],https://github.com/ajv-validator/ajv,,,2026-10-15T07:14:29.765Z
+npm,type-fest,23,downloads,1719445698,,top,5.10.0,2026-09-17T09:11:18.201Z,1,packument maintainers[],https://github.com/sindresorhus/type-fest,,,2026-10-15T07:14:30.381Z
+npm,source-map,24,downloads,1673760871,,top,0.8.0,2026-07-20T05:45:25.965Z,25,packument maintainers[],https://github.com/mozilla/source-map,,,2026-10-15T07:14:30.605Z
+npm,react-is,25,downloads,1636919311,,top,19.3.0,2026-09-09T17:17:33.743Z,2,packument maintainers[],https://github.com/react/react,,,2026-10-15T07:14:30.903Z
+npm,escape-string-regexp,26,downloads,1624568710,,top,5.0.0,2021-04-17T15:45:50.334Z,1,packument maintainers[],https://github.com/sindresorhus/escape-string-regexp,,,2026-10-15T07:14:31.157Z
+npm,color-name,27,downloads,1591762476,,top,2.1.1,2026-07-22T15:38:35.512Z,3,packument maintainers[],https://github.com/colorjs/color-name,,,2026-10-15T07:14:31.464Z
+npm,readable-stream,28,downloads,1585269689,,top,4.8.0,2026-10-08T08:21:05.681Z,3,packument maintainers[],https://github.com/nodejs/readable-stream,,,2026-10-15T07:14:32.228Z
+npm,which,29,downloads,1563983623,,top,7.0.0,2026-05-08T18:30:58.733Z,4,packument maintainers[],https://github.com/npm/node-which,,,2026-10-15T07:14:32.501Z
+npm,color-convert,30,downloads,1557304789,,top,3.1.3,2025-11-14T18:29:11.565Z,1,packument maintainers[],https://github.com/Qix-/color-convert,,,2026-10-15T07:14:32.827Z
+npm,undici-types,31,downloads,1508965403,,top,8.11.2,2026-09-24T08:41:03.829Z,2,packument maintainers[],https://github.com/nodejs/undici,,,2026-10-15T07:14:33.554Z
+npm,json-schema-traverse,32,downloads,1497928739,,top,1.0.0,2020-12-13T10:56:54.719Z,1,packument maintainers[],https://github.com/epoberezkin/json-schema-traverse,,,2026-10-15T07:14:33.792Z
+npm,find-up,33,downloads,1472520547,,top,8.0.0,2025-09-16T01:13:57.112Z,1,packument maintainers[],https://github.com/sindresorhus/find-up,,,2026-10-15T07:14:34.057Z
+npm,glob-parent,34,downloads,1469990284,,top,6.0.2,2021-09-29T22:14:24.467Z,4,packument maintainers[],https://github.com/gulpjs/glob-parent,,,2026-10-15T07:14:34.315Z
+npm,has-flag,35,downloads,1461851307,,top,5.0.1,2021-07-19T17:30:54.122Z,1,packument maintainers[],https://github.com/sindresorhus/has-flag,,,2026-10-15T07:14:34.572Z
+npm,ignore,36,downloads,1453557178,,top,7.0.12,2026-10-02T12:24:54.844Z,1,packument maintainers[],https://github.com/kaelzhang/node-ignore,,,2026-10-15T07:14:34.870Z
+npm,p-limit,37,downloads,1447097137,,top,7.3.3,2026-09-18T18:27:54.962Z,1,packument maintainers[],https://github.com/sindresorhus/p-limit,,,2026-10-15T07:14:35.145Z
+npm,locate-path,38,downloads,1434892019,,top,8.0.0,2025-09-15T23:17:38.813Z,1,packument maintainers[],https://github.com/sindresorhus/locate-path,,,2026-10-15T07:14:35.378Z
+npm,p-locate,39,downloads,1428242770,,top,7.0.0,2026-02-03T07:57:49.916Z,1,packument maintainers[],https://github.com/sindresorhus/p-locate,,,2026-10-15T07:14:35.666Z
+npm,yallist,40,downloads,1423577909,,top,5.0.0,2024-04-09T19:21:44.844Z,1,packument maintainers[],https://github.com/isaacs/yallist,,,2026-10-15T07:14:35.899Z
+npm,safe-buffer,41,downloads,1413001369,,top,5.2.1,2020-05-10T16:37:30.776Z,2,packument maintainers[],https://github.com/feross/safe-buffer,,,2026-10-15T07:14:36.151Z
+npm,zod,42,downloads,1398180056,,top,4.6.7,2026-10-12T16:29:37.778Z,1,packument maintainers[],https://github.com/colinhacks/zod,,,2026-10-15T07:14:36.534Z
+npm,entities,43,downloads,1380015191,,top,8.1.0,2026-09-07T22:42:04.929Z,1,packument maintainers[],https://github.com/fb55/entities,,,2026-10-15T07:14:36.808Z
+npm,js-yaml,44,downloads,1341906393,,top,5.4.3,2026-10-05T22:13:55.389Z,1,packument maintainers[],https://github.com/nodeca/js-yaml,,,2026-10-15T07:14:37.194Z
+npm,path-key,45,downloads,1334668521,,top,4.0.0,2021-04-09T12:04:51.822Z,1,packument maintainers[],https://github.com/sindresorhus/path-key,,,2026-10-15T07:14:38.675Z
+npm,iconv-lite,46,downloads,1332298765,,top,0.7.3,2026-07-03T17:53:11.119Z,3,packument maintainers[],https://github.com/pillarjs/iconv-lite,,,2026-10-15T07:14:39.027Z
+npm,isexe,47,downloads,1331144474,,top,4.0.0,2026-02-09T16:28:02.924Z,1,packument maintainers[],https://github.com/isaacs/isexe,,,2026-10-15T07:14:39.299Z
+npm,postcss,48,downloads,1331035707,,top,8.5.30,2026-10-12T20:38:43.212Z,1,packument maintainers[],https://github.com/postcss/postcss,,,2026-10-15T07:14:39.589Z
+npm,uuid,49,downloads,1319053972,,top,14.0.3,2026-10-10T00:30:19.423Z,2,packument maintainers[],https://github.com/uuidjs/uuid,,,2026-10-15T07:14:40.875Z
+npm,typescript,50,downloads,1316755551,,top,7.0.2,2026-07-08T15:55:18.431Z,7,packument maintainers[],https://github.com/microsoft/TypeScript,,,2026-10-15T07:14:41.445Z
+packagist,symfony/deprecation-contracts,1,downloads,969781281,,top,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/deprecation-contracts,,,2026-10-15T07:16:31.059Z
+packagist,symfony/polyfill-mbstring,2,downloads,1307730517,,top,v1.43.0,2026-09-24T15:19:04+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-mbstring,,,2026-10-15T07:16:31.334Z
+packagist,psr/log,3,downloads,1306457746,,top,3.0.2,2024-09-11T13:17:53+00:00,3,packagist maintainers[],https://github.com/php-fig/log,,,2026-10-15T07:16:31.550Z
+packagist,psr/http-message,4,downloads,1163371681,,top,2.0,2023-04-04T09:54:51+00:00,3,packagist maintainers[],https://github.com/php-fig/http-message,,,2026-10-15T07:16:31.806Z
+packagist,symfony/console,5,downloads,1225517049,,top,v8.1.8,2026-09-18T16:00:27+00:00,1,packagist maintainers[],https://github.com/symfony/console,,,2026-10-15T07:16:32.110Z
+packagist,psr/container,6,downloads,1139414045,,top,1.1.2,2021-11-05T16:50:12+00:00,3,packagist maintainers[],https://github.com/php-fig/container,,,2026-10-15T07:16:32.329Z
+packagist,symfony/polyfill-intl-normalizer,7,downloads,963373290,,top,v1.43.0,2026-09-23T22:02:09+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-normalizer,,,2026-10-15T07:16:32.716Z
+packagist,guzzlehttp/psr7,8,downloads,1153179200,,top,3.1.0,2026-08-24T11:02:13+00:00,6,packagist maintainers[],https://github.com/guzzle/psr7,,,2026-10-15T07:16:33.062Z
+packagist,symfony/polyfill-php80,9,downloads,945693261,,top,v1.43.0,2026-09-25T15:50:05+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-php80,,,2026-10-15T07:16:34.315Z
+packagist,symfony/service-contracts,10,downloads,993035817,,top,v3.7.3,2026-07-27T15:39:01+00:00,1,packagist maintainers[],https://github.com/symfony/service-contracts,,,2026-10-15T07:16:34.634Z
+packagist,psr/http-factory,11,downloads,824230552,,top,1.1.0,2024-04-15T12:06:14+00:00,3,packagist maintainers[],https://github.com/php-fig/http-factory,,,2026-10-15T07:16:34.848Z
+packagist,symfony/finder,12,downloads,1129698434,,top,v8.1.8,2026-09-26T06:33:49+00:00,1,packagist maintainers[],https://github.com/symfony/finder,,,2026-10-15T07:16:35.177Z
+packagist,symfony/string,13,downloads,853505252,,top,v8.1.7,2026-09-11T14:51:16+00:00,1,packagist maintainers[],https://github.com/symfony/string,,,2026-10-15T07:16:35.457Z
+packagist,nikic/php-parser,14,downloads,1029273905,,top,v5.9.0,2026-09-13T18:51:52+00:00,1,packagist maintainers[],https://github.com/nikic/PHP-Parser,,,2026-10-15T07:16:35.683Z
+packagist,symfony/polyfill-intl-grapheme,15,downloads,829293775,,top,v1.43.0,2026-09-25T15:46:47+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-grapheme,,,2026-10-15T07:16:35.947Z
+packagist,guzzlehttp/promises,16,downloads,1102871502,,top,3.0.2,2026-08-24T10:00:26+00:00,4,packagist maintainers[],https://github.com/guzzle/promises,,,2026-10-15T07:16:36.208Z
+packagist,guzzlehttp/guzzle,17,downloads,1122971793,,top,8.2.0,2026-09-06T13:55:09+00:00,5,packagist maintainers[],https://github.com/guzzle/guzzle,,,2026-10-15T07:16:36.542Z
+packagist,symfony/polyfill-ctype,18,downloads,1111620450,,top,v1.37.0,2026-04-10T16:19:22+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-ctype,,,2026-10-15T07:16:39.038Z
+packagist,symfony/process,19,downloads,1101448865,,top,v8.1.7,2026-09-02T12:40:29+00:00,1,packagist maintainers[],https://github.com/symfony/process,,,2026-10-15T07:16:39.429Z
+packagist,symfony/event-dispatcher,20,downloads,1111778260,,top,v8.1.5,2026-08-21T17:47:34+00:00,1,packagist maintainers[],https://github.com/symfony/event-dispatcher,,,2026-10-15T07:16:40.203Z
+packagist,psr/http-client,21,downloads,804065068,,top,1.0.3,2023-09-23T14:17:50+00:00,2,packagist maintainers[],https://github.com/php-fig/http-client,,,2026-10-15T07:16:40.426Z
+packagist,symfony/event-dispatcher-contracts,22,downloads,878998011,,top,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/event-dispatcher-contracts,,,2026-10-15T07:16:40.720Z
+packagist,monolog/monolog,23,downloads,1086071658,,top,3.12.1,2026-09-29T19:21:12+00:00,1,packagist maintainers[],https://github.com/Seldaek/monolog,,,2026-10-15T07:16:40.943Z
+packagist,psr/event-dispatcher,24,downloads,736299418,,top,1.0.0,2019-01-08T18:20:26+00:00,3,packagist maintainers[],https://github.com/php-fig/event-dispatcher,,,2026-10-15T07:16:41.180Z
+packagist,doctrine/lexer,25,downloads,1026958796,,top,3.0.3,2026-10-01T06:59:29+00:00,1,packagist maintainers[],https://github.com/doctrine/lexer,,,2026-10-15T07:16:41.452Z
+packagist,symfony/http-foundation,26,downloads,997851790,,top,v8.1.8,2026-09-24T07:13:53+00:00,1,packagist maintainers[],https://github.com/symfony/http-foundation,,,2026-10-15T07:16:41.800Z
+packagist,symfony/var-dumper,27,downloads,975647766,,top,v8.1.7,2026-09-03T16:02:27+00:00,1,packagist maintainers[],https://github.com/symfony/var-dumper,,,2026-10-15T07:16:42.820Z
+packagist,symfony/polyfill-intl-idn,28,downloads,891398158,,top,v1.43.0,2026-09-23T14:40:04+00:00,1,packagist maintainers[],https://github.com/symfony/polyfill-intl-idn,,,2026-10-15T07:16:43.191Z
+packagist,symfony/translation-contracts,29,downloads,816480954,,top,v3.7.1,2026-06-05T06:23:12+00:00,1,packagist maintainers[],https://github.com/symfony/translation-contracts,,,2026-10-15T07:16:43.711Z
+packagist,ralouphie/getallheaders,30,downloads,1001902262,,top,3.0.3,2019-03-08T08:55:37+00:00,1,packagist maintainers[],https://github.com/ralouphie/getallheaders,,,2026-10-15T07:16:43.926Z
+packagist,symfony/http-kernel,31,downloads,936639752,,top,v8.1.8,2026-09-29T14:08:01+00:00,1,packagist maintainers[],https://github.com/symfony/http-kernel,,,2026-10-15T07:16:44.334Z
+packagist,symfony/mime,32,downloads,784241415,,top,v8.1.7,2026-09-04T11:02:17+00:00,1,packagist maintainers[],https://github.com/symfony/mime,,,2026-10-15T07:16:44.984Z
+packagist,symfony/error-handler,33,downloads,764121991,,top,v8.1.8,2026-09-22T18:58:53+00:00,1,packagist maintainers[],https://github.com/symfony/error-handler,,,2026-10-15T07:16:45.746Z
+packagist,psr/clock,34,downloads,444903586,,top,1.0.0,2022-11-25T14:36:26+00:00,2,packagist maintainers[],https://github.com/php-fig/clock,,,2026-10-15T07:16:45.975Z
+packagist,symfony/routing,35,downloads,901302387,,top,v8.1.8,2026-09-28T19:13:15+00:00,1,packagist maintainers[],https://github.com/symfony/routing,,,2026-10-15T07:16:46.368Z
+packagist,symfony/translation,36,downloads,949850962,,top,v8.1.5,2026-08-21T17:47:34+00:00,1,packagist maintainers[],https://github.com/symfony/translation,,,2026-10-15T07:16:47.094Z
+packagist,psr/simple-cache,37,downloads,838961555,,top,3.0.0,2021-10-29T13:26:27+00:00,3,packagist maintainers[],https://github.com/php-fig/simple-cache,,,2026-10-15T07:16:47.353Z
+packagist,myclabs/deep-copy,38,downloads,958988381,,top,1.14.0,2026-08-11T10:17:44+00:00,2,packagist maintainers[],https://github.com/myclabs/DeepCopy,,,2026-10-15T07:16:47.599Z
+packagist,brick/math,39,downloads,612977775,,top,1.0.0,2026-09-12T10:28:18+00:00,1,packagist maintainers[],https://github.com/brick/math,,,2026-10-15T07:16:47.884Z
+packagist,sebastian/diff,40,downloads,1010488270,,top,9.0.1,2026-08-25T15:38:55+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/diff,,,2026-10-15T07:16:48.147Z
+packagist,ramsey/uuid,41,downloads,810163269,,top,4.9.4,2026-09-16T11:39:30+00:00,1,packagist maintainers[],https://github.com/ramsey/uuid,,,2026-10-15T07:16:48.371Z
+packagist,phpunit/phpunit,42,downloads,1019123383,,top,13.4.2,2026-10-12T15:29:04+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/phpunit,,,2026-10-15T07:16:48.790Z
+packagist,doctrine/inflector,43,downloads,964633367,,top,2.1.0,2025-08-10T19:31:58+00:00,1,packagist maintainers[],https://github.com/doctrine/inflector,,,2026-10-15T07:16:49.314Z
+packagist,phpunit/php-code-coverage,44,downloads,998683095,,top,14.4.1,2026-10-03T14:05:38+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-code-coverage,,,2026-10-15T07:16:49.593Z
+packagist,egulias/email-validator,45,downloads,798096892,,top,4.0.4,2025-03-06T22:45:56+00:00,1,packagist maintainers[],https://github.com/egulias/EmailValidator,,,2026-10-15T07:16:49.840Z
+packagist,sebastian/version,46,downloads,970369361,,top,7.0.1,2026-10-04T05:51:14+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/version,,,2026-10-15T07:16:50.065Z
+packagist,symfony/css-selector,47,downloads,861279699,,top,v8.1.6,2026-08-23T10:06:25+00:00,1,packagist maintainers[],https://github.com/symfony/css-selector,,,2026-10-15T07:16:50.372Z
+packagist,phpunit/php-file-iterator,48,downloads,985275438,,top,7.0.2,2026-08-25T14:47:43+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-file-iterator,,,2026-10-15T07:16:50.653Z
+packagist,phpunit/php-text-template,49,downloads,973098716,,top,6.0.1,2026-10-03T04:54:24+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/php-text-template,,,2026-10-15T07:16:50.932Z
+packagist,sebastian/exporter,50,downloads,989091624,,top,4.0.9,2026-08-11T04:55:59+00:00,1,packagist maintainers[],https://github.com/sebastianbergmann/exporter,,,2026-10-15T07:16:51.234Z
+pypi,boto3,1,downloads,2460723068,,top,1.43.112,2026-10-12T19:26:58.514Z,,unavailable,https://github.com/boto/boto3,,,2026-10-15T07:13:24.464Z
+pypi,packaging,2,downloads,1550430820,,top,26.3,2026-08-04T18:15:27.159Z,,unavailable,https://github.com/pypa/packaging,,,2026-10-15T07:13:24.697Z
+pypi,typing-extensions,3,downloads,1396876439,,top,4.16.0,2026-07-02T08:40:04.659Z,,unavailable,https://github.com/python/typing_extensions,,,2026-10-15T07:13:25.004Z
+pypi,idna,4,downloads,1339499236,,top,3.20,2026-09-17T14:11:03.168Z,,unavailable,https://github.com/kjd/idna,,,2026-10-15T07:13:25.363Z
+pypi,urllib3,5,downloads,1324020131,,top,2.8.0,2026-09-15T19:29:34.577Z,,unavailable,https://github.com/urllib3/urllib3,,,2026-10-15T07:13:26.777Z
+pypi,certifi,6,downloads,1290239262,,top,2026.7.22,2026-07-22T03:35:11.276Z,,unavailable,https://github.com/certifi/python-certifi,,,2026-10-15T07:13:32.637Z
+pypi,requests,7,downloads,1208056002,,top,2.34.2,2026-05-14T19:25:26.443Z,,unavailable,https://github.com/psf/requests,,,2026-10-15T07:13:33.432Z
+pypi,charset-normalizer,8,downloads,1186581556,,top,3.5.2,2026-09-30T04:34:42.843Z,,unavailable,https://github.com/jawah/charset_normalizer,,,2026-10-15T07:13:35.226Z
+pypi,cryptography,9,downloads,1070154291,,top,50.0.2,2026-09-30T14:43:44.339Z,,unavailable,https://github.com/pyca/cryptography,,,2026-10-15T07:13:35.688Z
+pypi,setuptools,10,downloads,973493203,,top,84.0.0,2026-08-08T18:27:56.719Z,,unavailable,https://github.com/pypa/setuptools,,,2026-10-15T07:13:40.159Z
+pypi,cffi,11,downloads,949615436,,top,2.1.1,2026-08-03T21:19:15.602Z,,unavailable,https://github.com/python-cffi/cffi,,,2026-10-15T07:13:41.945Z
+pypi,pygments,12,downloads,931583890,,top,2.21.0,2026-08-17T08:02:44.912Z,,unavailable,https://github.com/pygments/pygments,,,2026-10-15T07:13:42.255Z
+pypi,pyyaml,13,downloads,910851659,,top,6.0.3,2025-09-25T21:31:46.040Z,,unavailable,https://github.com/yaml/pyyaml,,,2026-10-15T07:13:43.045Z
+pypi,python-dateutil,14,downloads,904912826,,top,2.9.0.post0,2024-03-01T18:36:18.570Z,,unavailable,https://github.com/dateutil/dateutil,,,2026-10-15T07:13:43.308Z
+pypi,six,15,downloads,894556866,,top,1.17.0,2024-12-04T17:35:26.475Z,,unavailable,https://github.com/benjaminp/six,,,2026-10-15T07:13:43.527Z
+pypi,pluggy,16,downloads,877688356,,top,1.6.0,2025-05-15T12:30:06.134Z,,unavailable,,,,2026-10-15T07:13:43.828Z
+pypi,botocore,17,downloads,853428832,,top,1.43.112,2026-10-12T19:26:50.658Z,,unavailable,https://github.com/boto/botocore,,,2026-10-15T07:13:44.179Z
+pypi,pydantic,18,downloads,842605827,,top,2.14.1,2026-10-11T18:37:53.437Z,,unavailable,https://github.com/pydantic/pydantic,,,2026-10-15T07:13:44.484Z
+pypi,pycparser,19,downloads,837756809,,top,3.11,2026-10-09T12:56:58.131Z,,unavailable,https://github.com/eliben/pycparser,,,2026-10-15T07:13:44.750Z
+pypi,click,20,downloads,817239080,,top,8.5.0,2026-08-26T13:33:12.928Z,,unavailable,https://github.com/pallets/click,,,2026-10-15T07:13:44.982Z
+pypi,pydantic-core,21,downloads,808518099,,top,2.50.1,2026-10-11T18:31:38.345Z,,unavailable,https://github.com/pydantic/pydantic,,,2026-10-15T07:13:45.442Z
+pypi,anyio,22,downloads,803361854,,top,4.15.1,2026-09-05T10:42:37.923Z,,unavailable,https://github.com/agronholm/anyio,,,2026-10-15T07:13:45.775Z
+pypi,numpy,23,downloads,801552837,,top,2.5.4,2026-10-10T20:02:40.843Z,,unavailable,https://github.com/numpy/numpy,,,2026-10-15T07:13:47.640Z
+pypi,pytest,24,downloads,780160913,,top,9.1.1,2026-06-19T10:58:31.347Z,,unavailable,https://github.com/pytest-dev/pytest,,,2026-10-15T07:13:47.942Z
+pypi,iniconfig,25,downloads,755640889,,top,2.3.1,2026-10-06T22:48:36.959Z,,unavailable,https://github.com/pytest-dev/iniconfig,,,2026-10-15T07:13:48.708Z
+pypi,annotated-types,26,downloads,724456796,,top,0.8.0,2026-07-23T20:16:12.938Z,,unavailable,https://github.com/annotated-types/annotated-types,,,2026-10-15T07:13:48.951Z
+pypi,h11,27,downloads,710837874,,top,0.16.0,2025-04-24T03:35:24.344Z,,unavailable,https://github.com/python-hyper/h11,,,2026-10-15T07:13:49.237Z
+pypi,typing-inspection,28,downloads,695426964,,top,0.4.4,2026-08-12T12:37:24.648Z,,unavailable,https://github.com/pydantic/typing-inspection,,,2026-10-15T07:13:49.998Z
+pypi,attrs,29,downloads,692326327,,top,26.1.0,2026-03-19T14:22:23.645Z,,unavailable,https://github.com/python-attrs/attrs,,,2026-10-15T07:13:50.294Z
+pypi,s3transfer,30,downloads,645004335,,top,0.19.2,2026-07-22T19:30:43.251Z,,unavailable,https://github.com/boto/s3transfer,,,2026-10-15T07:13:50.569Z
+pypi,aiobotocore,31,downloads,619208081,,top,3.9.2,2026-10-01T02:01:57.883Z,,unavailable,https://github.com/aio-libs/aiobotocore,,,2026-10-15T07:13:50.848Z
+pypi,protobuf,32,downloads,619205877,,top,7.36.2,2026-09-17T20:07:51.542Z,,unavailable,,,,2026-10-15T07:13:51.243Z
+pypi,httpx,33,downloads,616760679,,top,0.28.1,2024-12-06T15:37:21.509Z,,unavailable,https://github.com/encode/httpx,,,2026-10-15T07:13:52.629Z
+pypi,markupsafe,34,downloads,614567882,,top,3.0.4,2026-10-02T23:04:20.141Z,,unavailable,https://github.com/pallets/markupsafe,,,2026-10-15T07:13:52.865Z
+pypi,httpcore,35,downloads,613832681,,top,1.0.9,2025-04-24T22:06:20.566Z,,unavailable,https://github.com/encode/httpcore,,,2026-10-15T07:13:53.148Z
+pypi,python-dotenv,36,downloads,574103823,,top,1.2.4,2026-10-01T05:36:08.633Z,,unavailable,https://github.com/theskumar/python-dotenv,,,2026-10-15T07:13:53.490Z
+pypi,pyjwt,37,downloads,565103517,,top,2.15.1,2026-09-28T18:40:41.429Z,,unavailable,https://github.com/jpadilla/pyjwt,,,2026-10-15T07:13:54.435Z
+pypi,platformdirs,38,downloads,563826118,,top,4.13.0,2026-10-11T02:05:22.776Z,,unavailable,https://github.com/tox-dev/platformdirs,,,2026-10-15T07:14:05.083Z
+pypi,fsspec,39,downloads,563154338,,top,2026.9.0,2026-09-18T17:50:41.341Z,,unavailable,https://github.com/fsspec/filesystem_spec,,,2026-10-15T07:14:05.420Z
+pypi,pandas,40,downloads,547072268,,top,3.0.6,2026-09-17T23:20:20.960Z,,unavailable,https://github.com/pandas-dev/pandas,,,2026-10-15T07:14:05.995Z
+pypi,jinja2,41,downloads,537719814,,top,3.1.6,2025-03-05T20:05:00.369Z,,unavailable,https://github.com/pallets/jinja,,,2026-10-15T07:14:06.371Z
+pypi,jmespath,42,downloads,509823585,,top,1.1.0,2026-01-22T16:35:24.919Z,,unavailable,https://github.com/jmespath/jmespath.py,,,2026-10-15T07:14:08.679Z
+pypi,pathspec,43,downloads,509699191,,top,1.1.1,2026-04-27T01:46:07.060Z,,unavailable,https://github.com/cpburnz/python-pathspec,,,2026-10-15T07:14:08.952Z
+pypi,filelock,44,downloads,499529209,,top,4.1.1,2026-10-11T16:11:52.753Z,,unavailable,https://github.com/tox-dev/py-filelock,,,2026-10-15T07:14:09.296Z
+pypi,starlette,45,downloads,494803667,,top,1.8.0,2026-10-13T07:54:38.019Z,,unavailable,https://github.com/Kludex/starlette,,,2026-10-15T07:14:10.617Z
+pypi,uvicorn,46,downloads,493237088,,top,0.54.0,2026-09-25T06:52:35.829Z,,unavailable,https://github.com/Kludex/uvicorn,,,2026-10-15T07:14:14.926Z
+pypi,multidict,47,downloads,472045565,,top,7.1.0,2026-10-09T13:58:50.692Z,,unavailable,https://github.com/aio-libs/multidict/actions,,,2026-10-15T07:14:15.332Z
+pypi,jsonschema,48,downloads,465214053,,top,4.26.0,2026-01-07T13:41:05.306Z,,unavailable,https://github.com/python-jsonschema/jsonschema,,,2026-10-15T07:14:15.848Z
+pypi,rpds-py,49,downloads,463583334,,top,2026.9.1,2026-10-04T16:28:55.207Z,,unavailable,https://github.com/crate-py/rpds,,,2026-10-15T07:14:16.216Z
+pypi,yarl,50,downloads,459889343,,top,1.25.1,2026-09-15T19:29:53.114Z,,unavailable,https://github.com/aio-libs/yarl/actions?query=branch:master,,,2026-10-15T07:14:16.580Z
+rubygems,bundler,1,downloads,3822414517,,top,4.0.22,2026-09-30T07:52:13.912Z,1,rubygems.org owners.json,https://github.com/ruby/rubygems,,,2026-10-15T07:14:56.917Z
+rubygems,aws-sdk-core,2,downloads,1768154250,,top,3.257.0,2026-09-14T20:25:02.732Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.219Z
+rubygems,aws-sigv4,3,downloads,1569573510,,top,1.12.1,2025-06-10T19:12:23.144Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.490Z
+rubygems,aws-partitions,4,downloads,1536044072,,top,1.1294.0,2026-10-12T21:15:14.140Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:14:57.786Z
+rubygems,i18n,5,downloads,1452834098,,top,1.15.2,2026-06-19T21:55:59.425Z,9,rubygems.org owners.json,https://github.com/ruby-i18n/i18n,,,2026-10-15T07:14:58.063Z
+rubygems,jmespath,6,downloads,1451862801,,top,1.6.2,2022-11-25T16:46:38.780Z,0,rubygems.org owners.json,https://github.com/trevorrowe/jmespath.rb,,,2026-10-15T07:14:58.292Z
+rubygems,activesupport,7,downloads,1449905134,,top,8.1.4,2026-09-24T14:21:18.068Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:14:58.691Z
+rubygems,rake,8,downloads,1435050999,,top,13.4.2,2026-04-16T04:47:46.997Z,3,rubygems.org owners.json,https://github.com/ruby/rake,,,2026-10-15T07:14:59.738Z
+rubygems,json,9,downloads,1400237838,,top,3.1.0,2026-10-13T08:04:46.273Z,5,rubygems.org owners.json,https://github.com/ruby/json,,,2026-10-15T07:15:00.136Z
+rubygems,concurrent-ruby,10,downloads,1391646101,,top,1.3.8,2026-07-19T13:35:54.097Z,5,rubygems.org owners.json,https://github.com/ruby-concurrency/concurrent-ruby,,,2026-10-15T07:15:01.207Z
+rubygems,aws-eventstream,11,downloads,1373177894,,top,1.4.0,2025-06-02T19:13:46.065Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:02.180Z
+rubygems,rack,12,downloads,1364343878,,top,3.2.7,2026-08-13T06:57:35.545Z,6,rubygems.org owners.json,https://github.com/rack/rack,,,2026-10-15T07:15:02.637Z
+rubygems,tzinfo,13,downloads,1333963275,,top,2.0.6,2023-01-28T20:27:53.927Z,1,rubygems.org owners.json,https://github.com/tzinfo/tzinfo,,,2026-10-15T07:15:09.921Z
+rubygems,minitest,14,downloads,1316440105,,top,6.0.6,2026-05-01T00:19:41.365Z,1,rubygems.org owners.json,https://github.com/minitest/minitest,,,2026-10-15T07:15:10.222Z
+rubygems,addressable,15,downloads,1282213187,,top,2.9.0,2026-04-05T03:41:55.596Z,3,rubygems.org owners.json,https://github.com/sporkmonger/addressable,,,2026-10-15T07:15:10.557Z
+rubygems,nokogiri,16,downloads,1277349699,,top,1.19.4,2026-06-18T15:18:13.773Z,3,rubygems.org owners.json,https://github.com/sparklemotion/nokogiri,,,2026-10-15T07:15:11.273Z
+rubygems,faraday,17,downloads,1275468821,,top,2.14.4,2026-09-15T13:16:49.550Z,3,rubygems.org owners.json,https://github.com/lostisland/faraday,,,2026-10-15T07:15:15.591Z
+rubygems,public_suffix,18,downloads,1254607929,,top,7.0.5,2026-03-03T08:27:05.269Z,1,rubygems.org owners.json,https://github.com/weppos/publicsuffix-ruby,,,2026-10-15T07:15:16.634Z
+rubygems,diff-lcs,19,downloads,1242695874,,top,2.0.0,2026-02-02T04:49:06.712Z,1,rubygems.org owners.json,https://github.com/halostatue/diff-lcs,,,2026-10-15T07:15:16.898Z
+rubygems,rspec-core,20,downloads,1210634904,,top,3.13.6,2025-10-19T12:41:03.629Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.172Z
+rubygems,rspec-expectations,21,downloads,1210018234,,top,3.13.5,2025-05-27T12:04:40.851Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.400Z
+rubygems,rspec-mocks,22,downloads,1204768261,,top,3.13.8,2026-02-27T18:04:08.645Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.654Z
+rubygems,rspec-support,23,downloads,1197438130,,top,3.13.7,2026-01-28T22:30:11.889Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:17.970Z
+rubygems,multi_json,24,downloads,1175571444,,top,1.21.2,2026-09-07T19:39:07.240Z,4,rubygems.org owners.json,https://github.com/sferik/multi_json,,,2026-10-15T07:15:18.205Z
+rubygems,thor,25,downloads,1165926956,,top,1.5.0,2026-01-06T22:32:36.590Z,10,rubygems.org owners.json,https://github.com/rails/thor,,,2026-10-15T07:15:18.504Z
+rubygems,aws-sdk-s3,26,downloads,1119127608,,top,1.233.2,2026-10-06T23:27:54.509Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:18.934Z
+rubygems,ffi,27,downloads,1102157396,,top,1.17.4,2026-03-26T13:22:38.528Z,4,rubygems.org owners.json,https://github.com/ffi/ffi,,,2026-10-15T07:15:19.454Z
+rubygems,aws-sdk-kms,28,downloads,1083094070,,top,1.132.0,2026-09-11T19:40:26.745Z,0,rubygems.org owners.json,https://github.com/aws/aws-sdk-ruby,,,2026-10-15T07:15:19.747Z
+rubygems,rspec,29,downloads,1028250321,,top,3.13.2,2025-10-21T09:50:39.502Z,1,rubygems.org owners.json,https://github.com/rspec/rspec,,,2026-10-15T07:15:19.985Z
+rubygems,unicode-display_width,30,downloads,1000534956,,top,3.3.0,2026-09-20T08:01:05.610Z,1,rubygems.org owners.json,https://github.com/janlelis/unicode-display_width,,,2026-10-15T07:15:20.235Z
+rubygems,builder,31,downloads,941692729,,top,3.3.0,2024-06-06T16:22:32.091Z,11,rubygems.org owners.json,https://github.com/rails/builder,,,2026-10-15T07:15:20.474Z
+rubygems,mime-types,32,downloads,935668400,,top,3.7.0,2025-05-07T03:54:04.236Z,1,rubygems.org owners.json,https://github.com/mime-types/ruby-mime-types,,,2026-10-15T07:15:20.738Z
+rubygems,multipart-post,33,downloads,933571936,,top,2.4.1,2024-05-07T10:09:00.468Z,1,rubygems.org owners.json,https://github.com/socketry/multipart-post,,,2026-10-15T07:15:21.032Z
+rubygems,activemodel,34,downloads,905862252,,top,8.1.4,2026-09-24T14:21:22.191Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:21.410Z
+rubygems,mini_mime,35,downloads,897450812,,top,1.1.5,2023-08-08T09:46:39.225Z,2,rubygems.org owners.json,https://github.com/discourse/mini_mime,,,2026-10-15T07:15:21.664Z
+rubygems,parser,36,downloads,854198852,,top,3.3.12.0,2026-07-16T07:54:42.683Z,5,rubygems.org owners.json,https://github.com/whitequark/parser,,,2026-10-15T07:15:22.028Z
+rubygems,activerecord,37,downloads,849845141,,top,8.1.4,2026-09-24T14:21:25.471Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:22.429Z
+rubygems,rexml,38,downloads,840414527,,top,3.4.4,2025-09-10T11:56:10.245Z,4,rubygems.org owners.json,https://github.com/ruby/rexml,,,2026-10-15T07:15:23.016Z
+rubygems,actionpack,39,downloads,837693041,,top,8.1.4,2026-09-24T14:21:32.114Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:25.120Z
+rubygems,parallel,40,downloads,837309820,,top,2.3.0,2026-10-03T03:23:32.278Z,1,rubygems.org owners.json,https://github.com/grosser/parallel,,,2026-10-15T07:15:26.742Z
+rubygems,jwt,41,downloads,824742226,,top,3.3.0,2026-09-11T20:34:50.521Z,2,rubygems.org owners.json,https://github.com/jwt/ruby-jwt,,,2026-10-15T07:15:27.077Z
+rubygems,rack-test,42,downloads,822392364,,top,2.2.0,2024-12-23T18:51:11.601Z,2,rubygems.org owners.json,https://github.com/rack/rack-test,,,2026-10-15T07:15:27.569Z
+rubygems,ast,43,downloads,809167364,,top,2.4.3,2025-03-19T18:49:27.350Z,3,rubygems.org owners.json,https://github.com/whitequark/ast,,,2026-10-15T07:15:27.803Z
+rubygems,tilt,44,downloads,800771185,,top,2.9.0,2026-08-17T19:38:53.829Z,1,rubygems.org owners.json,https://github.com/jeremyevans/tilt,,,2026-10-15T07:15:28.101Z
+rubygems,rails,45,downloads,799969084,,top,8.1.4,2026-09-24T14:22:14.180Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:28.403Z
+rubygems,rubyzip,46,downloads,799112391,,top,3.7.0,2026-09-18T18:59:58.749Z,4,rubygems.org owners.json,https://github.com/rubyzip/rubyzip,,,2026-10-15T07:15:28.735Z
+rubygems,railties,47,downloads,799030239,,top,8.1.4,2026-09-24T14:22:10.007Z,12,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:29.259Z
+rubygems,actionview,48,downloads,788747848,,top,8.1.4,2026-09-24T14:21:28.881Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:29.623Z
+rubygems,actionmailer,49,downloads,784588404,,top,8.1.4,2026-09-24T14:21:38.739Z,10,rubygems.org owners.json,https://github.com/rails/rails,,,2026-10-15T07:15:30.198Z
+rubygems,method_source,50,downloads,782253260,,top,1.1.0,2024-04-15T14:20:45.879Z,4,rubygems.org owners.json,,,,2026-10-15T07:15:30.674Z
