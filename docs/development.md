@@ -261,8 +261,12 @@ storage, and its tables expire after 60 days, so nothing is stored there. Querie
 read 0 for a partition-filtered query), and run with `maximumBytesBilled` (`PKG_TRUST_BQ_MAX_GIB`). Each result is stored in a JSON file with its SQL, parameters,
 deps.dev snapshot, bytes processed and job id, keyed by the hash of SQL, parameters and snapshot; a rerun
 reuses it. Aggregates go to `data/bigquery/{snapshot}/` (committed); the npm and Maven name lists, which are
-row-level, stay in `data/names/` (git-ignored), because deps.dev states no licence for the data. The dataset's
-Analytics Hub listing, where public datasets state their terms, is visible only in the Cloud console.
+row-level, stay in `data/names/` (git-ignored): deps.dev's CC-BY 4.0 licence covers only the data it
+generates, and package names are the registries' data, under their terms. Pages built from the dataset
+(`registry.md`) credit deps.dev. The deps.dev API (the agreement check) is used under Google's API Terms of
+Service, which let clients cache its answers; they are cached and published with the snapshot like any other
+response. The dataset's Analytics Hub listing is visible only in the Cloud console; deps.dev's README states
+the licence.
 
 ```sh
 bun run cli registry --snapshot <id>    # the whole-registry layer, then `report`

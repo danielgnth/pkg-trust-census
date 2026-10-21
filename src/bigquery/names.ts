@@ -1,11 +1,13 @@
 /**
- * Name lists read from deps.dev's BigQuery dataset, for the registries that publish none of their
- * own (npm, Maven Central). npm alone has over 12 million names, so the list is not downloaded:
+ * Name lists read from deps.dev's BigQuery dataset for npm and Maven Central, whose own complete
+ * lists are a feed of every change ever made and a 3.3 GB binary index. npm alone has over 12
+ * million names in deps.dev, so the list is not downloaded:
  * BigQuery orders it by a fingerprint of the seed and each name, a deterministic shuffle, and the
  * draw reads pages of that order until it has enough active packages.
  *
  * The pages read are stored with the snapshot's other draw inputs (`data/names/`, git-ignored),
- * never committed: deps.dev states no licence for the dataset. The draw record keeps the query, the
+ * never committed: package names are data deps.dev aggregates from the registries, outside its
+ * CC-BY 4.0 licence (which covers only the data it generates). The draw record keeps the query, the
  * deps.dev snapshot and the checksum of the names read.
  */
 

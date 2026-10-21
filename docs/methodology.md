@@ -124,8 +124,10 @@ two agreed on all 55 attested releases.
 
 The dataset is read through the BigQuery sandbox, the one source behind a login. Each query is stored with
 its SQL, parameters, the deps.dev snapshot it read, the bytes it processed and its job id
-(`data/bigquery/{snapshot}/`), and a rerun reuses a stored result. Only aggregates are committed: deps.dev
-states no licence for the data.
+(`data/bigquery/{snapshot}/`), and a rerun reuses a stored result. deps.dev licenses the data it generates
+(here, whether it verified an attestation) under CC-BY 4.0, and every page using it credits deps.dev; the data
+it aggregates (package names, the attestations themselves) stays under each registry's terms. So only counts
+are committed, and the npm and Maven name lists stay local.
 
 ## Snapshot and versions
 

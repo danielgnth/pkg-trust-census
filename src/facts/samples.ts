@@ -110,6 +110,15 @@ export const DATASET_NOTES: MethodNote[] = [
     sources: [cite("depsDevBigQuery", "This table contains the timestamps for which a full snapshot of all other tables exists.")],
   },
   {
+    label: "Whole registry: licence",
+    note: "Data deps.dev generates, such as whether it verified an attestation, is licensed CC-BY 4.0 and credited to deps.dev wherever it is used. Package names and the attestations themselves are data it aggregates from the registries, under their terms, so only counts are committed. Answers from its API may be cached.",
+    sources: [
+      cite("depsDevReadme", "This generated data is available under a CC-BY 4.0 license."),
+      cite("depsDevReadme", "For details on using the data from these sources, please consult their documentation."),
+      cite("depsDevReadme", "Clients are expressly permitted to cache data served by the API."),
+    ],
+  },
+  {
     label: "Whole registry: access",
     note: "The dataset is read through the BigQuery sandbox, which needs a Google account but no billing. Its monthly query allowance bounds what is scanned, so every query is dry-run first; nothing is stored there, since sandbox tables expire.",
     sources: [

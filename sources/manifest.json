@@ -1409,6 +1409,16 @@
     "sha256": "010ef93f40c66f0be9c6976d7b27d7fde11034ceaea6c1f5918af2e196642079",
     "archive": "sources/archive/docs.deps.dev_api_v3.md"
   },
+  "depsDevReadme": {
+    "fetched": "https://raw.githubusercontent.com/google/deps.dev/main/README.md",
+    "finalUrl": "https://raw.githubusercontent.com/google/deps.dev/main/README.md",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-21T12:18:38.694Z",
+    "title": "README.md",
+    "sha256": "75750ac0d9888fb9bd5d949fb2d349b97c598d9bdc377c4f276d30fb0bc459b3",
+    "archive": "sources/archive/raw.githubusercontent.com_google_deps.dev_main_README.md"
+  },
   "bigquerySandbox": {
     "fetched": "https://cloud.google.com/bigquery/docs/sandbox",
     "finalUrl": "https://docs.cloud.google.com/bigquery/docs/sandbox",

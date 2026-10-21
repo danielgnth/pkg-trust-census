@@ -229,6 +229,8 @@ function releaseNotes(
     "  `manifest.jsonl` is the record of what is published, each entry with the sha256 of the redacted body and",
     "  `originalSha256` of the body as fetched.",
     ...(missing.length ? [`- ${missing.length} manifest records have no stored payload and are not included.`] : []),
+    "- Answers from `api.deps.dev` (the agreement check) are deps.dev's data: what it generates is licensed CC-BY 4.0,",
+    "  what it aggregates stays under the registries' terms. Registry responses are under each registry's terms.",
     "",
     "To rebuild the snapshot: unpack every archive into one folder beside `manifest.jsonl`, then run",
     `\`bun run cli extract --snapshot ${snapshotId} --cache <folder>\`.`,

@@ -170,6 +170,7 @@ export const SOURCES = {
   schorlemmerSigning2024: "https://arxiv.org/html/2401.14635v2",
   depsDevBigQuery: "https://docs.deps.dev/bigquery/v1/",
   depsDevApi: "https://docs.deps.dev/api/v3/",
+  depsDevReadme: "https://github.com/google/deps.dev/blob/main/README.md",
   bigquerySandbox: "https://cloud.google.com/bigquery/docs/sandbox",
   ecosystemsOpenData: "https://blog.ecosyste.ms/2023/08/24/open-data-releases.html",
   mavenConsumptionLimits: "https://central.sonatype.org/faq/429-error/",

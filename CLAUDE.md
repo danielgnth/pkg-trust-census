@@ -39,7 +39,8 @@ bun run sources       # archive new sources (see below)
 - **Polite traffic.** Identify with the User-Agent, keep `HOST_POLICIES`, never work around rate limits or
   bot challenges, read nothing behind a login. The one exception is deps.dev's BigQuery dataset
   (`src/bigquery/`, a Google login): every query runs under `maximumBytesBilled`, is stored with its SQL and
-  deps.dev snapshot, and only aggregates are committed, since deps.dev states no licence for the data.
+  deps.dev snapshot, and only aggregates are committed: deps.dev's own data is CC-BY 4.0 (credit deps.dev
+  wherever it is used), but package names and attestations it aggregates stay under the registries' terms.
 - **`extract` is offline.** Every request an adapter needs goes through `fetch`, so `extract` can replay it
   from the cache.
 - **Nothing published names a person.** The repository and the cache releases are public. Fixtures, archived
