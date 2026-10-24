@@ -1,7 +1,5 @@
 # pkg-trust-census
 
-**How widely do package registries actually use their trust mechanisms?**
-
 This tool measures how many of the top packages in seven ecosystems use trusted publishing, signatures,
 provenance and related signals. Each run is a reproducible snapshot, with adoption traced back
 quarterly to 2024.
