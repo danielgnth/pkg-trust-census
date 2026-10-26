@@ -16,11 +16,11 @@
       "_id": "sigstore@4.0.0",
       "maintainers": [
         {
-          "name": "mylesborins",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         },
         {
-          "name": "bdehamer",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -59,8 +59,8 @@
         "clean": "shx rm -rf dist *.tsbuildinfo"
       },
       "_npmUser": {
-        "name": "GitHub Actions",
-        "email": "npm-oidc-no-reply@github.com",
+        "name": "redacted",
+        "email": "redacted@example.invalid",
         "trustedPublisher": {
           "id": "github",
           "oidcConfigId": "oidc:a123e7c7-98a7-4464-911d-09fa7c394dd1"
@@ -108,7 +108,7 @@
       "_id": "sigstore@4.1.0",
       "maintainers": [
         {
-          "name": "bdehamer",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -147,8 +147,8 @@
         "clean": "shx rm -rf dist *.tsbuildinfo"
       },
       "_npmUser": {
-        "name": "GitHub Actions",
-        "email": "npm-oidc-no-reply@github.com",
+        "name": "redacted",
+        "email": "redacted@example.invalid",
         "trustedPublisher": {
           "id": "github",
           "oidcConfigId": "oidc:a123e7c7-98a7-4464-911d-09fa7c394dd1"
@@ -196,7 +196,7 @@
       "_id": "sigstore@4.1.1",
       "maintainers": [
         {
-          "name": "bdehamer",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -235,8 +235,8 @@
         "clean": "shx rm -rf dist *.tsbuildinfo"
       },
       "_npmUser": {
-        "name": "GitHub Actions",
-        "email": "npm-oidc-no-reply@github.com",
+        "name": "redacted",
+        "email": "redacted@example.invalid",
         "trustedPublisher": {
           "id": "github",
           "oidcConfigId": "oidc:a123e7c7-98a7-4464-911d-09fa7c394dd1"
@@ -342,8 +342,8 @@
         ]
       },
       "_npmUser": {
-        "name": "GitHub Actions",
-        "email": "npm-oidc-no-reply@github.com",
+        "name": "redacted",
+        "email": "redacted@example.invalid",
         "trustedPublisher": {
           "id": "github",
           "oidcConfigId": "oidc:a123e7c7-98a7-4464-911d-09fa7c394dd1"
@@ -352,7 +352,7 @@
       "directories": {},
       "maintainers": [
         {
-          "name": "bdehamer",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -386,7 +386,7 @@
   "description": "code-signing for npm packages",
   "maintainers": [
     {
-      "name": "bdehamer",
+      "name": "redacted",
       "email": "redacted@example.invalid"
     }
   ],

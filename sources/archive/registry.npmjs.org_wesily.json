@@ -43,13 +43,13 @@
       },
       "_npmUser": {
         "name": "npm",
-        "email": "npm@npmjs.com"
+        "email": "redacted@example.invalid"
       },
       "directories": {},
       "maintainers": [
         {
           "name": "npm",
-          "email": "npm@npmjs.com"
+          "email": "redacted@example.invalid"
         }
       ],
       "_npmOperationalInternal": {
@@ -62,7 +62,7 @@
   "maintainers": [
     {
       "name": "npm",
-      "email": "npm@npmjs.com"
+      "email": "redacted@example.invalid"
     }
   ],
   "description": "security holding package",

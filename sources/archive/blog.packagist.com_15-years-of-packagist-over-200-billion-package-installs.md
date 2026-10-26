@@ -111,7 +111,7 @@ The sponsorship program is a first step toward spreading that cost across the bu
 
 We are encouraged that large enterprises are starting to back this direction. Earlier this month Arm, Datadog, Dell Technologies, Ericsson, GitHub, Google, IBM, Kusari, Microsoft, Red Hat, the Rust Foundation and Sonatype signed the OpenSSF letter [We're In: Enterprise Commitment to Sustainable Package Registries](https://openssf.org/blog/2026/09/16/were-in-enterprise-commitment-to-sustainable-package-registries/). They commit to treating registry fees as an investment in security and resilience, and to supporting registries like Packagist as they explore enterprise funding models, while keeping access free for individual developers and small organizations.
 
-Packagist.org stays free for individual developers and small and medium companies. If your company builds significant commercial value on Packagist.org, now is a good time to get in touch at [sponsoring@packagist.org](mailto:sponsoring@packagist.org) and help shape what these plans will look like.
+Packagist.org stays free for individual developers and small and medium companies. If your company builds significant commercial value on Packagist.org, now is a good time to get in touch at [redacted@example.invalid](mailto:redacted@example.invalid) and help shape what these plans will look like.
 
 ## Thank you
 

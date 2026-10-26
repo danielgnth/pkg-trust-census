@@ -18,7 +18,8 @@ import { TOOL_VERSION } from "../http/client.ts";
 /** Where a reader can look up any OSV id; not a cited source. */
 const OSV_VULN_PAGE = "https://osv.dev/vulnerability/";
 
-export function sbomJson(db: Db, snapshotId: string, asOf: string): string {
+/** `sample`: the sample's "{ecosystem}/{package}" keys; the SBOM lists that sample's packages. */
+export function sbomJson(db: Db, snapshotId: string, asOf: string, sample: Set<string>): string {
   const bom = new CDX.Models.Bom();
   bom.metadata.timestamp = new Date(asOf);
   bom.metadata.tools.components.add(new CDX.Models.Component(CDX.Enums.ComponentType.Application, "pkg-trust-census", { version: TOOL_VERSION }));
@@ -28,7 +29,8 @@ export function sbomJson(db: Db, snapshotId: string, asOf: string): string {
     .from(packageVersions)
     .innerJoin(packages, and(eq(packages.snapshotId, packageVersions.snapshotId), eq(packages.ecosystem, packageVersions.ecosystem), eq(packages.packageName, packageVersions.packageName)))
     .where(and(eq(packageVersions.snapshotId, snapshotId), eq(packageVersions.isLatest, true), isNotNull(packageVersions.purl)))
-    .all();
+    .all()
+    .filter((v) => sample.has(`${v.ecosystem}/${v.name}`));
   const components = new Map<string, CDX.Models.Component>();
   for (const v of latest) {
     const c = new CDX.Models.Component(CDX.Enums.ComponentType.Library, v.name, {

@@ -65,7 +65,7 @@ class FakeSource implements Source {
 
 function candidate(ecosystem: EcosystemId, name: string): Candidate {
   const deps = ecosystem === "go" || ecosystem === "maven";
-  return { ecosystem, name, rank: 1, rankFrame: deps ? "dependents" : "downloads", downloadCount: deps ? null : 1, dependentCount: deps ? 1 : null };
+  return { ecosystem, name, layer: "top", rank: 1, rankFrame: deps ? "dependents" : "downloads", downloadCount: deps ? null : 1, dependentCount: deps ? 1 : null };
 }
 
 const sig = (pkg: ExtractedPackage, version: string, signal: string) =>

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   packageInsert,
   packageVersionInsert,
+  sampleMemberInsert,
   signalAvailabilityInsert,
   snapshotInsert,
   validateAll,
@@ -12,27 +13,38 @@ const basePackage = {
   snapshotId: "snap-1",
   ecosystem: "pypi",
   packageName: "requests",
-  rankFrame: "downloads",
-  rank: 1,
-  downloadCount: 100,
 };
+
+const baseMember = { ...basePackage, layer: "top", rankFrame: "downloads", rank: 1, downloadCount: 100 };
 
 describe("packageInsert", () => {
   test("accepts a well-formed row", () => {
-    expect(packageInsert.parse(basePackage)).toMatchObject({ packageName: "requests", rank: 1 });
+    expect(packageInsert.parse(basePackage)).toMatchObject({ packageName: "requests" });
   });
 
   test.each([
     ["unknown ecosystem", { ecosystem: "cargo" }],
-    ["rank below 1", { rank: 0 }],
-    ["negative downloads", { downloadCount: -5 }],
     ["negative maintainer count", { maintainerCount: -1 }],
-    ["unknown rank frame", { rankFrame: "stars" }],
     ["empty package name", { packageName: "" }],
     ["unparseable timestamp", { fetchTimestamp: "last tuesday" }],
     ["non-url repository", { repositoryUrl: "github.com/psf/requests" }],
   ])("rejects %s", (_label, override) => {
     expect(packageInsert.safeParse({ ...basePackage, ...override }).success).toBe(false);
+  });
+});
+
+describe("sampleMemberInsert", () => {
+  test("accepts a well-formed row", () => {
+    expect(sampleMemberInsert.parse(baseMember)).toMatchObject({ packageName: "requests", rank: 1 });
+  });
+
+  test.each([
+    ["rank below 1", { rank: 0 }],
+    ["negative downloads", { downloadCount: -5 }],
+    ["unknown rank frame", { rankFrame: "stars" }],
+    ["unknown layer", { layer: "stratified" }],
+  ])("rejects %s", (_label, override) => {
+    expect(sampleMemberInsert.safeParse({ ...baseMember, ...override }).success).toBe(false);
   });
 
   /**
@@ -40,14 +52,14 @@ describe("packageInsert", () => {
    * count means the ranking source silently returned nothing useful.
    */
   test("requires a downloadCount when sampled by downloads", () => {
-    const r = packageInsert.safeParse({ ...basePackage, downloadCount: null });
+    const r = sampleMemberInsert.safeParse({ ...baseMember, downloadCount: null });
     expect(r.success).toBe(false);
     expect(r.error?.issues[0]?.message).toContain("requires a downloadCount");
   });
 
   test("requires a dependentCount when sampled by dependents", () => {
-    const r = packageInsert.safeParse({
-      ...basePackage,
+    const r = sampleMemberInsert.safeParse({
+      ...baseMember,
       rankFrame: "dependents",
       downloadCount: null,
       dependentCount: null,
@@ -58,8 +70,8 @@ describe("packageInsert", () => {
 
   test("accepts a dependents-framed row for Go, which publishes no download counts", () => {
     expect(
-      packageInsert.safeParse({
-        ...basePackage,
+      sampleMemberInsert.safeParse({
+        ...baseMember,
         ecosystem: "go",
         packageName: "github.com/gorilla/mux",
         rankFrame: "dependents",
@@ -67,6 +79,13 @@ describe("packageInsert", () => {
         dependentCount: 179073,
       }).success,
     ).toBe(true);
+  });
+
+  test("the random layer, and only it, is framed `random`", () => {
+    const random = { ...baseMember, layer: "random", rankFrame: "random", downloadCount: null };
+    expect(sampleMemberInsert.safeParse(random).success).toBe(true);
+    expect(sampleMemberInsert.safeParse({ ...random, rankFrame: "downloads", downloadCount: 1 }).success).toBe(false);
+    expect(sampleMemberInsert.safeParse({ ...baseMember, rankFrame: "random" }).success).toBe(false);
   });
 });
 
@@ -190,9 +209,9 @@ describe("snapshotInsert", () => {
 
 describe("validateAll", () => {
   test("names the offending row and field", () => {
-    const rows = [basePackage, { ...basePackage, packageName: "urllib3", rank: -1 }];
-    expect(() => validateAll(packageInsert, rows, "packages")).toThrow(
-      /invalid packages row 1 \(pypi\/urllib3\).*rank/s,
+    const rows = [baseMember, { ...baseMember, packageName: "urllib3", rank: -1 }];
+    expect(() => validateAll(sampleMemberInsert, rows, "sample_members")).toThrow(
+      /invalid sample_members row 1 \(pypi\/urllib3\).*rank/s,
     );
   });
 

@@ -13,6 +13,7 @@ import { GatheringAdapter, type RunContext } from "./types.ts";
 import { RANKING_CACHE_KEY } from "./ecosystems.ts";
 import { cleanRepoUrl, noMechanism, observed, selectKeptVersions } from "../extract/signals.ts";
 import { isComposerBranch, isComposerPrerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 interface PopularPage {
   packages: Array<{ name: string; downloads: number }>;
@@ -54,6 +55,7 @@ export class PackagistAdapter extends GatheringAdapter<Raw> {
     return rows.slice(0, n).map((r, i) => ({
       ecosystem: this.id,
       name: r.name,
+      layer: "top" as const,
       rank: i + 1,
       rankFrame: this.rankFrame,
       downloadCount: r.downloads,
@@ -116,3 +118,19 @@ export class PackagistAdapter extends GatheringAdapter<Raw> {
     };
   }
 }
+
+/** Packagist names maintainers (with avatars) per package and authors per version, in both of its APIs. */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "packagist",
+    endpoint: "packagist.org /packages/{p}.json",
+    matches: (url) => /^https:\/\/packagist\.org\/packages\/.+\.json$/.test(url),
+    paths: ["package.maintainers", "package.versions.*.authors"],
+  },
+  {
+    ecosystem: "packagist",
+    endpoint: "repo.packagist.org /p2/{p}.json (the random draw's activity check)",
+    matches: (url) => url.startsWith("https://repo.packagist.org/p2/"),
+    paths: ["packages.*.*.authors"],
+  },
+]

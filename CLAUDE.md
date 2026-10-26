@@ -37,9 +37,15 @@ bun run sources       # archive new sources (see below)
 - **Three-state signals.** `unknown` is never converted to `false`; an absent mechanism is `no_mechanism`,
   not `0%`.
 - **Polite traffic.** Identify with the User-Agent, keep `HOST_POLICIES`, never work around rate limits or
-  bot challenges, read nothing behind a login.
+  bot challenges, read nothing behind a login. The one exception is deps.dev's BigQuery dataset
+  (`src/bigquery/`, a Google login): every query runs under `maximumBytesBilled`, is stored with its SQL and
+  deps.dev snapshot, and only aggregates are committed: deps.dev's own data is CC-BY 4.0 (credit deps.dev
+  wherever it is used), but package names and attestations it aggregates stay under the registries' terms.
 - **`extract` is offline.** Every request an adapter needs goes through `fetch`, so `extract` can replay it
   from the cache.
-- **Fixtures carry no personal data** (`bun run fixtures` redacts emails and npm star lists).
+- **Nothing published names a person.** The repository and the cache releases are public. Fixtures, archived
+  sources and the published cache go through `src/publish/redact.ts`: each adapter lists the response fields
+  that name people in `PERSONAL_DATA` (a new adapter must), and email addresses are replaced everywhere.
+  `bun run cli publish` refuses to pack a cache whose redacted copy changes a signal or still names someone.
 - **Docs describe the current state**, not its history (git has that). When behaviour changes, update
   `docs/methodology.md` and `docs/registries.md` in the same change.

@@ -65,4 +65,4 @@ Not every url-safe character is allowed any more. You can use the package [valid
 
 ## Good package names help everyone
 
-We hope this new restriction on names helps package authors pick names that stand out and helps users avoid getting the wrong package by accident. If you have any questions/comments/concerns, shoot us a note at support@npmjs.com or tweet at us [@npm\_support](https://twitter.com/npm_support?lang=en).
+We hope this new restriction on names helps package authors pick names that stand out and helps users avoid getting the wrong package by accident. If you have any questions/comments/concerns, shoot us a note at redacted@example.invalid or tweet at us [@npm\_support](https://twitter.com/npm_support?lang=en).

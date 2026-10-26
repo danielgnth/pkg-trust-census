@@ -23,6 +23,7 @@ import {
 } from "../extract/signals.ts";
 import { quarterBoundaries, withdrawalWindowStart } from "../extract/quarters.ts";
 import { isSemverPrerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const API = "https://crates.io/api/v1";
 
@@ -84,6 +85,7 @@ export class CratesAdapter extends GatheringAdapter<Raw> {
       .map((c, i) => ({
         ecosystem: this.id,
         name: c.name,
+        layer: "top" as const,
         rank: i + 1,
         rankFrame: this.rankFrame,
         downloadCount: c.recent_downloads,
@@ -184,3 +186,20 @@ export class CratesAdapter extends GatheringAdapter<Raw> {
     };
   }
 }
+
+/** crates.io names the publishing account on every version, and every owner; `kind` (user or team) is what the maintainer count reads. */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "crates",
+    endpoint: "crates.io /api/v1/crates/{c}/versions, /api/v1/crates/{c}",
+    matches: (url) => /^https:\/\/crates\.io\/api\/v1\/crates\/[^/?]+(\/versions)?(\?|$)/.test(url),
+    paths: ["versions.*.published_by", "versions.*.audit_actions.*.user"],
+  },
+  {
+    ecosystem: "crates",
+    endpoint: "crates.io /api/v1/crates/{c}/owners",
+    matches: (url) => /^https:\/\/crates\.io\/api\/v1\/crates\/[^/]+\/owners$/.test(url),
+    paths: ["users.*"],
+    keep: ["kind"],
+  },
+]

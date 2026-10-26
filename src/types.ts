@@ -59,14 +59,27 @@ export type Availability =
   /** No such mechanism exists in this ecosystem (crates.io attestations, Packagist signing). */
   | "no_mechanism";
 
-/** Go and Maven publish no download counts anywhere, so they are sampled by dependents. */
-export type RankFrame = "downloads" | "dependents";
+/**
+ * The samples a snapshot can hold (docs/methodology.md, Sample). `top` answers what the most-used
+ * packages do, `random` what a typical active package does. A package drawn into both is
+ * measured once and counted in each.
+ */
+export const SAMPLE_LAYERS = ["top", "random"] as const;
+export type SampleLayer = (typeof SAMPLE_LAYERS)[number];
+
+/**
+ * How a package entered its sample. Go and Maven publish no download counts anywhere, so their
+ * top layer is ranked by dependents; `random` is the seeded draw, whose rank is the draw order.
+ */
+export const RANK_FRAMES = ["downloads", "dependents", "random"] as const;
+export type RankFrame = (typeof RANK_FRAMES)[number];
 
 /** A package selected for the sample, before any signal fetching. */
 export interface Candidate {
   ecosystem: EcosystemId;
   /** Registry-canonical name. Maven uses "groupId:artifactId". */
   name: string;
+  layer: SampleLayer;
   rank: number;
   rankFrame: RankFrame;
   downloadCount: number | null;
@@ -87,6 +100,8 @@ export interface CacheEntry {
   path: string;
   /** The body of a POST request; `url` then holds "POST {url} {sha256 of the body}". */
   requestBody?: string;
+  /** In a published (redacted) cache: the sha256 of the response as it was fetched. */
+  originalSha256?: string;
 }
 
 export interface FetchResult {

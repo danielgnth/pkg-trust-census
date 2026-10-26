@@ -5,7 +5,23 @@ rule involves a judgement, the alternative and the reason for rejecting it are s
 
 ## Sample
 
-For each of seven registries we take the top *N* packages (pilot *N* = 50, full run *N* = 250).
+Each snapshot holds up to three layers. Each answers its own question:
+
+| Layer | Question | Signals | Measured by |
+|---|---|---|---|
+| Top *N* | What do the most-used packages do? | all seven | the adapters |
+| Random *N* | What does a typical active package do? | all seven | the adapters |
+| Whole registry | How common are Sigstore attestations across a registry, and how has that changed? | attestations only | deps.dev's BigQuery dataset |
+
+The top and random layers go through the same pipeline, so their numbers compare directly. A package drawn
+into both is measured once and counted in each (`sample_members` records which layer drew it). The full run
+uses *N* = 500 for the top layer and *N* = 1000 for the random layer; the pilot used 50 and no random layer.
+The whole-registry layer is third-party data, reported on its own page (`registry.md`) and never mixed into
+the matrix or the score.
+
+### Top sample
+
+The top *N* packages of each registry:
 
 | Registry | Ranking source | Frame | Window |
 |---|---|---|---|
@@ -18,12 +34,100 @@ For each of seven registries we take the top *N* packages (pilot *N* = 50, full 
 | Packagist | `/explore/popular.json` (Packagist's own popularity order) | downloads | Packagist-defined |
 
 Go and Maven Central publish no download counts anywhere, so they are sampled by number of dependent
-packages instead. The frame is recorded per row (`packages.rank_frame`). The two frames select different
+packages instead. The frame is recorded per row (`sample_members.rank_frame`). The two frames select different
 populations: dependents favours libraries, downloads favours whatever CI systems install most. Comparisons
 across the frame boundary should be read with that in mind. ecosyste.ms is a third-party aggregator. It
 only seeds the candidate lists. Where the registry publishes authoritative counts (npm), those counts
 replace the seed's. RubyGems has no recent-window ranking, so its all-time order favours long-established
 gems.
+
+### Random sample
+
+The top sample says what the packages people install do, not what a typical package does, and it cannot
+measure rare signals. Prior work measured whole registries, and sampled where a registry was too large:
+Schorlemmer et al. (IEEE S&P 2024) measured a random tenth of Maven Central.
+
+**Population.** A package is *active* if the registry lists at least one release published in the 36 months
+before the snapshot. Yanked releases count; deleted ones cannot.
+"Active" keeps out the long tail of abandoned and empty packages, which would push every signal towards 0% and
+say little.
+
+**Draw.** For each registry, every package name is listed, the list is sorted and shuffled with a seeded
+generator (the seed defaults to the snapshot id), and the shuffled list is walked in order. A name is accepted
+if the registry's own metadata shows a release in the window; the first *N* accepted names are the sample.
+Drawing uniformly from the full list and rejecting inactive names yields a uniform sample of active packages,
+and the registry, not the list, decides whether a package is active. The seed, the list's source and
+checksum, and every rejected name with its reason are recorded (`random/draw.json`), so the draw can be
+repeated exactly. Names that turn out to be no package (gone since the list was made, or not a valid name) are
+recorded too, and left out of the share of active packages the draw estimates.
+
+| Registry | Name list | Activity check |
+|---|---|---|
+| PyPI | Simple API root (every project) | the project's releases, dated by their earliest file |
+| npm | deps.dev `PackageVersions` | packument `time`, versions still published |
+| crates.io | daily database dump, `crates.csv` | the dump's `versions.csv` `created_at` |
+| RubyGems | weekly PostgreSQL dump (sanitized of user data) | the dump's `versions.created_at` |
+| Go | module index, over the window | the index's time of each tagged version |
+| Maven Central | deps.dev `PackageVersions` | `maven-metadata.xml` `<lastUpdated>` |
+| Packagist | `packages/list.json` | p2 metadata, tagged releases |
+
+npm's only complete list is its replication feed, which pages through every change ever made, deleted
+packages included, and Maven Central's is a 3.3 GB binary index; their names come from deps.dev, and only
+the activity check is first-party. deps.dev's npm list holds 12.6 million names, so it is shuffled inside
+BigQuery, ordered by `FARM_FINGERPRINT(seed:name)`, and read only as far as the draw walks. For Go, the index is read over the
+window only: a module without a version there is inactive anyway. Its time is when proxy.golang.org first
+cached a version, not when the version was tagged; the two differ for versions fetched long after tagging.
+A pseudo-version is a commit, not a release, and does not make a module active.
+
+The random layer is backfilled over the same quarters as the top layer (from 2024Q1). Packages that are still publishing are
+followed back, but those quarters describe *today's* active packages in the past, not the registry as it was
+then (survivorship). Spam packages, which some registries host in large numbers, are part of the population
+and stay in the sample: filtering them would need a classifier, and a random sample full of spam is a
+finding in itself.
+
+### Statistics
+
+Every share is reported with its 95% Wilson interval (`lo`, `hi` in `aggregate.json`; `pct_lo`, `pct_hi` in
+the CSVs; in brackets in the tables). At these sample sizes:
+
+| *n* per registry | true 2% | true 10% | true 50% |
+|---|---|---|---|
+| 500 | 1.1–3.6% | 7.7–12.9% | 45.6–54.4% |
+| 1000 | 1.3–3.1% | 8.3–12.0% | 46.9–53.1% |
+
+With 1000, a share is known to about ±3 points, and differences between registries or between the two
+samples of about 4 points become detectable (80% power, α = 0.05, near 10%).
+
+- **Intervals, not tests.** 7 registries × 7 signals × 2 samples make too many comparisons for per-cell
+  significance testing. Where two intervals do not overlap, the difference exceeds sampling error. Inferred
+  shares keep their "≥": an interval cannot repair a lower bound.
+- **Rare signals.** At 2% adoption, 1000 packages yield about 20 hits. For Sigstore attestations the
+  whole-registry layer gives the exact count; for other rare signals the interval stays wide.
+- **Subgroups divide *n*.** A quarter's share rests on the packages that existed then, so its interval is
+  wider than the latest release's.
+
+### Whole-registry layer
+
+deps.dev's BigQuery dataset records, for every version of every package it indexes, the attestations it found
+and whether it verified them (Sigstore bundles with sigstore-go), with source repository and commit. The layer
+reads one deps.dev snapshot (the newest at or before the census snapshot; deps.dev snapshots weekly) and, as
+the census does with its own anchors, takes each package's newest release at each quarter's end and at the
+snapshot. It reports how many carry an attestation, how many deps.dev verified, and how many name a commit,
+over all packages and over active ones. The active share sits beside the random layer's own measurement of
+the same mechanism, whose 95% interval it should usually fall within.
+
+It covers one family of signals: Sigstore attestations on npm, PyPI and RubyGems, and none recorded for Maven
+Central. It says nothing about GPG, MFA, crates.io trusted publishing, Go's checksum database or Packagist.
+`scripts/check-depsdev.ts` compares deps.dev with this project's own reading for the latest release of every
+sampled package, rerun per snapshot and archived as the source `depsDevAgreement`; on the pilot snapshot the
+two agreed on all 55 attested releases.
+
+The dataset is read through the BigQuery sandbox, the one source behind a login. Each query is stored with
+its SQL, parameters, the deps.dev snapshot it read, the bytes it processed and its job id
+(`data/bigquery/{snapshot}/`), and a rerun reuses a stored result. deps.dev licenses the data it generates
+(here, whether it verified an attestation) under CC-BY 4.0, and every page using it credits deps.dev; the data
+it aggregates (package names, the attestations themselves) stays under each registry's terms. So only counts
+are committed, and the npm and Maven name lists stay local.
 
 ## Snapshot and versions
 
@@ -144,9 +248,11 @@ of the first attested file, because publishing workflows attest every file of a 
 
 ## Aggregation
 
-Denominators are packages. A package contributes its latest version to the matrix and at most one anchor
-to each quarter. The headline share is `true / n`, so `unknown` counts as not adopted. `true / (true +
-false)` is reported alongside it as `pct_known`. Inferred cells with unknowns are marked "≥".
+Each sample layer is aggregated and reported on its own: the top layer in the snapshot's folder, the random
+layer in `random/`, and the two side by side in `layers.md`. Denominators are packages. A package contributes
+its latest version to the matrix and at most one anchor to each quarter. The headline share is `true / n`, so
+`unknown` counts as not adopted, with its 95% Wilson interval (see *Statistics*). `true / (true + false)` is
+reported alongside it as `pct_known`. Inferred cells with unknowns are marked "≥".
 
 ### Trust summary score
 
@@ -339,8 +445,11 @@ their access dates in [sources.md](sources.md).
 
 ## Reproducibility
 
-Every raw response is stored gzipped (git-ignored). Its URL, sha256, size, HTTP status and fetch time are
-appended to the committed `data/cache/manifest.jsonl`. Every signal row names its rule, the endpoint and
+Every raw response is stored gzipped, per snapshot (`data/cache/{snapshot}/`, git-ignored), and its URL,
+sha256, size, HTTP status and fetch time are appended to the snapshot's manifest. A new snapshot fetches
+everything afresh. The manifest grows to tens of megabytes at scale, so it is not committed: the committed
+`requests.json` summarises it (responses per host and status) with its sha256, and the manifest itself is
+published with the snapshot's cache release (see below). Every signal row names its rule, the endpoint and
 field it is read from (`signal_source`, the same for every release), and the URL and sha256 of each cached
 response this release's value was actually read from (`version_signals.responses`; `response_urls` and
 `response_sha256s` in `signals.csv`). A value can rest on several responses, for example Maven's `.asc` and
@@ -348,6 +457,32 @@ response this release's value was actually read from (`version_signals.responses
 `extract` reads only from the cache and makes exactly the requests `fetch` made, so the dataset can be
 rebuilt offline from the cached payloads. The sources of the curated facts are archived and committed
 (see above).
+
+**The published cache.** Each snapshot's responses are published as a GitHub release (`cache-{snapshot}`),
+one archive per registry. Registry responses name people (npm maintainers and publishing accounts, PyPI
+authors, crates.io publishers and owners, RubyGems authors, owners and pushers, Packagist authors, OSV
+credits), and the repository is public, so nothing that names a person is published:
+
+- *Field-level redaction.* Each adapter lists the fields that name people (`PERSONAL_DATA`), and their values
+  become placeholders of the same type: an array keeps its length, so maintainer counts survive, and an object
+  keeps the keys a signal reads (npm `_npmUser.trustedPublisher`; a RubyGems user push still links a profile,
+  `/profiles/redacted`). Sigstore certificates naming a person's email are blanked. An email pattern runs over
+  everything on top. Free text the publisher wrote (descriptions, readmes) keeps any names written into it.
+  Package names and repository URLs, which can contain account names, are the identifiers measured and are kept.
+- *Signals must survive.* The snapshot is extracted twice, from the original and from the redacted cache, and
+  publishing stops unless versions, signals, evidence and package fields are identical.
+- *A scan blocks publication.* Any listed field still carrying a value, or any address left in a response or
+  in a manifest, stops the publish.
+- *Two manifests.* `manifest.original.jsonl` is what was fetched, byte for byte (its sha256 is in
+  `requests.json`); `manifest.jsonl` is what was published, each record with the redacted body's sha256 and
+  the original's (`originalSha256`).
+
+`extract --cache <folder>` rebuilds a snapshot from the unpacked release. Archived sources are committed with
+email addresses replaced, and so are the test fixtures, by the same redaction.
+
+**Draws and queries.** The random draw's seed, name lists (source, sha256, size) and every rejected name are
+in `random/draw.json`. BigQuery results are stored per query with their SQL, parameters, deps.dev snapshot,
+bytes processed and job id (`data/bigquery/{snapshot}/`).
 
 ## Limitations
 
@@ -383,3 +518,11 @@ rebuilt offline from the cached payloads. The sources of the curated facts are a
 10. **Advisory coverage differs by ecosystem.** OSV counts only what its source databases record, and which
     databases cover an ecosystem differs (the database table in `advisories.md` shows it per snapshot). A
     lower share of affected releases is not by itself evidence of fewer vulnerabilities.
+11. **npm and Maven's random populations come from deps.dev.** Only their activity check is first-party. A
+    package deps.dev does not index cannot be drawn.
+12. **Go's activity is the proxy's first fetch.** The index dates a version by when proxy.golang.org first
+    cached it, which can be long after it was tagged, so a module whose old tags were first fetched in the
+    window counts as active.
+13. **The random series is survivorship-biased.** Its quarters show today's active packages in the past.
+14. **The whole-registry layer is deps.dev's reading.** It sees Sigstore attestations only, and none on Maven
+    Central; how far it matches this project's reading is checked per snapshot (`depsDevAgreement`).

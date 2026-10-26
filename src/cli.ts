@@ -11,7 +11,7 @@
 
 import { defineCommand, runMain } from "citty";
 import * as p from "@clack/prompts";
-import { ECOSYSTEMS, type EcosystemId } from "./types.ts";
+import { ECOSYSTEMS, SAMPLE_LAYERS, type EcosystemId, type SampleLayer } from "./types.ts";
 import {
   closeDb,
   dbPath,
@@ -20,17 +20,21 @@ import {
   latestSnapshot,
   newSnapshotId,
   openDb,
+  snapshotAsOf,
   type Db,
 } from "./db/open.ts";
-import { packages, snapshots } from "./db/schema.ts";
+import { packages, sampleMembers, snapshots } from "./db/schema.ts";
 import { HttpClient, TOOL_VERSION, USER_AGENT } from "./http/client.ts";
+import { ResponseCache } from "./http/cache.ts";
 import { implementedEcosystems } from "./adapters/index.ts";
-import { runRank } from "./stages/rank.ts";
+import { runRank, snapshotLayers } from "./stages/rank.ts";
 import { runFetch } from "./stages/fetch.ts";
 import { runExtract } from "./stages/extract.ts";
-import { runAggregate } from "./stages/aggregate.ts";
-import { runReport } from "./stages/report.ts";
-import { count, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { outDir, runAggregate } from "./stages/aggregate.ts";
+import { runLayersReport, runReport } from "./stages/report.ts";
+import { runPublish } from "./publish/publish.ts";
+import { registryAttestations } from "./bigquery/registry.ts";
+import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 const isInteractive = () => process.stdout.isTTY === true && !process.env.CI;
 
@@ -129,15 +133,23 @@ function banner(stage: string, snapshotId: string, ecosystems: EcosystemId[], tr
   );
 }
 
+function parseLayer(value: string): SampleLayer {
+  if (!SAMPLE_LAYERS.includes(value as SampleLayer)) throw new Error(`unknown layer "${value}" (known: ${SAMPLE_LAYERS.join(", ")})`);
+  return value as SampleLayer;
+}
+
 const rank = defineCommand({
   meta: { name: "rank", description: "Build the candidate sample per ecosystem" },
   args: {
     ...sharedArgs,
     n: { type: "string", description: "sample size per ecosystem", default: "50" },
+    layer: { type: "string", description: `which sample to build (${SAMPLE_LAYERS.join(", ")})`, default: "top" },
+    seed: { type: "string", description: "seed of the random draw (default: the snapshot id)" },
   },
   async run({ args }) {
     const n = Number(args.n);
     if (!Number.isInteger(n) || n < 1) throw new Error("--n must be a positive integer");
+    const layer = parseLayer(args.layer);
 
     const requested = parseEcosystems(args.ecosystem);
     const { runnable, skipped } = withAdapters(requested);
@@ -146,16 +158,16 @@ const rank = defineCommand({
     const snapshotId = args.snapshot ?? newSnapshotId();
     ensureSnapshot(db, snapshotId, { n, ecosystems: runnable }, TOOL_VERSION);
 
-    const http = new HttpClient();
+    const http = new HttpClient({ cache: new ResponseCache(snapshotId) });
     await http.cache.load();
     banner("rank", snapshotId, runnable, http.transport.name);
     if (skipped.length) p.log.warn(`no adapter yet: ${skipped.join(", ")}`);
 
     const s = spinner();
-    s.start(`ranking top ${n}`);
+    s.start(layer === "top" ? `ranking top ${n}` : `drawing ${n} active packages`);
     try {
-      const results = await runRank(runnable, n, snapshotId, db, http, (m) => s.message(m));
-      s.stop(`ranked ${results.reduce((a, r) => a + r.count, 0)} packages`);
+      const results = await runRank(runnable, n, snapshotId, db, http, (m) => s.message(m), { layer, seed: args.seed });
+      s.stop(`${layer}: ${results.reduce((a, r) => a + r.count, 0)} packages`);
       for (const r of results) p.log.success(`${r.ecosystem}: ${r.count} → ${r.path}`);
     } catch (err) {
       s.stop("ranking failed");
@@ -178,7 +190,7 @@ const fetch = defineCommand({
     const db = openDb();
     const snapshotId = await resolveSnapshot(db, args.snapshot);
 
-    const http = new HttpClient();
+    const http = new HttpClient({ cache: new ResponseCache(snapshotId) });
     await http.cache.load();
     banner("fetch", snapshotId, runnable, http.transport.name);
 
@@ -215,12 +227,15 @@ const fetch = defineCommand({
 
 const extract = defineCommand({
   meta: { name: "extract", description: "Parse cached responses into versions and signals (offline)" },
-  args: sharedArgs,
+  args: {
+    ...sharedArgs,
+    cache: { type: "string", description: "read a published cache release unpacked in this folder, not the snapshot's own cache" },
+  },
   async run({ args }) {
     const { runnable } = withAdapters(parseEcosystems(args.ecosystem));
     const db = openDb();
     const snapshotId = await resolveSnapshot(db, args.snapshot);
-    const http = new HttpClient();
+    const http = new HttpClient({ cache: args.cache ? ResponseCache.at(args.cache) : new ResponseCache(snapshotId) });
     await http.cache.load();
     banner("extract", snapshotId, runnable, "cache only");
 
@@ -249,15 +264,17 @@ const extract = defineCommand({
 });
 
 const aggregate = defineCommand({
-  meta: { name: "aggregate", description: "Compute the maturity matrix and adoption series" },
+  meta: { name: "aggregate", description: "Compute the maturity matrix and adoption series, per sample layer" },
   args: { snapshot: sharedArgs.snapshot },
   async run({ args }) {
     const db = openDb();
     try {
       const snapshotId = await resolveSnapshot(db, args.snapshot);
       p.intro(`pkg-trust-census · aggregate · ${snapshotId}`);
-      const { aggregate: agg, path } = await runAggregate(db, snapshotId);
-      p.log.success(`${agg.matrix.length} matrix cells, ${agg.series.length} series points → ${path}`);
+      for (const layer of snapshotLayers(db, snapshotId)) {
+        const { aggregate: agg, path } = await runAggregate(db, snapshotId, layer);
+        p.log.success(`${layer}: ${agg.matrix.length} matrix cells, ${agg.series.length} series points → ${path}`);
+      }
       p.outro(`next: bun run cli report --snapshot ${snapshotId}`);
     } finally {
       closeDb(db);
@@ -273,9 +290,56 @@ const report = defineCommand({
     try {
       const snapshotId = await resolveSnapshot(db, args.snapshot);
       p.intro(`pkg-trust-census · report · ${snapshotId}`);
-      const { dir, files } = await runReport(db, snapshotId);
-      p.log.success(`${files.length} files → ${dir}`);
-      p.outro(`open ${dir}/summary.md`);
+      for (const layer of snapshotLayers(db, snapshotId)) {
+        const { dir, files } = await runReport(db, snapshotId, layer);
+        p.log.success(`${layer}: ${files.length} files → ${dir}`);
+      }
+      const compared = await runLayersReport(db, snapshotId);
+      if (compared) p.log.success(`top vs random: ${compared.files.length} files → ${compared.dir}`);
+      p.outro(`open ${outDir(snapshotId)}/README.md`);
+    } finally {
+      closeDb(db);
+    }
+  },
+});
+
+const publish = defineCommand({
+  meta: { name: "publish", description: "Redact a snapshot's response cache and pack it as a GitHub release" },
+  args: {
+    snapshot: sharedArgs.snapshot,
+    upload: { type: "boolean", description: "create or update the release with gh (otherwise only stage it)", default: false },
+  },
+  async run({ args }) {
+    const db = openDb();
+    try {
+      const snapshotId = await resolveSnapshot(db, args.snapshot);
+      p.intro(`pkg-trust-census · publish · ${snapshotId}`);
+      const s = spinner();
+      s.start("redacting");
+      const r = await runPublish(db, snapshotId, { upload: args.upload, onProgress: (m) => s.message(m) });
+      s.stop(`${r.entries} responses, ${r.redacted} redacted; same ${r.compared.signals} signals from the redacted cache`);
+      if (r.missing.length) p.log.warn(`${r.missing.length} manifest records without a payload were left out`);
+      for (const a of r.assets) p.log.success(`${a.name}  ${(a.bytes / 1e6).toFixed(1)} MB`);
+      p.outro(r.uploaded ? `release ${r.tag} updated` : `staged in ${r.dir} — run with --upload to publish release ${r.tag}`);
+    } finally {
+      closeDb(db);
+    }
+  },
+});
+
+const registry = defineCommand({
+  meta: { name: "registry", description: "Count attestations across whole registries from deps.dev's BigQuery dataset (needs a Google login)" },
+  args: { snapshot: sharedArgs.snapshot },
+  async run({ args }) {
+    const db = openDb();
+    try {
+      const snapshotId = await resolveSnapshot(db, args.snapshot);
+      p.intro(`pkg-trust-census · registry · ${snapshotId}`);
+      const s = spinner();
+      s.start("querying deps.dev (a stored result is reused)");
+      const q = await registryAttestations(snapshotId, snapshotAsOf(db, snapshotId));
+      s.stop(`${q.rows.length} rows from deps.dev snapshot ${q.depsdevSnapshot}; ${(q.stats.bytesProcessed / 1024 ** 3).toFixed(1)} GiB processed`);
+      p.outro(`next: bun run cli report --snapshot ${snapshotId}`);
     } finally {
       closeDb(db);
     }
@@ -287,14 +351,19 @@ const run = defineCommand({
   meta: { name: "run", description: "rank → fetch → extract → aggregate → report, in one go" },
   args: {
     ...sharedArgs,
-    n: { type: "string", description: "sample size per ecosystem", default: "50" },
+    n: { type: "string", description: "top sample size per ecosystem", default: "50" },
+    random: { type: "string", description: "random sample size per ecosystem (0: none)", default: "0" },
+    seed: { type: "string", description: "seed of the random draw (default: the snapshot id)" },
   },
   async run({ args }) {
     const n = Number(args.n);
     if (!Number.isInteger(n) || n < 1) throw new Error("--n must be a positive integer");
+    const random = Number(args.random);
+    if (!Number.isInteger(random) || random < 0) throw new Error("--random must be a non-negative integer");
     const snapshotId = args.snapshot ?? newSnapshotId();
     const shared = { ecosystem: args.ecosystem, snapshot: snapshotId };
-    await rank.run!({ args: { ...shared, n: args.n }, rawArgs: [], cmd: rank } as never);
+    await rank.run!({ args: { ...shared, n: args.n, layer: "top" }, rawArgs: [], cmd: rank } as never);
+    if (random > 0) await rank.run!({ args: { ...shared, n: args.random, layer: "random", seed: args.seed }, rawArgs: [], cmd: rank } as never);
     await fetch.run!({ args: shared, rawArgs: [], cmd: fetch } as never);
     await extract.run!({ args: shared, rawArgs: [], cmd: extract } as never);
     await aggregate.run!({ args: { snapshot: snapshotId }, rawArgs: [], cmd: aggregate } as never);
@@ -306,7 +375,7 @@ const status = defineCommand({
   meta: { name: "status", description: "Show snapshots, cache and coverage" },
   async run() {
     const db = openDb();
-    const http = new HttpClient();
+    const http = new HttpClient({ cache: new ResponseCache(latestSnapshot(db) ?? undefined) });
     await http.cache.load();
 
     const snaps = db
@@ -320,7 +389,7 @@ const status = defineCommand({
       .all();
 
     p.intro("pkg-trust-census · status");
-    p.log.info(`db ${dbPath()}\ncached responses ${http.cache.size}\ntransport ${http.transport.name}`);
+    p.log.info(`db ${dbPath()}\ncached responses (latest snapshot) ${http.cache.size}\ntransport ${http.transport.name}`);
 
     if (snaps.length === 0) {
       p.log.warn("no snapshots yet — run `rank`");
@@ -335,6 +404,7 @@ const status = defineCommand({
 
       const coverage = db
         .select({
+          layer: sampleMembers.layer,
           ecosystem: packages.ecosystem,
           total: count(),
           fetched: sql<number>`SUM(CASE WHEN ${packages.fetchTimestamp} IS NOT NULL THEN 1 ELSE 0 END)`,
@@ -342,13 +412,17 @@ const status = defineCommand({
           extractErrors: sql<number>`SUM(CASE WHEN ${packages.extractError} IS NOT NULL THEN 1 ELSE 0 END)`,
         })
         .from(packages)
+        .innerJoin(
+          sampleMembers,
+          and(eq(sampleMembers.snapshotId, packages.snapshotId), eq(sampleMembers.ecosystem, packages.ecosystem), eq(sampleMembers.packageName, packages.packageName)),
+        )
         .where(eq(packages.snapshotId, latest!))
-        .groupBy(packages.ecosystem)
+        .groupBy(sampleMembers.layer, packages.ecosystem)
         .all();
 
       for (const c of coverage) {
         p.log.message(
-          `  ${c.ecosystem}: ${c.total} sampled, ${c.fetched} fetched` +
+          `  ${c.layer} ${c.ecosystem}: ${c.total} sampled, ${c.fetched} fetched` +
             (c.errors ? `, ${c.errors} fetch errors` : "") +
             (c.extractErrors ? `, ${c.extractErrors} extract errors` : ""),
         );
@@ -381,6 +455,8 @@ const main = defineCommand({
     aggregate,
     report,
     run,
+    publish,
+    registry,
     status,
   },
   setup() {

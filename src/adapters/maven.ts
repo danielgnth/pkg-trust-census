@@ -20,6 +20,7 @@ import { noMechanism, observed, selectKeptVersions, type KeptVersion, type Versi
 import { probeAnchorDates } from "../extract/probe.ts";
 import { fulcioSourceRef } from "../extract/fulcio.ts";
 import { isMavenPrerelease } from "../extract/versions.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const REPO = "https://repo1.maven.org/maven2";
 
@@ -79,6 +80,7 @@ export class MavenAdapter extends GatheringAdapter<Raw> {
       .map((r, i) => ({
         ecosystem: this.id,
         name: r.name,
+        layer: "top" as const,
         rank: i + 1,
         rankFrame: this.rankFrame,
         downloadCount: null,
@@ -189,3 +191,10 @@ function certSource(body: string) {
     return null;
   }
 }
+
+/**
+ * POMs name developers, but they are only probed with HEAD, whose stored body is three headers.
+ * A Sigstore bundle signed with a personal identity carries an email in its certificate, which
+ * the publish step blanks for every registry (src/publish/redact.ts).
+ */
+export const PERSONAL_DATA: PersonalData[] = [];

@@ -1,14 +1,16 @@
 /**
- * Content-addressed, gzipped response cache plus an integrity manifest.
+ * Content-addressed, gzipped response cache plus an integrity manifest, one per snapshot.
  *
- * Payloads are git-ignored (npm packuments alone run to hundreds of MB per snapshot);
- * `manifest.jsonl` is committed, so a reviewer can verify byte-exact integrity and the
- * extract stage can be re-derived offline without re-fetching.
+ * A snapshot reads only its own responses (`data/cache/{snapshot}/`), so a new snapshot fetches
+ * the registries afresh rather than reusing an older one's answers. Payloads and the manifest are
+ * git-ignored (npm packuments alone run to hundreds of MB per snapshot); both are published with
+ * the snapshot's cache release (src/publish/), and the report commits a summary of the manifest
+ * with its sha256 (`requests.json`), so integrity can be checked against the release.
  */
 
 import { createHash } from "node:crypto";
 import { appendFile, mkdir } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import type { CacheEntry, EcosystemId } from "../types.ts";
 
 /**
@@ -23,8 +25,13 @@ export function cacheDir(): string {
   return join(dataDir(), "cache");
 }
 
-export function manifestPath(): string {
-  return join(cacheDir(), "manifest.jsonl");
+/** A snapshot's cache folder; without a snapshot, the shared root (tests, fixture capture). */
+export function snapshotCacheDir(snapshotId?: string): string {
+  return snapshotId ? join(cacheDir(), snapshotId) : cacheDir();
+}
+
+export function manifestPath(snapshotId?: string): string {
+  return join(snapshotCacheDir(snapshotId), "manifest.jsonl");
 }
 
 export function sha256(s: string): string {
@@ -46,10 +53,6 @@ export function slug(name: string): string {
   return `${cleaned.slice(0, 80) || "pkg"}-${digest}`;
 }
 
-export function cachePath(ecosystem: EcosystemId, pkg: string, url: string): string {
-  return join(cacheDir(), ecosystem, slug(pkg), `${sha256(url).slice(0, 32)}.json.gz`);
-}
-
 /**
  * Serialises manifest appends. Concurrent fetches would otherwise interleave partial
  * lines into the file that is supposed to be the integrity record.
@@ -57,9 +60,11 @@ export function cachePath(ecosystem: EcosystemId, pkg: string, url: string): str
 class ManifestWriter {
   #tail: Promise<void> = Promise.resolve();
 
+  constructor(readonly path: string) {}
+
   append(entry: CacheEntry): Promise<void> {
     this.#tail = this.#tail.then(async () => {
-      const path = manifestPath();
+      const path = this.path;
       await mkdir(dirname(path), { recursive: true });
       await appendFile(path, JSON.stringify(entry) + "\n", "utf8");
     });
@@ -72,15 +77,47 @@ class ManifestWriter {
 }
 
 export class ResponseCache {
-  #manifest = new ManifestWriter();
+  #manifest: ManifestWriter;
   /** In-memory index of the manifest, keyed by URL. */
   #index = new Map<string, CacheEntry>();
   #loaded = false;
+  readonly dir: string;
+  /** A published cache records payload paths relative to its folder, so it can be unpacked anywhere. */
+  #relative = false;
+
+  /** `snapshotId`: whose responses this cache holds; omitted, the shared root (tests). */
+  constructor(readonly snapshotId?: string) {
+    this.dir = snapshotCacheDir(snapshotId);
+    this.#manifest = new ManifestWriter(join(this.dir, "manifest.jsonl"));
+  }
+
+  /**
+   * A cache in `dir` whose manifest names payloads relative to it: the layout of a published
+   * cache release, so `extract --cache <dir>` can rebuild a snapshot from the release alone.
+   */
+  static at(dir: string): ResponseCache {
+    const cache = new ResponseCache();
+    (cache as { dir: string }).dir = dir;
+    cache.#manifest = new ManifestWriter(join(dir, "manifest.jsonl"));
+    cache.#relative = true;
+    return cache;
+  }
+
+  /** The newest record of every URL, in manifest order. */
+  async entries(): Promise<CacheEntry[]> {
+    await this.load();
+    return [...this.#index.values()];
+  }
+
+  /** Where a record's payload lies on disk. */
+  payloadPath(entry: CacheEntry): string {
+    return this.#relative ? join(this.dir, entry.path) : entry.path;
+  }
 
   async load(): Promise<void> {
     if (this.#loaded) return;
     this.#loaded = true;
-    const f = Bun.file(manifestPath());
+    const f = Bun.file(join(this.dir, "manifest.jsonl"));
     if (!(await f.exists())) return;
     for (const line of (await f.text()).split("\n")) {
       if (!line.trim()) continue;
@@ -106,7 +143,7 @@ export class ResponseCache {
     const entry = this.#index.get(url);
     if (!entry) return null;
 
-    const f = Bun.file(entry.path);
+    const f = Bun.file(this.payloadPath(entry));
     if (!(await f.exists())) return null;
 
     try {
@@ -127,8 +164,12 @@ export class ResponseCache {
     package: string;
     /** The body of a POST, kept so the request can be replayed from the manifest. */
     requestBody?: string | undefined;
+    /** When the response was fetched, if not now: a redacted copy keeps the original's time. */
+    fetchedAt?: string | undefined;
+    /** sha256 of the response as fetched, when this body is a redacted copy of it. */
+    originalSha256?: string | undefined;
   }): Promise<CacheEntry> {
-    const path = cachePath(args.ecosystem, args.package, args.url);
+    const path = join(this.dir, args.ecosystem, slug(args.package), `${sha256(args.url).slice(0, 32)}.json.gz`);
     await mkdir(dirname(path), { recursive: true });
     await Bun.write(path, Bun.gzipSync(new TextEncoder().encode(args.body)));
 
@@ -137,11 +178,12 @@ export class ResponseCache {
       sha256: sha256(args.body),
       bytes: Buffer.byteLength(args.body, "utf8"),
       httpStatus: args.httpStatus,
-      fetchedAt: new Date().toISOString(),
+      fetchedAt: args.fetchedAt ?? new Date().toISOString(),
       ecosystem: args.ecosystem,
       package: args.package,
-      path,
+      path: this.#relative ? relative(this.dir, path) : path,
       ...(args.requestBody !== undefined ? { requestBody: args.requestBody } : {}),
+      ...(args.originalSha256 !== undefined ? { originalSha256: args.originalSha256 } : {}),
     };
     this.#index.set(entry.url, entry);
     await this.#manifest.append(entry);

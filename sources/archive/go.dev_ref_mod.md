@@ -2096,7 +2096,7 @@ The `go` command only applies credentials obtained through `GOAUTH`, including i
 Alternatively, credentials may be specified directly in `GOPROXY` URLs. For example:
 
 ```
-GOPROXY=https://jrgopher:hunter2@proxy.corp.example.com
+GOPROXY=https://jrgopher:redacted@example.invalid
 ```
 
 Use caution when taking this approach: environment variables may appear in shell history and in logs.

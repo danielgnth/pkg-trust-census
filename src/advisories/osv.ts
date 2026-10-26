@@ -12,6 +12,7 @@
 
 import type { Source } from "../http/client.ts";
 import type { EcosystemId, ExtractedPackage, FetchResult, ResponseRef } from "../types.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 export const OSV_API = "https://api.osv.dev/v1";
 
@@ -176,3 +177,14 @@ export function aliasGroups(advisories: ReadonlyArray<Pick<Advisory, "id" | "ali
 export function databaseOf(id: string): string {
   return /^[A-Z]+/.exec(id)?.[0] ?? id;
 }
+
+/** OSV records credit the people who found or fixed a vulnerability, with contact addresses. */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "any",
+    endpoint: "api.osv.dev /v1/vulns/{id}",
+    matches: (url) => url.startsWith("https://api.osv.dev/v1/vulns/"),
+    paths: ["credits"],
+    keep: ["type"],
+  },
+]

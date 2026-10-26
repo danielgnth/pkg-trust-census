@@ -36,11 +36,11 @@
       "_id": "chalk@5.6.0",
       "maintainers": [
         {
-          "name": "sindresorhus",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         },
         {
-          "name": "qix",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -100,7 +100,7 @@
         "bench": "matcha benchmark.js"
       },
       "_npmUser": {
-        "name": "sindresorhus",
+        "name": "redacted",
         "email": "redacted@example.invalid"
       },
       "repository": {
@@ -159,7 +159,7 @@
       "_id": "chalk@5.6.2",
       "maintainers": [
         {
-          "name": "sindresorhus",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -219,7 +219,7 @@
         "bench": "matcha benchmark.js"
       },
       "_npmUser": {
-        "name": "sindresorhus",
+        "name": "redacted",
         "email": "redacted@example.invalid"
       },
       "repository": {
@@ -322,7 +322,7 @@
       },
       "version": "6.0.0",
       "_npmUser": {
-        "name": "sindresorhus",
+        "name": "redacted",
         "email": "redacted@example.invalid"
       },
       "homepage": "https://github.com/chalk/chalk#readme",
@@ -357,7 +357,7 @@
       "directories": {},
       "maintainers": [
         {
-          "name": "sindresorhus",
+          "name": "redacted",
           "email": "redacted@example.invalid"
         }
       ],
@@ -424,7 +424,7 @@
   "description": "Terminal string styling done right",
   "maintainers": [
     {
-      "name": "sindresorhus",
+      "name": "redacted",
       "email": "redacted@example.invalid"
     }
   ],

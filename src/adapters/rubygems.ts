@@ -32,6 +32,7 @@ import {
   type KeptVersion,
   type VersionRecord,
 } from "../extract/signals.ts";
+import type { PersonalData } from "../publish/redact.ts";
 
 const API = "https://rubygems.org/api/v1";
 
@@ -116,6 +117,7 @@ export class RubygemsAdapter extends GatheringAdapter<Raw> {
       .map((r, i) => ({
         ecosystem: this.id,
         name: r.name,
+        layer: "top" as const,
         rank: i + 1,
         rankFrame: this.rankFrame,
         downloadCount: r.downloads,
@@ -275,3 +277,37 @@ function repoRoot(u: string | null | undefined): string | null {
   const m = /^(https:\/\/(?:github\.com|gitlab\.com|codeberg\.org)\/[^/]+\/[^/]+)/.exec(clean);
   return m ? m[1]! : clean;
 }
+
+/**
+ * RubyGems names authors and owners in its JSON, and on each version page the pusher, the owners
+ * (profile links with avatars) and the authors. A page keeps the shape `pusherOf` reads: a user
+ * push still links to a profile, now `/profiles/redacted`, and a trusted publisher keeps its title.
+ */
+export const PERSONAL_DATA: PersonalData[] = [
+  {
+    ecosystem: "rubygems",
+    endpoint: "rubygems.org /api/v1/versions/{g}.json, /api/v1/gems/{g}.json",
+    matches: (url) => /^https:\/\/rubygems\.org\/api\/v1\/(versions|gems)\/[^/]+\.json$/.test(url),
+    paths: ["authors", "*.authors"],
+  },
+  {
+    ecosystem: "rubygems",
+    endpoint: "rubygems.org /api/v1/gems/{g}/owners.json",
+    matches: (url) => /^https:\/\/rubygems\.org\/api\/v1\/gems\/[^/]+\/owners\.json$/.test(url),
+    paths: ["*"],
+  },
+  {
+    ecosystem: "rubygems",
+    endpoint: "rubygems.org /gems/{g}/versions/{v} (HTML)",
+    matches: (url) => /^https:\/\/rubygems\.org\/gems\/[^/]+\/versions\//.test(url),
+    text: (html) =>
+      html
+        .replace(/<a\b[^>]*href="\/profiles\/[^"]*"[^>]*>[\s\S]*?<\/a>/g, '<a href="/profiles/redacted"><span class="truncate">redacted</span></a>')
+        .replace(/(>Authors<\/h3>\s*<p[^>]*>)[\s\S]*?(<\/p>)/g, "$1redacted$2"),
+    textResidue: (html) => [
+      ...[...html.matchAll(/href="\/profiles\/(?!redacted")[^"]*"/g)].map((m) => `profile link ${m[0]}`),
+      ...[...html.matchAll(/\/users\/\d+\/avatar/g)].map((m) => `avatar ${m[0]}`),
+      ...[...html.matchAll(/>Authors<\/h3>\s*<p[^>]*>(?!redacted<)/g)].map(() => "authors paragraph"),
+    ],
+  },
+]

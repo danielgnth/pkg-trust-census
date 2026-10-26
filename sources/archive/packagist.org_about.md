@@ -62,7 +62,7 @@ A typical composer.json file looks like this:
     "authors": [
         {
             "name": "Jordi Boggiano",
-            "email": "j.boggiano@seld.be",
+            "email": "redacted@example.invalid",
             "homepage": "http://seld.be",
             "role": "Developer"
         }

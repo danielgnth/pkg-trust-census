@@ -3,8 +3,8 @@
  * Captures small, real API responses as test fixtures — one per signal shape the
  * extractors will parse.
  *
- * Fixtures are deliberately *trimmed* (huge version arrays cut down) and *redacted* (email
- * addresses, npm star lists — see redactPersonalData) but otherwise never edited:
+ * Fixtures are deliberately *trimmed* (huge version arrays cut down) and *redacted* (fields that
+ * name people, email addresses — see redactFixture) but otherwise never edited:
  * field names, nesting and value shapes are exactly what the registry returned. Every
  * fixture's source URL, capture date and trim rule is recorded in fixtures.json so a
  * reviewer can tell a real capture from a hand-written mock.
@@ -15,6 +15,8 @@
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { HttpClient } from "../src/http/client.ts";
+import { redactBody } from "../src/publish/redact.ts";
+import { ALL_PERSONAL_DATA } from "../src/publish/publish.ts";
 import type { EcosystemId } from "../src/types.ts";
 
 const OUT = "test/fixtures";
@@ -41,25 +43,12 @@ interface Spec {
 const keepNewestAtEnd = (arr: unknown[], n: number) => arr.splice(0, Math.max(0, arr.length - n));
 const keepNewestAtStart = (arr: unknown[], n: number) => arr.splice(n);
 
-/** Public registry data still names people; fixtures are committed, so they carry none of it. */
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
-const KEEP = /no-?reply|example\.(com|org|invalid)/i;
-
-export function redactPersonalData<T>(value: T): T {
-  if (typeof value === "string") {
-    return value.replace(EMAIL, (m) => (KEEP.test(m) ? m : "redacted@example.invalid")) as T;
-  }
-  if (Array.isArray(value)) return value.map(redactPersonalData) as T;
-  if (value && typeof value === "object") {
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value)) {
-      // npm's `users`: which npm accounts starred the package. Unused, and it names people.
-      if (k === "users" && v && typeof v === "object" && !Array.isArray(v)) continue;
-      out[k] = redactPersonalData(v);
-    }
-    return out as T;
-  }
-  return value;
+/**
+ * Public registry data still names people; fixtures are committed, so they carry none of it. The
+ * same field-level redaction as a published cache (src/publish/redact.ts), applied before trimming.
+ */
+export function redactFixture(url: string, body: string): string {
+  return redactBody(url, body, ALL_PERSONAL_DATA);
 }
 
 const SPECS: Spec[] = [
@@ -241,9 +230,9 @@ async function main() {
       let note: string | null = null;
       let out: string;
       if (spec.text) {
-        out = res.body;
+        out = redactFixture(spec.url, res.body);
       } else {
-        const data = redactPersonalData(JSON.parse(res.body));
+        const data = JSON.parse(redactFixture(spec.url, res.body));
         note = spec.trim?.(data) ?? null;
         out = JSON.stringify(data, null, 2) + "\n";
       }
@@ -260,7 +249,7 @@ async function main() {
         full_response_sha256: res.entry.sha256,
         full_response_bytes: res.entry.bytes,
         trimmed: note,
-        redacted: "email addresses; npm per-user star lists",
+        redacted: "fields that name people (PERSONAL_DATA in each adapter) and email addresses",
         why: spec.why,
       });
       console.log(`  ok  ${spec.name}${note ? `  (${note})` : ""}`);

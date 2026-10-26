@@ -5,8 +5,10 @@ adapters depend on. This describes the current code; the reasons behind each ava
 stored with the data (`signal_availability.notes`, from [`src/facts/index.ts`](../src/facts/index.ts)).
 Policy claims (dates, mandates, defaults) are cited in the facts files and listed in [sources.md](sources.md).
 
-All endpoints are public and read without authentication. Every request carries the project's User-Agent;
-crates.io answers requests without a descriptive one with HTTP 403.
+All registry endpoints are public and read without authentication. Every request carries the project's
+User-Agent; crates.io answers requests without a descriptive one with HTTP 403. The one exception is deps.dev's
+BigQuery dataset (name lists for npm and Maven Central, and the whole-registry layer), which needs a Google
+account; see [deps.dev](#depsdev-name-lists-and-whole-registry-all-registries).
 
 ## Cross-registry findings
 
@@ -30,6 +32,8 @@ These shaped the signal model ([methodology](methodology.md#signals)):
 
 ## Sampling
 
+### Top sample
+
 | Registry | Ranking source | Frame |
 |---|---|---|
 | PyPI | `hugovk/top-pypi-packages` `top-pypi-packages.json` (`{project, download_count}`) | downloads, 30 days |
@@ -44,6 +48,39 @@ Go and Maven Central publish no download counts (ecosyste.ms reports `downloads:
 dependents frame. npm's bulk downloads endpoint rejects scoped names, which need one request each, and its
 downloads API answers 5 requests per second with HTTP 429, so it is paced at one per second. Packagist's popular list is not ordered by the
 all-time `downloads` it reports.
+
+### Random sample
+
+Where each draw gets every package name, and how it decides that a package is active (a release in the 36
+months before the snapshot; [methodology](methodology.md#random-sample)). Inputs are stored per snapshot under
+`data/names/{snapshot}/` with their sha256, and reused when a draw is restarted.
+
+| Registry | Name list | Activity check |
+|---|---|---|
+| PyPI | `GET /simple/` (PEP 691 JSON, 45 MB): `projects[].name` | the project's Simple API page (the adapter's first request): newest release, dated by its earliest file |
+| npm | deps.dev BigQuery `PackageVersions`, `System = 'NPM'` | the packument (the adapter's request): `time` of versions still in `versions` |
+| crates.io | `static.crates.io/db-dump.tar.gz` (daily, 2 GB): `crates.csv` | from the dump: newest `versions.csv` `created_at` |
+| RubyGems | weekly PostgreSQL dump (680 MB), the newest taken before the snapshot: `rubygems` | from the dump: newest `versions.created_at` |
+| Go | `index.golang.org/index?since=…`, paged 2,000 at a time over the window | from the index: newest non-pseudo version's `Timestamp` |
+| Maven Central | deps.dev BigQuery `PackageVersions`, `System = 'MAVEN'` | `maven-metadata.xml` (the adapter's request): `<lastUpdated>` |
+| Packagist | `GET /packages/list.json`: `packageNames` | `repo.packagist.org/p2/{p}.json`: `time` of tagged releases |
+
+- **npm and Maven names come from deps.dev.** npm's own complete list is its replication feed
+  (`replicate.npmjs.com/registry/_changes`, 4.5M live documents in October 2026, paged through every change
+  ever made, deleted packages included), Maven Central's a 3.3 GB binary index
+  (`.index/nexus-maven-repository-index.gz`). deps.dev's npm list is 12.6M names, too many to
+  download page by page, so BigQuery orders it by `FARM_FINGERPRINT(seed:name)` and the draw reads 5,000
+  names at a time. deps.dev also lists strings npm never accepted as names (paths of bundled dependencies,
+  `ember-cli>1.13.9>chalk>ansi-styles`); `validate-npm-package-name` rejects them as no package.
+- **Go is crawled over the window only.** A module without a version cached in the window is inactive, so
+  the earlier index is not needed. The window still holds tens of millions of entries (about 5 million in the
+  first six months of a 2026 window). Pages follow one another by `since`, so one cursor is latency-bound;
+  the window is split into months, crawled four at a time, and each month resumes from its own cursor.
+- **Dumps are parsed once.** The newest-release map read from a dump is stored beside it, keyed by the dump's
+  sha256.
+- **Releases after the snapshot instant do not count.** Lists are read after the snapshot; only releases at or
+  before it decide activity.
+- **p2 returns an empty list, not 404,** for a package without tagged releases.
 
 ## PyPI
 
@@ -189,3 +226,26 @@ OSV is not a registry, but every package's versions are looked up there ([method
   (`requestBody`), so each query can be replayed.
 - `database_specific` fields on GHSA records (`github_reviewed_at`, `nvd_published_at`, `severity`) are not
   read: GitHub documents them as internal and subject to change.
+
+## deps.dev (name lists and whole registry, all registries)
+
+deps.dev is not a registry either. Its BigQuery dataset (`bigquery-public-data.deps_dev_v1`) supplies the npm
+and Maven name lists and the whole-registry layer ([methodology](methodology.md#whole-registry-layer)); its
+per-version API backs the agreement check (`scripts/check-depsdev.ts`).
+
+| Data | Source |
+|---|---|
+| snapshot | `Snapshots.Time`: the newest at or before the census snapshot (weekly, since May 2022) |
+| names | `PackageVersions.Name`, one partition (`SnapshotAt`), one `System` |
+| attestations | `PackageVersions.Attestations[]`: `Type`, `URL`, `Verified`, `SourceRepository`, `Commit`; releases only (`VersionInfo.IsRelease`), dated by `UpstreamPublishedAt` |
+| per version | `GET api.deps.dev/v3/systems/{system}/packages/{name}/versions/{version}` → `attestations[]` |
+
+- `PackageVersions` is partitioned by day on `SnapshotAt` and clustered on `System`, `Name`. A query filtered
+  to one snapshot scans 1–7 GB; the `…Latest` views are not pruned and would scan hundreds of GB. Dry runs of
+  partition-filtered queries can report an upper bound of 0 bytes (the name lists did; the attestation query
+  estimated 7.5 GB and processed 6.1), so every query also runs with `maximumBytesBilled`.
+- Snapshot times carry microseconds; `SnapshotAt` matches a snapshot only with all six digits.
+- `Attestations` covers npm, PyPI and RubyGems; it holds none for any Maven Central package (October 2026). No
+  column carries crates.io trusted publishing or Go's checksum database, and Packagist is not in deps.dev.
+- `SLSAProvenance` is filled for npm only; `Attestations` includes the same SLSA statements.
+- RubyGems attestations carry an empty `Type`.

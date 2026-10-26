@@ -273,7 +273,7 @@ Even if you never publish your package, you can still get a lot of benefits of u
     
     npm install git+ssh://git@github.com:npm/cli
     
-    npm install git+https://isaacs@github.com/npm/cli.git
+    npm install git+https://redacted@example.invalid/npm/cli.git
     
     npm install git://github.com/npm/cli.git
     

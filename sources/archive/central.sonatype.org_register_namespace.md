@@ -100,7 +100,7 @@ Warning
 
 The automated system checks the _exact_ domain for the namespace for the `TXT` record. For the `com.example` namespace, the registration process checks `example.com`. It does not check `com.example.com`, `maven-central.example.com`, or any other variation that you might find on other services. Please verify that you have set the namespace request on the correct domain _before_ submitting your request. Failure to do so will result in your support request being prioritized lower than those that do.
 
-If you have set up your DNS TXT record correctly, it should only take a few minutes for us to verify your namespace. You can refresh the Namespace page to see if the verification status has changed to "Verified." If verification takes more than a few hours to complete or returns an error, please email [Central Support](mailto:central-support@sonatype.com) and provide as much supporting information as you can (e.g. screenshots, logs, steps to reproduce).
+If you have set up your DNS TXT record correctly, it should only take a few minutes for us to verify your namespace. You can refresh the Namespace page to see if the verification status has changed to "Verified." If verification takes more than a few hours to complete or returns an error, please email [Central Support](mailto:redacted@example.invalid) and provide as much supporting information as you can (e.g. screenshots, logs, steps to reproduce).
 
 #### By Code Hosting Services[⚓︎](#by-code-hosting-services "Permanent link")
 
@@ -142,7 +142,7 @@ As mentioned above, if you sign up with a GitHub account, you will automatically
 
 Currently, we only support the GitHub username that you used to sign up, so `io.github.<github organization name>` is not available as an automatically registered namespace.
 
-If you log in to your account via GitHub and you do not have an automatically created namespace, please email \[[Central Support](mailto:central-support@sonatype.com) for help.
+If you log in to your account via GitHub and you do not have an automatically created namespace, please email \[[Central Support](mailto:redacted@example.invalid) for help.
 
 ### Existing OSSRH Namespaces[⚓︎](#existing-ossrh-namespaces "Permanent link")
 
@@ -156,7 +156,7 @@ As documented below, manually publishing has a slightly different structure for 
     
 2.  Observe the sections labeled as "Central Portal Namespaces" or "OSSRH Namespaces".
     
-    -   If "OSSRH Namespaces" section does not exist, there are no OSSRH namespaces associated with your account. If you expect there to be namespaces listed, first verify that they are not associated with a different publisher account, and then contact [Central Support](mailto:central-support@sonatype.com).
+    -   If "OSSRH Namespaces" section does not exist, there are no OSSRH namespaces associated with your account. If you expect there to be namespaces listed, first verify that they are not associated with a different publisher account, and then contact [Central Support](mailto:redacted@example.invalid).
 3.  Click the menu in the top right of the namespace (three dots).
     
     ![A screenshot of the namespaces page that shows the menu activated by the More Actions button](../../images/namespace-more-actions-button.png)

@@ -39,20 +39,45 @@ jobs:
           snapshot = max(p for p in Path("data/out").iterdir() if p.is_dir())
           site = Path("_pages")
           shutil.copytree(snapshot, site)
-          (site / "README.md").rename(site / "index.md")
+          # Each page's folder in the repository, so a relative link can be resolved where it was written.
+          origin = {page: snapshot / page.relative_to(site).parent for page in site.rglob("*.md")}
+          for readme in list(site.rglob("README.md")):
+              index = readme.with_name("index.md")
+              origin[index] = origin.pop(readme)
+              readme.rename(index)
           for doc in Path("docs").glob("*.md"):
               shutil.copy(doc, site / doc.name)
+              origin[site / doc.name] = Path("docs")
 
           blob = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_SHA']}/"
 
-          def inline(m):
-              svg = (site / m[2]).read_text().replace("<svg ", f'<svg role="img" aria-label="{m[1]}" ', 1)
-              return f'<div class="chart">{svg}</div>'
+          def relink(page, m):
+              # A link that stays inside the site (random/README.md -> ../layers.md) is kept; one that
+              # leaves it (../../../sources/archive/...) points at the file on GitHub for this commit.
+              inside = os.path.normpath(page.parent / m[1])
+              if not os.path.relpath(inside, site).startswith(".."):
+                  return m[0]
+              return f"]({blob}{os.path.normpath(origin[page] / m[1])}"
 
-          for page in site.glob("*.md"):
+          for page in site.rglob("*.md"):
+              def inline(m):
+                  svg = (page.parent / m[2]).read_text().replace("<svg ", f'<svg role="img" aria-label="{m[1]}" ', 1)
+                  return f'<div class="chart">{svg}</div>'
               text = re.sub(r"^!\[([^\]]*)\]\((charts/[^)]+\.svg)\)$", inline, page.read_text(), flags=re.M)
-              text = re.sub(r"\]\((?:\.\./)+([^)\s]+)", lambda m: f"]({blob}{m[1]}", text)
+              text = re.sub(r"\]\(((?:\.\./)+[^)\s]+)", lambda m: relink(page, m), text)
+              text = re.sub(r"\]\(((?:[^)\s:]*/)?)README\.md\)", r"](\1index.md)", text)
               page.write_text(text)
+
+          # Indented as the nav entries below are once the block is unindented.
+          layers = (
+              "  - Top and random samples: layers.md\n"
+              "  - Random sample:\n"
+              "      - Overview: random/index.md\n"
+              "      - Run summary: random/summary.md\n"
+              "      - Adoption matrix: random/matrix.md\n"
+          ) if (site / "layers.md").exists() else ""
+          if (site / "registry.md").exists():
+              layers += "  - Whole registry (deps.dev): registry.md\n"
 
           (site / "site.css").write_text(
               ".md-grid { max-width: 90rem; }\n"
@@ -87,7 +112,7 @@ jobs:
                 - Governance and containment: policies.md
                 - Sigstore: sigstore.md
                 - Post-quantum exposure: pqc.md
-            - Documentation:
+          {layers}  - Documentation:
                 - Methodology: methodology.md
                 - Registry reference: registries.md
                 - Sources: sources.md

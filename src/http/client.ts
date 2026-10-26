@@ -11,6 +11,9 @@
 
 import ky, { HTTPError } from "ky";
 import PQueue from "p-queue";
+import { createHash } from "node:crypto";
+import { mkdir, rename } from "node:fs/promises";
+import { dirname } from "node:path";
 import type { EcosystemId, FetchResult } from "../types.ts";
 import { ResponseCache, sha256 } from "./cache.ts";
 import { defaultTransport, type Transport } from "./transport.ts";
@@ -64,6 +67,14 @@ export const HOST_POLICIES: Record<string, HostPolicy> = {
   "raw.githubusercontent.com": { rps: 4, concurrency: 4 },
   // OSV publishes no rate limit; held to the same pace as the registries.
   "api.osv.dev": { rps: 4, concurrency: 4 },
+  // deps.dev publishes no rate limit; its per-version API backs scripts/check-depsdev.ts.
+  "api.deps.dev": { rps: 4, concurrency: 4 },
+  // The random draw's activity checks and bulk inputs (src/sample/sources.ts).
+  "repo.packagist.org": { rps: 4, concurrency: 4 },
+  // Pages are sequential within a month of the index, so months are crawled side by side.
+  "index.golang.org": { rps: 4, concurrency: 4 },
+  "static.crates.io": { rps: 1, concurrency: 1 },
+  "s3-us-west-2.amazonaws.com": { rps: 1, concurrency: 1 },
 };
 
 export interface RequestOptions {
@@ -206,9 +217,75 @@ export class HttpClient {
     return this.getJson<T>(url, { ...opts, method: "POST", body: JSON.stringify(body) });
   }
 
+  /**
+   * One request with the client's identity, pacing and retries, but outside the response cache:
+   * for the rank stage's bulk inputs (name lists, dumps, index pages), which are stored as files
+   * with their own checksums rather than as per-package responses.
+   */
+  async request(url: string, opts: { headers?: Record<string, string> } = {}): Promise<Response> {
+    let attempts = 1;
+    try {
+      return await this.#ky(url, {
+        headers: opts.headers,
+        hooks: { beforeRetry: [() => void (attempts++, this.stats.retries++)] },
+      });
+    } catch (err) {
+      this.stats.errors++;
+      const reason = err instanceof HTTPError ? `HTTP ${err.response.status}` : err instanceof Error ? err.message : String(err);
+      throw new Error(`fetch failed after ${attempts} attempts: ${url}: ${reason}`);
+    }
+  }
+
+  /**
+   * Streams `url` to `dest` and records its sha256 next to it (`dest.json`). A file already
+   * downloaded with a matching checksum is reused, so a restarted draw fetches nothing again.
+   */
+  async download(url: string, dest: string, opts: { headers?: Record<string, string> } = {}): Promise<BulkFile> {
+    const sidecar = Bun.file(`${dest}.json`);
+    if ((await sidecar.exists()) && (await Bun.file(dest).exists())) {
+      const known = (await sidecar.json()) as BulkFile;
+      if (known.url === url && (await sha256File(dest)) === known.sha256) return known;
+    }
+    await mkdir(dirname(dest), { recursive: true });
+    const partial = `${dest}.partial`;
+    const fetchedAt = new Date().toISOString();
+    if (this.transport.download) {
+      await this.#queue(new URL(url).host).add(() => this.transport.download!(url, partial, { "User-Agent": USER_AGENT, ...opts.headers }));
+    } else {
+      const res = await this.request(url, opts);
+      if (!res.body) throw new Error(`empty body: ${url}`);
+      const sink = Bun.file(partial).writer();
+      for await (const chunk of res.body) sink.write(chunk);
+      await sink.end();
+    }
+    await rename(partial, dest);
+    this.stats.fetched++;
+    const file: BulkFile = { url, sha256: await sha256File(dest), bytes: Bun.file(dest).size, fetchedAt, path: dest };
+    await Bun.write(sidecar, JSON.stringify(file, null, 2) + "\n");
+    return file;
+  }
+
   flush(): Promise<void> {
     return this.cache.flush();
   }
+}
+
+/** A file the rank stage read in bulk: a name list, a dump, or a stored crawl. */
+export interface BulkFile {
+  /** What was requested, or how the file was assembled (a paged crawl, a query). */
+  url: string;
+  sha256: string;
+  bytes: number;
+  fetchedAt: string;
+  /** Local path; not part of the published record. */
+  path?: string;
+}
+
+/** sha256 of a file, streamed: dumps run to gigabytes. */
+export async function sha256File(path: string): Promise<string> {
+  const hash = createHash("sha256");
+  for await (const chunk of Bun.file(path).stream()) hash.update(chunk);
+  return hash.digest("hex");
 }
 
 /**

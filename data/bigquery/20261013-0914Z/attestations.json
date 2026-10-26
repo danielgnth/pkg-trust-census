@@ -1,0 +1,554 @@
+{
+  "key": "c09c149d1006b748eddf3e81e5467ad4d8d476602381d9eff3ab2b0c05ce97d0",
+  "sql": "\nWITH releases AS (\n  SELECT\n    System AS system,\n    Name AS name,\n    UpstreamPublishedAt AS t,\n    ARRAY_LENGTH(Attestations) > 0 AS attested,\n    ARRAY_LENGTH(Attestations) > 0 AND NOT EXISTS (SELECT 1 FROM UNNEST(Attestations) a WHERE NOT IFNULL(a.Verified, FALSE)) AS verified,\n    EXISTS (SELECT 1 FROM UNNEST(Attestations) a WHERE IFNULL(a.SourceRepository, '') != '' AND IFNULL(a.Commit, '') != '') AS linked\n  FROM `bigquery-public-data.deps_dev_v1.PackageVersions`\n  WHERE SnapshotAt = TIMESTAMP(@snapshot)\n    AND System IN UNNEST(@systems)\n    AND VersionInfo.IsRelease\n    AND UpstreamPublishedAt IS NOT NULL\n),\npoints AS (\n  SELECT p.label, TIMESTAMP(p.until) AS boundary FROM UNNEST(@points) AS p\n),\nanchors AS (\n  SELECT\n    points.label,\n    points.boundary,\n    releases.system,\n    releases.name,\n    ARRAY_AGG(STRUCT(releases.t, releases.attested, releases.verified, releases.linked) ORDER BY releases.t DESC LIMIT 1)[OFFSET(0)] AS newest\n  FROM releases\n  JOIN points ON releases.t <= points.boundary\n  GROUP BY 1, 2, 3, 4\n)\nSELECT\n  label AS point,\n  system,\n  COUNT(*) AS packages,\n  COUNTIF(newest.attested) AS attested,\n  COUNTIF(newest.verified) AS verified,\n  COUNTIF(newest.linked) AS linked,\n  COUNTIF(newest.t > TIMESTAMP(DATETIME_SUB(DATETIME(boundary), INTERVAL @months MONTH))) AS active,\n  COUNTIF(newest.attested AND newest.t > TIMESTAMP(DATETIME_SUB(DATETIME(boundary), INTERVAL @months MONTH))) AS active_attested\nFROM anchors\nGROUP BY 1, 2\nORDER BY 1, 2\n",
+  "params": {
+    "systems": [
+      "NPM",
+      "PYPI",
+      "RUBYGEMS",
+      "MAVEN"
+    ],
+    "points": [
+      {
+        "label": "2024Q1",
+        "until": "2024-04-01T00:00:00.000Z"
+      },
+      {
+        "label": "2024Q2",
+        "until": "2024-07-01T00:00:00.000Z"
+      },
+      {
+        "label": "2024Q3",
+        "until": "2024-10-01T00:00:00.000Z"
+      },
+      {
+        "label": "2024Q4",
+        "until": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "label": "2025Q1",
+        "until": "2025-04-01T00:00:00.000Z"
+      },
+      {
+        "label": "2025Q2",
+        "until": "2025-07-01T00:00:00.000Z"
+      },
+      {
+        "label": "2025Q3",
+        "until": "2025-10-01T00:00:00.000Z"
+      },
+      {
+        "label": "2025Q4",
+        "until": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "label": "2026Q1",
+        "until": "2026-04-01T00:00:00.000Z"
+      },
+      {
+        "label": "2026Q2",
+        "until": "2026-07-01T00:00:00.000Z"
+      },
+      {
+        "label": "2026Q3",
+        "until": "2026-10-01T00:00:00.000Z"
+      },
+      {
+        "label": "snapshot",
+        "until": "2026-10-13T09:14:26.098Z"
+      }
+    ],
+    "months": 36
+  },
+  "depsdevSnapshot": "2026-10-12T21:01:01.783976Z",
+  "stats": {
+    "estimatedBytes": 7500046086,
+    "bytesProcessed": 6538915691,
+    "bytesBilled": 6538919936,
+    "runMs": 21000,
+    "ranAt": "2026-10-21T11:36:12.220Z",
+    "jobId": "4109639d-c54d-45a5-82ce-d3340dd02119"
+  },
+  "rows": [
+    {
+      "point": "2024Q1",
+      "system": "MAVEN",
+      "packages": 570187,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 312750,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q1",
+      "system": "NPM",
+      "packages": 2557384,
+      "attested": 7695,
+      "verified": 7695,
+      "linked": 7695,
+      "active": 1297894,
+      "active_attested": 7695
+    },
+    {
+      "point": "2024Q1",
+      "system": "PYPI",
+      "packages": 473880,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 278199,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q1",
+      "system": "RUBYGEMS",
+      "packages": 177069,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 29211,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q2",
+      "system": "MAVEN",
+      "packages": 587930,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 316145,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q2",
+      "system": "NPM",
+      "packages": 2878486,
+      "attested": 9984,
+      "verified": 9984,
+      "linked": 9984,
+      "active": 1544752,
+      "active_attested": 9984
+    },
+    {
+      "point": "2024Q2",
+      "system": "PYPI",
+      "packages": 495870,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 286855,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q2",
+      "system": "RUBYGEMS",
+      "packages": 178192,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 28688,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q3",
+      "system": "MAVEN",
+      "packages": 607754,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 323932,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q3",
+      "system": "NPM",
+      "packages": 3011082,
+      "attested": 15098,
+      "verified": 15098,
+      "linked": 15098,
+      "active": 1601314,
+      "active_attested": 15098
+    },
+    {
+      "point": "2024Q3",
+      "system": "PYPI",
+      "packages": 516926,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 295325,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q3",
+      "system": "RUBYGEMS",
+      "packages": 179334,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 28447,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q4",
+      "system": "MAVEN",
+      "packages": 626318,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 331014,
+      "active_attested": 0
+    },
+    {
+      "point": "2024Q4",
+      "system": "NPM",
+      "packages": 3084156,
+      "attested": 18446,
+      "verified": 18446,
+      "linked": 18446,
+      "active": 1600736,
+      "active_attested": 18446
+    },
+    {
+      "point": "2024Q4",
+      "system": "PYPI",
+      "packages": 540449,
+      "attested": 5673,
+      "verified": 5673,
+      "linked": 5673,
+      "active": 305463,
+      "active_attested": 5673
+    },
+    {
+      "point": "2024Q4",
+      "system": "RUBYGEMS",
+      "packages": 180432,
+      "attested": 94,
+      "verified": 94,
+      "linked": 94,
+      "active": 28174,
+      "active_attested": 94
+    },
+    {
+      "point": "2025Q1",
+      "system": "MAVEN",
+      "packages": 646605,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 340023,
+      "active_attested": 0
+    },
+    {
+      "point": "2025Q1",
+      "system": "NPM",
+      "packages": 3166608,
+      "attested": 21755,
+      "verified": 21755,
+      "linked": 21755,
+      "active": 1605955,
+      "active_attested": 21755
+    },
+    {
+      "point": "2025Q1",
+      "system": "PYPI",
+      "packages": 565905,
+      "attested": 11601,
+      "verified": 11601,
+      "linked": 11601,
+      "active": 316426,
+      "active_attested": 11601
+    },
+    {
+      "point": "2025Q1",
+      "system": "RUBYGEMS",
+      "packages": 181514,
+      "attested": 180,
+      "verified": 180,
+      "linked": 180,
+      "active": 27774,
+      "active_attested": 180
+    },
+    {
+      "point": "2025Q2",
+      "system": "MAVEN",
+      "packages": 667938,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 349238,
+      "active_attested": 0
+    },
+    {
+      "point": "2025Q2",
+      "system": "NPM",
+      "packages": 3255488,
+      "attested": 25431,
+      "verified": 25431,
+      "linked": 25431,
+      "active": 1615816,
+      "active_attested": 25431
+    },
+    {
+      "point": "2025Q2",
+      "system": "PYPI",
+      "packages": 595792,
+      "attested": 16942,
+      "verified": 16942,
+      "linked": 16941,
+      "active": 332083,
+      "active_attested": 16942
+    },
+    {
+      "point": "2025Q2",
+      "system": "RUBYGEMS",
+      "packages": 182701,
+      "attested": 355,
+      "verified": 355,
+      "linked": 355,
+      "active": 27619,
+      "active_attested": 355
+    },
+    {
+      "point": "2025Q3",
+      "system": "MAVEN",
+      "packages": 692581,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 362042,
+      "active_attested": 0
+    },
+    {
+      "point": "2025Q3",
+      "system": "NPM",
+      "packages": 3345858,
+      "attested": 31244,
+      "verified": 31244,
+      "linked": 31244,
+      "active": 1596380,
+      "active_attested": 31244
+    },
+    {
+      "point": "2025Q3",
+      "system": "PYPI",
+      "packages": 626095,
+      "attested": 22131,
+      "verified": 22131,
+      "linked": 22130,
+      "active": 348076,
+      "active_attested": 22131
+    },
+    {
+      "point": "2025Q3",
+      "system": "RUBYGEMS",
+      "packages": 183968,
+      "attested": 469,
+      "verified": 469,
+      "linked": 469,
+      "active": 27665,
+      "active_attested": 469
+    },
+    {
+      "point": "2025Q4",
+      "system": "MAVEN",
+      "packages": 719880,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 377341,
+      "active_attested": 0
+    },
+    {
+      "point": "2025Q4",
+      "system": "NPM",
+      "packages": 3448239,
+      "attested": 49167,
+      "verified": 49167,
+      "linked": 49167,
+      "active": 1624418,
+      "active_attested": 49166
+    },
+    {
+      "point": "2025Q4",
+      "system": "PYPI",
+      "packages": 660833,
+      "attested": 28875,
+      "verified": 28875,
+      "linked": 28862,
+      "active": 367993,
+      "active_attested": 28875
+    },
+    {
+      "point": "2025Q4",
+      "system": "RUBYGEMS",
+      "packages": 185462,
+      "attested": 600,
+      "verified": 600,
+      "linked": 600,
+      "active": 28015,
+      "active_attested": 600
+    },
+    {
+      "point": "2026Q1",
+      "system": "MAVEN",
+      "packages": 755774,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 400707,
+      "active_attested": 0
+    },
+    {
+      "point": "2026Q1",
+      "system": "NPM",
+      "packages": 3634073,
+      "attested": 83198,
+      "verified": 83198,
+      "linked": 83198,
+      "active": 1717230,
+      "active_attested": 83191
+    },
+    {
+      "point": "2026Q1",
+      "system": "PYPI",
+      "packages": 716074,
+      "attested": 44104,
+      "verified": 44104,
+      "linked": 43946,
+      "active": 407001,
+      "active_attested": 44104
+    },
+    {
+      "point": "2026Q1",
+      "system": "RUBYGEMS",
+      "packages": 188342,
+      "attested": 833,
+      "verified": 833,
+      "linked": 833,
+      "active": 29553,
+      "active_attested": 833
+    },
+    {
+      "point": "2026Q2",
+      "system": "MAVEN",
+      "packages": 795662,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 427471,
+      "active_attested": 0
+    },
+    {
+      "point": "2026Q2",
+      "system": "NPM",
+      "packages": 3870151,
+      "attested": 137619,
+      "verified": 137618,
+      "linked": 137619,
+      "active": 1851589,
+      "active_attested": 137423
+    },
+    {
+      "point": "2026Q2",
+      "system": "PYPI",
+      "packages": 780323,
+      "attested": 66931,
+      "verified": 66931,
+      "linked": 66618,
+      "active": 453919,
+      "active_attested": 66931
+    },
+    {
+      "point": "2026Q2",
+      "system": "RUBYGEMS",
+      "packages": 190728,
+      "attested": 1130,
+      "verified": 1130,
+      "linked": 1130,
+      "active": 30733,
+      "active_attested": 1130
+    },
+    {
+      "point": "2026Q3",
+      "system": "MAVEN",
+      "packages": 841156,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 460881,
+      "active_attested": 0
+    },
+    {
+      "point": "2026Q3",
+      "system": "NPM",
+      "packages": 4151791,
+      "attested": 222007,
+      "verified": 222006,
+      "linked": 222007,
+      "active": 2061104,
+      "active_attested": 221349
+    },
+    {
+      "point": "2026Q3",
+      "system": "PYPI",
+      "packages": 844152,
+      "attested": 97006,
+      "verified": 97006,
+      "linked": 96672,
+      "active": 499734,
+      "active_attested": 97006
+    },
+    {
+      "point": "2026Q3",
+      "system": "RUBYGEMS",
+      "packages": 193806,
+      "attested": 1623,
+      "verified": 1623,
+      "linked": 1623,
+      "active": 32773,
+      "active_attested": 1623
+    },
+    {
+      "point": "snapshot",
+      "system": "MAVEN",
+      "packages": 848247,
+      "attested": 0,
+      "verified": 0,
+      "linked": 0,
+      "active": 466416,
+      "active_attested": 0
+    },
+    {
+      "point": "snapshot",
+      "system": "NPM",
+      "packages": 4190289,
+      "attested": 236797,
+      "verified": 236796,
+      "linked": 236797,
+      "active": 2090163,
+      "active_attested": 236070
+    },
+    {
+      "point": "snapshot",
+      "system": "PYPI",
+      "packages": 853647,
+      "attested": 102078,
+      "verified": 102078,
+      "linked": 101742,
+      "active": 505628,
+      "active_attested": 102078
+    },
+    {
+      "point": "snapshot",
+      "system": "RUBYGEMS",
+      "packages": 194158,
+      "attested": 1705,
+      "verified": 1705,
+      "linked": 1705,
+      "active": 32997,
+      "active_attested": 1705
+    }
+  ]
+}

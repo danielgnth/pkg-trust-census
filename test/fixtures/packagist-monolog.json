@@ -5,8 +5,8 @@
     "time": "2011-09-27T00:35:19+00:00",
     "maintainers": [
       {
-        "name": "Seldaek",
-        "avatar_url": "https://www.gravatar.com/avatar/b69782e1d7f426ef78f61d159c466a536372eff931f13981ac578fa3f4649352?d=identicon"
+        "name": "redacted",
+        "avatar_url": "redacted"
       }
     ],
     "versions": {
@@ -26,9 +26,9 @@
         ],
         "authors": [
           {
-            "name": "Jordi Boggiano",
+            "name": "redacted",
             "email": "redacted@example.invalid",
-            "homepage": "https://seld.be"
+            "homepage": "redacted"
           }
         ],
         "source": {
@@ -131,9 +131,9 @@
         ],
         "authors": [
           {
-            "name": "Jordi Boggiano",
+            "name": "redacted",
             "email": "redacted@example.invalid",
-            "homepage": "https://seld.be"
+            "homepage": "redacted"
           }
         ],
         "source": {
@@ -234,9 +234,9 @@
         ],
         "authors": [
           {
-            "name": "Jordi Boggiano",
+            "name": "redacted",
             "email": "redacted@example.invalid",
-            "homepage": "https://seld.be"
+            "homepage": "redacted"
           }
         ],
         "source": {

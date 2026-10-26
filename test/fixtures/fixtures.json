@@ -13,7 +13,7 @@
     "full_response_bytes": 72076,
     "trimmed": "files 132 -> 6 (kept newest)",
     "why": "files[].provenance is non-null — PEP 740 attestation present",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/pypi-simple-ruff.json",
@@ -29,7 +29,7 @@
     "full_response_bytes": 4449402,
     "trimmed": "files 7044 -> 4 (kept newest)",
     "why": "files[].provenance is null — the negative case, so `false` is a real negative",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/npm-packument-sigstore.json",
@@ -42,7 +42,7 @@
     "full_response_bytes": 121433,
     "trimmed": "versions 40 -> 4; readme dropped",
     "why": "dist.attestations present; also exercises the `time` map the backfill needs",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/npm-packument-chalk.json",
@@ -55,7 +55,7 @@
     "full_response_bytes": 134775,
     "trimmed": "versions 44 -> 3; readme dropped",
     "why": "dist.signatures present but no dist.attestations — proves signatures are not the differentiator",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/crates-versions-bon.json",
@@ -68,7 +68,7 @@
     "full_response_bytes": 7416,
     "trimmed": null,
     "why": "trustpub_data populated — the only direct trusted-publishing observation of the seven",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/crates-versions-serde.json",
@@ -81,7 +81,7 @@
     "full_response_bytes": 5094,
     "trimmed": null,
     "why": "trustpub_data null — token-published negative case",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-versions-trusted-publishing-test.json",
@@ -94,7 +94,7 @@
     "full_response_bytes": 16099,
     "trimmed": "versions 19 -> 4 (newest-first API, kept head)",
     "why": "Ruby Central's own trusted-publishing gem exposes NO trusted-publishing field — pins the negative finding",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-versions-rails.json",
@@ -107,7 +107,7 @@
     "full_response_bytes": 463850,
     "trimmed": "versions 519 -> 4 (newest-first API, kept head)",
     "why": "metadata.rubygems_mfa_required present per version — the backfillable MFA signal",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/go-latest-gorilla-mux.json",
@@ -120,7 +120,7 @@
     "full_response_bytes": 187,
     "trimmed": null,
     "why": "Origin {VCS, URL, Ref, Hash} — source provenance built into the module proxy",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/go-sumdb-gorilla-mux.txt",
@@ -133,7 +133,7 @@
     "full_response_bytes": 361,
     "trimmed": null,
     "why": "transparency-log inclusion proof; HTTP 200 is itself the signal",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/maven-gav-sigstore.json",
@@ -146,7 +146,7 @@
     "full_response_bytes": 3590,
     "trimmed": null,
     "why": "ec[] lists .jar.sigstore.json — the Sigstore positive case. Note it lists .jar.asc.sha256 but never a bare .jar.asc",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/maven-gav-guava.json",
@@ -159,7 +159,7 @@
     "full_response_bytes": 1284,
     "trimmed": null,
     "why": "ec[] omits .asc even though the .asc file exists — pins the trap that ec is unreliable for GPG",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/packagist-monolog.json",
@@ -172,7 +172,7 @@
     "full_response_bytes": 235864,
     "trimmed": "versions 93 -> 3",
     "why": "no signing field of any kind exists on version objects — the no_mechanism case",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/pypi-provenance-sigstore.json",
@@ -185,7 +185,7 @@
     "full_response_bytes": 10018,
     "trimmed": null,
     "why": "PEP 740 provenance object: 'publish' predicate (not SLSA) and a Fulcio certificate carrying repository + commit",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-attestations-rails.json",
@@ -198,7 +198,7 @@
     "full_response_bytes": 9196,
     "trimmed": null,
     "why": "Sigstore attestation bundle (bare message signature) whose certificate carries repository + commit",
-    "redacted": "email addresses; npm per-user star lists"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-page-rails-8.1.3.1.html",
@@ -214,7 +214,7 @@
     "full_response_bytes": 69141,
     "trimmed": "page cut to the release-info block (Pushed by … SHA 256 checksum)",
     "why": "trusted-publisher push: \"Pushed by\" shows the GitHub Actions publisher",
-    "redacted": "none"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-page-rails-7.0.0.html",
@@ -230,7 +230,7 @@
     "full_response_bytes": 63671,
     "trimmed": "page cut to the release-info block (Pushed by … SHA 256 checksum)",
     "why": "user push: \"Pushed by\" links the user's profile (an API-key push)",
-    "redacted": "none"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   },
   {
     "fixture": "test/fixtures/rubygems-page-rails-4.0.0.html",
@@ -246,6 +246,6 @@
     "full_response_bytes": 62590,
     "trimmed": "page cut to the release-info block (Pushed by … SHA 256 checksum)",
     "why": "pushed before rubygems.org recorded pushers: no \"Pushed by\" section",
-    "redacted": "none"
+    "redacted": "fields that name people (PERSONAL_DATA in each adapter) and email addresses"
   }
 ]

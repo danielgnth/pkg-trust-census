@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { closeDb, ensureSnapshot, newSnapshotId, openDb } from "../src/db/open.ts";
-import { packageVersions, packages, snapshots, versionSignals } from "../src/db/schema.ts";
+import { packageVersions, packages, sampleMembers, snapshots, versionSignals } from "../src/db/schema.ts";
 
 function freshDb() {
   const db = openDb(":memory:");
@@ -12,10 +12,9 @@ const pkg = {
   snapshotId: "snap-1",
   ecosystem: "pypi",
   packageName: "requests",
-  rankFrame: "downloads",
-  rank: 1,
-  downloadCount: 10,
 };
+
+const member = { ...pkg, layer: "top", rankFrame: "downloads", rank: 1, downloadCount: 10 };
 
 describe("migrations", () => {
   test("open creates every table", () => {
@@ -50,23 +49,33 @@ describe("CHECK constraints (defence in depth)", () => {
 
   test("rejects a rank below 1", () => {
     const db = freshDb();
-    expect(() => db.insert(packages).values({ ...pkg, rank: 0 }).run()).toThrow(/CHECK/i);
+    db.insert(packages).values(pkg).run();
+    expect(() => db.insert(sampleMembers).values({ ...member, rank: 0 }).run()).toThrow(/CHECK/i);
     closeDb(db);
   });
 
   test("rejects a negative download count", () => {
     const db = freshDb();
+    db.insert(packages).values(pkg).run();
     expect(() =>
-      db.insert(packages).values({ ...pkg, downloadCount: -1 }).run(),
+      db.insert(sampleMembers).values({ ...member, downloadCount: -1 }).run(),
     ).toThrow(/CHECK/i);
     closeDb(db);
   });
 
-  test("rejects a rank frame outside the two", () => {
+  test("rejects a rank frame outside the three", () => {
     const db = freshDb();
+    db.insert(packages).values(pkg).run();
     expect(() =>
-      db.insert(packages).values({ ...pkg, rankFrame: "stars" }).run(),
+      db.insert(sampleMembers).values({ ...member, rankFrame: "stars" }).run(),
     ).toThrow(/CHECK/i);
+    closeDb(db);
+  });
+
+  test("rejects a sample layer outside the two", () => {
+    const db = freshDb();
+    db.insert(packages).values(pkg).run();
+    expect(() => db.insert(sampleMembers).values({ ...member, layer: "stratified" }).run()).toThrow(/CHECK/i);
     closeDb(db);
   });
 
@@ -118,6 +127,12 @@ describe("CHECK constraints (defence in depth)", () => {
 });
 
 describe("foreign keys", () => {
+  test("a sample member cannot reference a missing package", () => {
+    const db = freshDb();
+    expect(() => db.insert(sampleMembers).values(member).run()).toThrow(/FOREIGN KEY/i);
+    closeDb(db);
+  });
+
   test("a package cannot reference a missing snapshot", () => {
     const db = freshDb();
     expect(() =>

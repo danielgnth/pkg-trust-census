@@ -57,7 +57,7 @@ We would love for you to contribute and help us make improvements in the followi
 
 **How do I report a vulnerability in the Go project?**
 
-Report all security bugs in the Go project by email to [security@golang.org](mailto:security@golang.org). Read [Go’s Security Policy](/security/policy) for more information about our processes.
+Report all security bugs in the Go project by email to [redacted@example.invalid](mailto:redacted@example.invalid). Read [Go’s Security Policy](/security/policy) for more information about our processes.
 
 **How do I add a public vulnerability to the Go vulnerability database?**
 
