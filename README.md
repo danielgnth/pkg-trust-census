@@ -56,7 +56,9 @@ a Google account for deps.dev's public BigQuery dataset (npm and Maven name list
 Personal data in registry responses is removed before anything is published.
 
 - **Paced requests.** Requests are rate-limited per host and honour `Retry-After`. crates.io is held to
-  one request per second, as its crawler policy asks ([`src/http/client.ts`](src/http/client.ts)).
+  one request per second, as its crawler policy asks ([`src/http/client.ts`](src/http/client.ts)). A host
+  that answers HTTP 429 is paused as a whole and slowed down, and after an hour of 429s it is left alone
+  until its block ends rather than retried ([`src/http/limiter.ts`](src/http/limiter.ts)).
 - **Identified traffic.** Every request carries a User-Agent naming this project and repository. To add
   a contact address, as registries recommend:
   ```sh

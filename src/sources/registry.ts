@@ -99,6 +99,8 @@ export const SOURCES = {
   rubygemsSecurityResponse: "https://blog.rubygems.org/2025/08/25/rubygems-security-response.html",
   rubygemsPusher: "https://github.com/rubygems/rubygems.org/blob/master/app/models/pusher.rb",
   rubygemsGemTypo: "https://github.com/rubygems/rubygems.org/blob/master/app/models/gem_typo.rb",
+  rubygemsDeletion: "https://github.com/rubygems/rubygems.org/blob/master/app/models/deletion.rb",
+  rubygemsApiGems: "https://github.com/rubygems/rubygems.org/blob/master/app/controllers/api/v1/rubygems_controller.rb",
   gemPushCommand: "https://github.com/ruby/rubygems/blob/master/lib/rubygems/commands/push_command.rb",
   bundler26: "https://blog.rubygems.org/2024/12/19/bundler-v2-6",
   bundlerEndpointChecksum: "https://github.com/ruby/rubygems/blob/master/lib/bundler/endpoint_specification.rb",

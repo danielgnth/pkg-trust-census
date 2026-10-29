@@ -819,6 +819,26 @@
     "sha256": "ba990a8b497149870c582d3310c9e5eaedf98871143c1ed4b504adc5ecc365fc",
     "archive": "sources/archive/raw.githubusercontent.com_rubygems_rubygems.org_master_app_models_gem_typo.rb"
   },
+  "rubygemsDeletion": {
+    "fetched": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/deletion.rb",
+    "finalUrl": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/models/deletion.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-28T07:25:55.984Z",
+    "title": "deletion.rb",
+    "sha256": "e6ee91cf7d77f033ade509532f49c14f2643e1c53cfaa768eb36a04ece22b208",
+    "archive": "sources/archive/raw.githubusercontent.com_rubygems_rubygems.org_master_app_models_deletion.rb"
+  },
+  "rubygemsApiGems": {
+    "fetched": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/controllers/api/v1/rubygems_controller.rb",
+    "finalUrl": "https://raw.githubusercontent.com/rubygems/rubygems.org/master/app/controllers/api/v1/rubygems_controller.rb",
+    "status": 200,
+    "contentType": "text/plain; charset=utf-8",
+    "accessedAt": "2026-10-28T07:25:56.986Z",
+    "title": "rubygems_controller.rb",
+    "sha256": "a627f99928e0b6d21502f74a504134d891b7594db963ddb60e23d5746d616599",
+    "archive": "sources/archive/raw.githubusercontent.com_rubygems_rubygems.org_master_app_controllers_api_v1_rubygems_controller.rb"
+  },
   "gemPushCommand": {
     "fetched": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/rubygems/commands/push_command.rb",
     "finalUrl": "https://raw.githubusercontent.com/ruby/rubygems/master/lib/rubygems/commands/push_command.rb",

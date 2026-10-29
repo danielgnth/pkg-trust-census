@@ -27,7 +27,7 @@ import { packages, sampleMembers, snapshots } from "./db/schema.ts";
 import { HttpClient, TOOL_VERSION, USER_AGENT } from "./http/client.ts";
 import { ResponseCache } from "./http/cache.ts";
 import { implementedEcosystems } from "./adapters/index.ts";
-import { runRank, snapshotLayers } from "./stages/rank.ts";
+import { RankIncompleteError, runRank, snapshotLayers } from "./stages/rank.ts";
 import { runFetch } from "./stages/fetch.ts";
 import { runExtract } from "./stages/extract.ts";
 import { outDir, runAggregate } from "./stages/aggregate.ts";
@@ -133,6 +133,14 @@ function banner(stage: string, snapshotId: string, ecosystems: EcosystemId[], tr
   );
 }
 
+/** Rate-limit events from the HTTP client: a host blocking, slowing down or recovering. */
+const onHttpEvent = (message: string) => p.log.warn(message);
+
+/** The command that finishes a ranking some registries failed. */
+function rerunRank(snapshotId: string, layer: SampleLayer, n: number, seed: string | undefined, ecosystems: EcosystemId[]): string {
+  return `bun run cli rank --snapshot ${snapshotId} --layer ${layer} --n ${n} --ecosystem ${ecosystems.join(",")}${seed ? ` --seed ${seed}` : ""}`;
+}
+
 function parseLayer(value: string): SampleLayer {
   if (!SAMPLE_LAYERS.includes(value as SampleLayer)) throw new Error(`unknown layer "${value}" (known: ${SAMPLE_LAYERS.join(", ")})`);
   return value as SampleLayer;
@@ -145,6 +153,7 @@ const rank = defineCommand({
     n: { type: "string", description: "sample size per ecosystem", default: "50" },
     layer: { type: "string", description: `which sample to build (${SAMPLE_LAYERS.join(", ")})`, default: "top" },
     seed: { type: "string", description: "seed of the random draw (default: the snapshot id)" },
+    fresh: { type: "boolean", description: "rank or draw again even where the snapshot already has the sample", default: false },
   },
   async run({ args }) {
     const n = Number(args.n);
@@ -158,19 +167,29 @@ const rank = defineCommand({
     const snapshotId = args.snapshot ?? newSnapshotId();
     ensureSnapshot(db, snapshotId, { n, ecosystems: runnable }, TOOL_VERSION);
 
-    const http = new HttpClient({ cache: new ResponseCache(snapshotId) });
+    const http = new HttpClient({ cache: new ResponseCache(snapshotId), onEvent: onHttpEvent });
     await http.cache.load();
     banner("rank", snapshotId, runnable, http.transport.name);
     if (skipped.length) p.log.warn(`no adapter yet: ${skipped.join(", ")}`);
 
     const s = spinner();
     s.start(layer === "top" ? `ranking top ${n}` : `drawing ${n} active packages`);
+    const ranked = (results: Array<{ ecosystem: string; count: number; path: string; reused?: boolean }>) => {
+      for (const r of results) p.log.success(`${r.ecosystem}: ${r.count} → ${r.path}${r.reused ? " (kept from an earlier run)" : ""}`);
+    };
     try {
-      const results = await runRank(runnable, n, snapshotId, db, http, (m) => s.message(m), { layer, seed: args.seed });
+      const results = await runRank(runnable, n, snapshotId, db, http, (m) => s.message(m), { layer, seed: args.seed, fresh: args.fresh });
       s.stop(`${layer}: ${results.reduce((a, r) => a + r.count, 0)} packages`);
-      for (const r of results) p.log.success(`${r.ecosystem}: ${r.count} → ${r.path}`);
+      ranked(results);
     } catch (err) {
-      s.stop("ranking failed");
+      if (!(err instanceof RankIncompleteError)) {
+        s.stop("ranking failed");
+        throw err;
+      }
+      s.stop(`${layer}: ranking incomplete`);
+      ranked(err.results);
+      for (const f of err.failures) p.log.error(`${f.ecosystem}: ${f.error}`);
+      p.log.info(`finish later (kept samples are reused, an interrupted draw continues):\n  ${rerunRank(snapshotId, layer, n, args.seed, err.failures.map((f) => f.ecosystem))}`);
       throw err;
     } finally {
       await http.flush();
@@ -190,7 +209,7 @@ const fetch = defineCommand({
     const db = openDb();
     const snapshotId = await resolveSnapshot(db, args.snapshot);
 
-    const http = new HttpClient({ cache: new ResponseCache(snapshotId) });
+    const http = new HttpClient({ cache: new ResponseCache(snapshotId), onEvent: onHttpEvent });
     await http.cache.load();
     banner("fetch", snapshotId, runnable, http.transport.name);
 
@@ -362,10 +381,25 @@ const run = defineCommand({
     if (!Number.isInteger(random) || random < 0) throw new Error("--random must be a non-negative integer");
     const snapshotId = args.snapshot ?? newSnapshotId();
     const shared = { ecosystem: args.ecosystem, snapshot: snapshotId };
-    await rank.run!({ args: { ...shared, n: args.n, layer: "top" }, rawArgs: [], cmd: rank } as never);
-    if (random > 0) await rank.run!({ args: { ...shared, n: args.random, layer: "random", seed: args.seed }, rawArgs: [], cmd: rank } as never);
+    // A registry whose ranking failed does not hold up the others: they are fetched and extracted,
+    // and the run stops before the report, which would otherwise describe an incomplete sample.
+    const unfinished: string[] = [];
+    const rankLayer = async (layer: SampleLayer, size: number, seed?: string) => {
+      try {
+        await rank.run!({ args: { ...shared, n: String(size), layer, seed, fresh: false }, rawArgs: [], cmd: rank } as never);
+      } catch (err) {
+        if (!(err instanceof RankIncompleteError)) throw err;
+        unfinished.push(rerunRank(snapshotId, layer, size, seed, err.failures.map((f) => f.ecosystem)));
+      }
+    };
+    await rankLayer("top", n);
+    if (random > 0) await rankLayer("random", random, args.seed);
     await fetch.run!({ args: shared, rawArgs: [], cmd: fetch } as never);
     await extract.run!({ args: shared, rawArgs: [], cmd: extract } as never);
+    if (unfinished.length) {
+      const then = ["fetch", "extract", "aggregate", "report"].map((stage) => `bun run cli ${stage} --snapshot ${snapshotId}`);
+      throw new Error(`ranking incomplete, so no aggregate or report yet. Once the registry allows it:\n  ${[...unfinished, ...then].join("\n  ")}`);
+    }
     await aggregate.run!({ args: { snapshot: snapshotId }, rawArgs: [], cmd: aggregate } as never);
     await report.run!({ args: { snapshot: snapshotId }, rawArgs: [], cmd: report } as never);
   },
@@ -429,10 +463,15 @@ const status = defineCommand({
       }
     }
 
+    // Packages of the latest snapshot's samples only: a name dropped by a redraw keeps its row.
     const failures = db
-      .select({ ecosystem: packages.ecosystem, name: packages.packageName, err: packages.fetchError })
+      .selectDistinct({ ecosystem: packages.ecosystem, name: packages.packageName, err: packages.fetchError })
       .from(packages)
-      .where(isNotNull(packages.fetchError))
+      .innerJoin(
+        sampleMembers,
+        and(eq(sampleMembers.snapshotId, packages.snapshotId), eq(sampleMembers.ecosystem, packages.ecosystem), eq(sampleMembers.packageName, packages.packageName)),
+      )
+      .where(and(eq(packages.snapshotId, latestSnapshot(db) ?? ""), isNotNull(packages.fetchError)))
       .limit(5)
       .all();
     for (const f of failures) p.log.error(`${f.ecosystem}/${f.name}: ${f.err}`);

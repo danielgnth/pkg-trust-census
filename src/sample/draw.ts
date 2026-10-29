@@ -9,10 +9,14 @@
  * registry, not the list, decides what is active.
  *
  * The draw is deterministic: the same list and seed give the same order, so a restarted rank
- * stage repeats it, and its activity checks are cache hits.
+ * stage repeats it. A draw that stops part-way (a registry rate-limiting its activity checks) keeps
+ * every check made so far in a journal, and a restart with the same seed replays them without
+ * reading a single response again; a different seed starts the journal over.
  */
 
 import { createHash } from "node:crypto";
+import { appendFile, mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { uniformInt } from "pure-rand/distribution/uniformInt";
 import { xoroshiro128plus } from "pure-rand/generator/xoroshiro128plus";
 import type { Candidate, EcosystemId } from "../types.ts";
@@ -42,6 +46,11 @@ export interface NameList {
   latestRelease?: Map<string, string>;
   /** Why a name missing from `latestRelease` is rejected, when "no release" would mislead. */
   noRelease?: string;
+  /**
+   * Listed names the registry no longer serves as packages (a list read from a dump keeps them), and
+   * why: they are recorded as no package, outside the population, like a name an activity check finds gone.
+   */
+  gone?: { names: Set<string>; reason: string };
   /**
    * A list too long to download whole, served already in draw order by the source (deps.dev's,
    * shuffled inside BigQuery by the seed). `names` is then empty, and the draw reads pages until it
@@ -77,6 +86,8 @@ export interface DrawContext {
   seed: string;
   /** Where name lists and dumps for this snapshot are stored. */
   dir: string;
+  /** Told how a long name list (Go's index crawl) is getting on. */
+  progress?: ((message: string) => void) | undefined;
 }
 
 /**
@@ -123,10 +134,60 @@ export function* shuffled(names: readonly string[], seed: string): Generator<str
   }
 }
 
+/** Thrown when an activity check fails part-way through a draw; the checks made so far are kept. */
+export class DrawInterruptedError extends Error {
+  constructor(ecosystem: EcosystemId, name: string, checked: number, accepted: number, cause: unknown) {
+    const reason = cause instanceof Error ? cause.message : String(cause);
+    super(`${ecosystem}: draw stopped at "${name}" after ${checked} names checked and ${accepted} accepted: ${reason}`, { cause });
+    this.name = "DrawInterruptedError";
+  }
+}
+
+/**
+ * The activity checks a draw has made, one JSON line each after a header naming the seed. A journal
+ * written under another seed is started over.
+ */
+export async function openJournal(path: string, seed: string): Promise<{ known: Map<string, Activity>; add(entries: Array<[string, Activity]>): Promise<void> }> {
+  const known = new Map<string, Activity>();
+  const file = Bun.file(path);
+  const lines = (await file.exists()) ? (await file.text()).split("\n") : [];
+  let header: { seed?: string } | null = null;
+  try {
+    header = lines[0] ? (JSON.parse(lines[0]) as { seed?: string }) : null;
+  } catch {
+    header = null;
+  }
+  if (header?.seed === seed) {
+    for (const line of lines.slice(1)) {
+      if (!line.trim()) continue;
+      try {
+        const { name, ...activity } = JSON.parse(line) as { name: string } & Activity;
+        known.set(name, activity);
+      } catch {
+        // A truncated last line from an interrupted run: that check is made again.
+      }
+    }
+  } else {
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, JSON.stringify({ seed }) + "\n");
+  }
+  return {
+    known,
+    async add(entries) {
+      if (entries.length === 0) return;
+      for (const [name, a] of entries) known.set(name, a);
+      await appendFile(path, entries.map(([name, a]) => JSON.stringify({ name, ...a }) + "\n").join(""));
+    },
+  };
+}
+
 /**
  * Draws `n` active packages. Activity checks run a batch ahead of the walk, so the host's queue
  * stays busy; a name checked past the `n`th acceptance is dropped from the record, as if never
- * checked, and costs nothing on a re-run (it is cached).
+ * checked, and costs nothing on a re-run (it is cached, and in the journal).
+ *
+ * A failed check stops the draw at that name, in walk order, after the batch's other checks are
+ * journaled: a re-run continues exactly there, so the sample is the one an uninterrupted draw makes.
  */
 export async function drawActive(
   source: DrawSource,
@@ -135,11 +196,19 @@ export async function drawActive(
   http: HttpClient,
   ctx: DrawContext,
   onProgress?: (message: string) => void,
+  opts: { journal?: string } = {},
 ): Promise<{ candidates: Candidate[]; record: DrawRecord }> {
-  const list = await source.nameList(http, ctx);
+  onProgress?.(`[${source.ecosystem}] reading the name list`);
+  const list = await source.nameList(http, { ...ctx, progress: onProgress });
   const since = activityWindowStart(ctx.asOf).getTime();
+  // A list that carries its own dates needs no requests, so there is nothing to journal.
+  const journal = opts.journal && !list.latestRelease ? await openJournal(opts.journal, seed) : null;
+  if (journal?.known.size) onProgress?.(`[${source.ecosystem}] resuming: ${journal.known.size} activity checks journaled`);
   const check = async (name: string): Promise<Activity> => {
+    if (list.gone?.names.has(name)) return { latestRelease: null, missing: list.gone.reason };
     if (list.latestRelease) return { latestRelease: list.latestRelease.get(name) ?? null };
+    const known = journal?.known.get(name);
+    if (known) return known;
     if (!source.activity) throw new Error(`${source.ecosystem}: the name list has no dates and there is no activity check`);
     return source.activity(name, http, ctx);
   };
@@ -153,11 +222,21 @@ export async function drawActive(
     const next = await walk.next();
     if (next.done) break;
     const names = next.value;
-    const results = await Promise.all(names.map(check));
+    const settled = await Promise.allSettled(names.map(check));
+    if (journal) {
+      await journal.add(
+        names.flatMap((name, i): Array<[string, Activity]> => {
+          const r = settled[i]!;
+          return r.status === "fulfilled" && !journal.known.has(name) ? [[name, r.value]] : [];
+        }),
+      );
+    }
     for (const [i, name] of names.entries()) {
       if (accepted.length >= n) break;
+      const r = settled[i]!;
+      if (r.status === "rejected") throw new DrawInterruptedError(source.ecosystem, name, checked, accepted.length, r.reason);
       checked++;
-      const a = results[i]!;
+      const a = r.value;
       const t = a.latestRelease ? Date.parse(a.latestRelease) : NaN;
       if (a.missing) rejected.push({ name, reason: a.missing, latestRelease: null, missing: true });
       else if (!Number.isFinite(t)) rejected.push({ name, reason: list.noRelease ?? "no release by the snapshot", latestRelease: null });

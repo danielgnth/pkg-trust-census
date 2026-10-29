@@ -12,6 +12,11 @@ const { HttpClient } = await import("../src/http/client.ts");
 
 afterAll(() => rmSync(TMP, { recursive: true, force: true }));
 
+/** A transport answering from `handler`, for tests that need no real connection. */
+function mock(handler: (req: Request) => Response | Promise<Response>) {
+  return { name: "mock", fetch: async (req: Request) => handler(req) };
+}
+
 /** Minimal origin so tests exercise the real fetch path without touching the network. */
 function serve(handler: (req: Request) => Response | Promise<Response>) {
   return Bun.serve({ port: 0, fetch: handler });
@@ -245,6 +250,70 @@ describe("HttpClient", () => {
     }
   }, 20_000);
 
+  test("a 429 holds back the whole host, not just the request that met it", async () => {
+    let limitedAt = 0;
+    let laterAt = 0;
+    const transport = mock((req) => {
+      if (new URL(req.url).pathname === "/first") {
+        if (limitedAt) return Response.json({ ok: true });
+        limitedAt = Date.now();
+        return new Response("slow down", { status: 429, headers: { "retry-after": "1" } });
+      }
+      laterAt = Date.now();
+      return Response.json({ ok: true });
+    });
+    const http = new HttpClient({ transport, policies: { "limited.test": { rps: 100, concurrency: 4 } } });
+    const first = http.get("https://limited.test/first", { ecosystem: "maven", package: "a" });
+    while (!limitedAt) await Bun.sleep(10);
+    await http.get("https://limited.test/other", { ecosystem: "maven", package: "b" });
+    await first;
+    expect(laterAt - limitedAt).toBeGreaterThanOrEqual(900);
+  }, 20_000);
+
+  test("after a 429 without Retry-After the host waits a backoff and is sent one request at a time", async () => {
+    let n = 0;
+    let active = 0;
+    let peakAfter = 0;
+    const transport = mock(async () => {
+      if (++n === 1) return new Response("slow down", { status: 429 });
+      peakAfter = Math.max(peakAfter, ++active);
+      await Bun.sleep(20);
+      active--;
+      return Response.json({});
+    });
+    const events: string[] = [];
+    const http = new HttpClient({
+      transport,
+      policies: { "limited.test": { rps: 1000, concurrency: 4 } },
+      rateLimit: { firstBlockMs: 300 },
+      onEvent: (m) => events.push(m),
+    });
+    const t0 = Date.now();
+    await http.get("https://limited.test/0", { ecosystem: "go", package: "m" });
+    expect(Date.now() - t0).toBeGreaterThanOrEqual(900); // ky's first retry delay, the block being shorter
+    await Promise.all(Array.from({ length: 6 }, (_, i) => http.get(`https://limited.test/${i + 1}`, { ecosystem: "go", package: "m" })));
+    expect(peakAfter).toBe(1);
+    expect(events[0]).toBe("limited.test: HTTP 429, pausing 0.3 s (backoff), then 500 req/s, one at a time; staying under 800 req/s from now on");
+  }, 20_000);
+
+  test("gives up on a host that keeps rate limiting past the patience, and sends nothing more until the block ends", async () => {
+    let hits = 0;
+    const transport = mock(() => {
+      hits++;
+      return new Response("slow down", { status: 429 });
+    });
+    const http = new HttpClient({ transport, rateLimit: { patienceMs: 300, firstBlockMs: 200, maxBlockMs: 60_000 } });
+    const { RateLimitedError } = await import("../src/http/client.ts");
+    const err = await http.get("https://limited.test/a", { ecosystem: "maven", package: "a" }).catch((e) => e);
+    expect(err).toBeInstanceOf(RateLimitedError);
+    expect(err.message).toMatch(/^limited\.test is rate limiting \(HTTP 429 for \d\.\d s\); not retrying before .* — re-run the stage then$/);
+    expect(hits).toBe(2);
+    // Another request to the host fails at once, without being sent, and is not cached.
+    await expect(http.get("https://limited.test/b", { ecosystem: "maven", package: "b" })).rejects.toBeInstanceOf(RateLimitedError);
+    expect(hits).toBe(2);
+    expect(http.cache.size).toBe(0);
+  }, 20_000);
+
   test("throws once the retry budget is exhausted so it becomes a recorded fetch_error", async () => {
     const srv = serve(() => new Response("down", { status: 500 }));
     try {
@@ -363,6 +432,62 @@ describe("HttpClient", () => {
     } finally {
       srv.stop(true);
     }
+  });
+});
+
+describe("HostLimiter", () => {
+  test("reads Retry-After as seconds or as an HTTP date", async () => {
+    const { parseRetryAfter } = await import("../src/http/limiter.ts");
+    const now = Date.parse("2026-10-26T12:00:00Z");
+    expect(parseRetryAfter("120", now)).toBe(120_000);
+    expect(parseRetryAfter("Mon, 26 Oct 2026 12:05:00 GMT", now)).toBe(300_000);
+    expect(parseRetryAfter("Mon, 26 Oct 2026 11:00:00 GMT", now)).toBe(0);
+    expect(parseRetryAfter("soon", now)).toBeNull();
+    expect(parseRetryAfter(null, now)).toBeNull();
+  });
+
+  test("halves the pace on a 429, then speeds up in steps, staying under the rate that met it", async () => {
+    const { HostLimiter, DEFAULT_RATE_LIMIT } = await import("../src/http/limiter.ts");
+    const events: string[] = [];
+    const l = new HostLimiter("h", { rps: 10, concurrency: 4 }, { ...DEFAULT_RATE_LIMIT, recoverAfter: 3 }, (m) => events.push(m));
+    const ok = (times: number) => {
+      for (let i = 0; i < times; i++) l.observe(i % 2 ? 404 : 200, null);
+    };
+    l.observe(429, "0");
+    expect(l.rate).toBe(5);
+    expect(events.at(-1)).toBe("h: HTTP 429, pausing 0.0 s (Retry-After), then 5 req/s, one at a time; staying under 8 req/s from now on");
+    ok(2);
+    expect(l.rate).toBe(5);
+    ok(1);
+    expect(l.rate).toBe(6);
+    ok(9);
+    expect(l.rate).toBe(8);
+    ok(30);
+    expect(l.rate).toBe(8);
+    expect(events.slice(1)).toEqual(["h: speeding up to 6 req/s", "h: speeding up to 7 req/s", "h: speeding up to 8 req/s"]);
+
+    // A 429 at the ceiling lowers it again.
+    await Bun.sleep(5);
+    l.observe(429, "0");
+    expect(l.rate).toBe(4);
+    expect(events.at(-1)).toEndWith("staying under 6.4 req/s from now on");
+  });
+
+  test("a 503 with Retry-After pauses the host but does not slow it down", async () => {
+    const { HostLimiter, DEFAULT_RATE_LIMIT } = await import("../src/http/limiter.ts");
+    const events: string[] = [];
+    const l = new HostLimiter("h", { rps: 10, concurrency: 4 }, { ...DEFAULT_RATE_LIMIT, recoverAfter: 1 }, (m) => events.push(m));
+    l.observe(503, "0");
+    expect(l.rate).toBe(10);
+    expect(events).toEqual([]);
+  });
+
+  test("a 429 with a Retry-After beyond the patience gives up at once", async () => {
+    const { HostLimiter, DEFAULT_RATE_LIMIT } = await import("../src/http/limiter.ts");
+    const l = new HostLimiter("h", { rps: 10, concurrency: 4 }, { ...DEFAULT_RATE_LIMIT, patienceMs: 60_000 });
+    l.observe(429, "3600");
+    expect(l.givenUp).toBe(true);
+    await expect(l.run(async () => "sent")).rejects.toThrow(/^h is rate limiting \(HTTP 429\); not retrying before /);
   });
 });
 

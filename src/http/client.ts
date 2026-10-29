@@ -1,6 +1,6 @@
 /**
  * The shared fetch path for every adapter: identifies the project, paces itself per host
- * (p-queue), retries transient failures (ky), and writes every response through the cache.
+ * (`HostLimiter`), retries transient failures (ky), and writes every response through the cache.
  *
  * Two behaviours matter for data integrity:
  *  - A 404 is a *fact* (the package or file does not exist) and is cached and returned.
@@ -10,13 +10,15 @@
  */
 
 import ky, { HTTPError } from "ky";
-import PQueue from "p-queue";
 import { createHash } from "node:crypto";
 import { mkdir, rename } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { EcosystemId, FetchResult } from "../types.ts";
 import { ResponseCache, sha256 } from "./cache.ts";
 import { defaultTransport, type Transport } from "./transport.ts";
+import { DEFAULT_RATE_LIMIT, HostLimiter, RateLimitedError, RETRYABLE, type HostPolicy, type RateLimitOptions } from "./limiter.ts";
+
+export { RateLimitedError, type HostPolicy } from "./limiter.ts";
 
 export const TOOL_VERSION = "0.1.0";
 
@@ -32,15 +34,11 @@ export const USER_AGENT =
     (process.env.PKG_TRUST_CONTACT ? `; ${process.env.PKG_TRUST_CONTACT}` : "") +
     ")";
 
-/** Retried: transient by nature. Anything else is returned to the caller as-is. */
-const RETRYABLE = [408, 425, 429, 500, 502, 503, 504];
-
-export interface HostPolicy {
-  /** Requests per second. */
-  rps: number;
-  /** Max in-flight requests to this host. */
-  concurrency: number;
-}
+/**
+ * ky's own cap on attempts. Server errors and transport failures get `maxRetries`; a 429 is retried
+ * until the host's limiter gives up on it, which its patience bounds.
+ */
+const RETRY_CEILING = 100;
 
 export const DEFAULT_POLICY: HostPolicy = { rps: 4, concurrency: 4 };
 
@@ -57,7 +55,8 @@ export const HOST_POLICIES: Record<string, HostPolicy> = {
   "packages.ecosyste.ms": { rps: 2, concurrency: 2 },
   "packagist.org": { rps: 2, concurrency: 2 },
   "search.maven.org": { rps: 2, concurrency: 2 },
-  "repo1.maven.org": { rps: 4, concurrency: 4 },
+  // Central limits its heaviest consumers and lowers the thresholds over time; a draw at 4 req/s met 429.
+  "repo1.maven.org": { rps: 2, concurrency: 2 },
   "sum.golang.org": { rps: 4, concurrency: 4 },
   "proxy.golang.org": { rps: 4, concurrency: 4 },
   "pypi.org": { rps: 5, concurrency: 5 },
@@ -72,7 +71,8 @@ export const HOST_POLICIES: Record<string, HostPolicy> = {
   // The random draw's activity checks and bulk inputs (src/sample/sources.ts).
   "repo.packagist.org": { rps: 4, concurrency: 4 },
   // Pages are sequential within a month of the index, so months are crawled side by side.
-  "index.golang.org": { rps: 4, concurrency: 4 },
+  // The crawl met 429 at 4 req/s.
+  "index.golang.org": { rps: 2, concurrency: 2 },
   "static.crates.io": { rps: 1, concurrency: 1 },
   "s3-us-west-2.amazonaws.com": { rps: 1, concurrency: 1 },
 };
@@ -96,7 +96,9 @@ export class HttpClient {
   readonly transport: Transport;
   #ky: typeof ky;
   #policies: Record<string, HostPolicy>;
-  #queues = new Map<string, PQueue>();
+  #rateLimit: RateLimitOptions;
+  #onEvent: ((message: string) => void) | undefined;
+  #limiters = new Map<string, HostLimiter>();
 
   stats = { fetched: 0, cacheHits: 0, retries: 0, errors: 0 };
 
@@ -107,54 +109,70 @@ export class HttpClient {
       transport?: Transport;
       /** Per-host overrides of HOST_POLICIES. */
       policies?: Record<string, HostPolicy>;
+      /** Overrides of how long and how a rate-limited host is waited for. */
+      rateLimit?: Partial<RateLimitOptions>;
+      /** Told when a host rate-limits, slows down or recovers. */
+      onEvent?: (message: string) => void;
     } = {},
   ) {
     this.cache = opts.cache ?? new ResponseCache();
     this.transport = opts.transport ?? defaultTransport();
     this.#policies = { ...HOST_POLICIES, ...opts.policies };
+    this.#rateLimit = { ...DEFAULT_RATE_LIMIT, ...opts.rateLimit };
+    this.#onEvent = opts.onEvent;
+    const maxRetries = opts.maxRetries ?? 4;
     this.#ky = ky.create({
       // Every attempt, retries included, waits for its host's next slot.
       fetch: (request) => this.#paced(request),
       headers: { "User-Agent": USER_AGENT },
       timeout: 120_000,
       retry: {
-        limit: opts.maxRetries ?? 4,
+        limit: RETRY_CEILING,
         statusCodes: RETRYABLE,
         // POST is only used for queries (OSV), which are safe to repeat.
         methods: ["get", "head", "post"],
-        // Exponential with jitter, capped so a long run cannot stall for minutes.
+        // Exponential with jitter, capped so a long run cannot stall for minutes. A rate-limited
+        // host's block is waited out by its limiter, before the retry is sent.
         delay: (attempt) => 1000 * 2 ** (attempt - 1),
         backoffLimit: 30_000,
+        maxRetryAfter: this.#rateLimit.patienceMs,
         jitter: (d) => d + Math.random() * 250,
         retryOnTimeout: true,
-        // A transport failure (connection reset, curl exit) is as transient as a 503.
-        shouldRetry: ({ error }) => (error instanceof HTTPError ? undefined : true),
+        shouldRetry: ({ error, retryCount }) => {
+          if (error instanceof RateLimitedError) return false;
+          if (error instanceof HTTPError && error.response.status === 429) return !this.#limiter(new URL(error.request.url).host).givenUp;
+          if (retryCount > maxRetries) return false;
+          // A transport failure (connection reset, curl exit) is as transient as a 503.
+          return error instanceof HTTPError ? undefined : true;
+        },
       },
     });
   }
 
-  /** One queue per host: at most `concurrency` in flight, starts spaced 1/rps apart. */
-  #queue(host: string): PQueue {
-    let q = this.#queues.get(host);
-    if (!q) {
-      const { rps, concurrency } = this.#policies[host] ?? DEFAULT_POLICY;
-      q = new PQueue({ concurrency, intervalCap: 1, interval: 1000 / rps, strict: true });
-      this.#queues.set(host, q);
+  /** One limiter per host: at most `concurrency` in flight, starts spaced 1/rps apart, blocks on 429. */
+  #limiter(host: string): HostLimiter {
+    let l = this.#limiters.get(host);
+    if (!l) {
+      l = new HostLimiter(host, this.#policies[host] ?? DEFAULT_POLICY, this.#rateLimit, this.#onEvent);
+      this.#limiters.set(host, l);
     }
-    return q;
+    return l;
   }
 
   async #paced(request: Request): Promise<Response> {
-    const q = this.#queue(new URL(request.url).host);
-    const res = await q.add(() => this.transport.fetch(request));
-    // ky waits out Retry-After for this request; pausing the queue holds back the rest of
-    // the host's traffic too, which is what the header asks for.
-    const retryAfter = Number(res.headers.get("retry-after"));
-    if (RETRYABLE.includes(res.status) && retryAfter > 0) {
-      q.pause();
-      setTimeout(() => q.start(), retryAfter * 1000);
-    }
+    const limiter = this.#limiter(new URL(request.url).host);
+    const res = await limiter.run(() => this.transport.fetch(request));
+    limiter.observe(res.status, res.headers.get("retry-after"));
     return res;
+  }
+
+  /** The error to report for a failed request: a host that is rate limiting says so, and until when. */
+  #failure(url: string, attempts: number, err: unknown): Error {
+    if (err instanceof RateLimitedError) return err;
+    const limiter = this.#limiter(new URL(url).host);
+    if (err instanceof HTTPError && err.response.status === 429 && limiter.givenUp) return limiter.error();
+    const reason = err instanceof HTTPError ? `HTTP ${err.response.status}` : err instanceof Error ? err.message : String(err);
+    return new Error(`fetch failed after ${attempts} attempts: ${url}: ${reason}`);
   }
 
   async get(url: string, opts: RequestOptions): Promise<FetchResult> {
@@ -190,8 +208,7 @@ export class HttpClient {
       if (err instanceof HTTPError && !RETRYABLE.includes(err.response.status)) {
         throw new Error(`unexpected HTTP ${err.response.status} for ${url}`);
       }
-      const reason = err instanceof HTTPError ? `HTTP ${err.response.status}` : err instanceof Error ? err.message : String(err);
-      throw new Error(`fetch failed after ${attempts} attempts: ${url}: ${reason}`);
+      throw this.#failure(url, attempts, err);
     }
 
     // A HEAD has no body, so the headers worth keeping become the cached body. The
@@ -231,8 +248,7 @@ export class HttpClient {
       });
     } catch (err) {
       this.stats.errors++;
-      const reason = err instanceof HTTPError ? `HTTP ${err.response.status}` : err instanceof Error ? err.message : String(err);
-      throw new Error(`fetch failed after ${attempts} attempts: ${url}: ${reason}`);
+      throw this.#failure(url, attempts, err);
     }
   }
 
@@ -250,7 +266,7 @@ export class HttpClient {
     const partial = `${dest}.partial`;
     const fetchedAt = new Date().toISOString();
     if (this.transport.download) {
-      await this.#queue(new URL(url).host).add(() => this.transport.download!(url, partial, { "User-Agent": USER_AGENT, ...opts.headers }));
+      await this.#limiter(new URL(url).host).run(() => this.transport.download!(url, partial, { "User-Agent": USER_AGENT, ...opts.headers }));
     } else {
       const res = await this.request(url, opts);
       if (!res.body) throw new Error(`empty body: ${url}`);
