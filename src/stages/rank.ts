@@ -5,10 +5,14 @@
  * full name list (src/sample/draw.ts). Either way the stage writes the candidate list to
  * `data/rankings/` (the record of who was sampled and why) and seeds `packages` and
  * `sample_members`. Later stages fill in the rest of each package row.
+ *
+ * Re-running the stage on a snapshot keeps every sample it already has with the same size (and, for a
+ * draw, the same seed), and continues an interrupted draw from its journal. One registry failing does
+ * not stop the others; the stage ends with `RankIncompleteError` naming the ones still to do.
  */
 
 import { and, asc, eq } from "drizzle-orm";
-import { mkdir } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { SAMPLE_LAYERS, type Candidate, type EcosystemId, type SampleLayer } from "../types.ts";
 import type { HttpClient } from "../http/client.ts";
@@ -25,12 +29,32 @@ export interface RankResult {
   layer: SampleLayer;
   count: number;
   path: string;
+  /** Kept from an earlier run of the stage on this snapshot, not ranked or drawn again. */
+  reused?: boolean;
 }
 
 export interface RankOptions {
   layer?: SampleLayer;
   /** Seed of the random draw; defaults to the snapshot id, so a snapshot names its own draw. */
   seed?: string | undefined;
+  /** Rank or draw again even where the snapshot already has the sample, discarding draw journals. */
+  fresh?: boolean;
+}
+
+export interface RankFailure {
+  ecosystem: EcosystemId;
+  error: string;
+}
+
+/** Some registries were ranked, others failed; the failures are re-run on their own later. */
+export class RankIncompleteError extends Error {
+  constructor(
+    readonly results: RankResult[],
+    readonly failures: RankFailure[],
+  ) {
+    super(`ranking incomplete for ${failures.map((f) => f.ecosystem).join(", ")}`);
+    this.name = "RankIncompleteError";
+  }
 }
 
 export function rankingPath(ecosystem: EcosystemId, snapshotId: string, layer: SampleLayer): string {
@@ -40,6 +64,33 @@ export function rankingPath(ecosystem: EcosystemId, snapshotId: string, layer: S
 /** Where a snapshot's name lists and dumps are stored, with their checksums. */
 export function namesDir(snapshotId: string): string {
   return join(dataDir(), "names", snapshotId);
+}
+
+/** The draw's journal of activity checks, so an interrupted draw resumes (src/sample/draw.ts). */
+export function journalPath(snapshotId: string, ecosystem: EcosystemId): string {
+  return join(namesDir(snapshotId), `${ecosystem}-draw.jsonl`);
+}
+
+interface StoredRanking {
+  layer: SampleLayer;
+  requested_n: number;
+  returned: number;
+  draw?: { seed: string };
+  candidates: Candidate[];
+}
+
+/** The sample an earlier run of the stage wrote for this layer, if it was made the same way. */
+async function storedRanking(path: string, layer: SampleLayer, n: number, seed: string): Promise<Candidate[] | null> {
+  const file = Bun.file(path);
+  if (!(await file.exists())) return null;
+  try {
+    const stored = (await file.json()) as StoredRanking;
+    if (stored.layer !== layer || stored.requested_n !== n || stored.returned !== stored.candidates.length) return null;
+    if (layer === "random" && stored.draw?.seed !== seed) return null;
+    return stored.candidates;
+  } catch {
+    return null;
+  }
 }
 
 export async function runRank(
@@ -61,6 +112,7 @@ export async function runRank(
   const seed = opts.seed ?? snapshotId;
   const ctx = { snapshotId, asOf: snapshotAsOf(db, snapshotId), dir: namesDir(snapshotId), seed };
 
+  const failures: RankFailure[] = [];
   for (const eco of ecosystems) {
     const adapter = getAdapter(eco);
     if (!adapter) {
@@ -68,23 +120,41 @@ export async function runRank(
       continue;
     }
 
-    let candidates: Candidate[];
-    let record: Record<string, unknown>;
-    if (layer === "top") {
-      candidates = await adapter.rank(n, http);
-      record = { rank_frame: adapter.rankFrame };
-    } else {
-      const source = getDrawSource(eco);
-      if (!source) {
-        onProgress?.(`[${eco}] no name list for a random draw yet — skipping`);
-        continue;
-      }
-      const drawn = await drawActive(source, n, seed, http, ctx, onProgress);
-      candidates = drawn.candidates;
-      record = { rank_frame: "random", draw: drawn.record };
+    const path = rankingPath(eco, snapshotId, layer);
+    if (opts.fresh) await rm(journalPath(snapshotId, eco), { force: true });
+    const stored = opts.fresh ? null : await storedRanking(path, layer, n, seed);
+    if (stored) {
+      // Written again in case an interrupted run wrote the file but not the rows.
+      persistCandidates(db, snapshotId, eco, layer, stored);
+      results.push({ ecosystem: eco, layer, count: stored.length, path, reused: true });
+      onProgress?.(`[${eco}] ${layer}: kept the ${stored.length} already in ${path}`);
+      continue;
     }
 
-    const path = rankingPath(eco, snapshotId, layer);
+    let candidates: Candidate[];
+    let record: Record<string, unknown>;
+    try {
+      if (layer === "top") {
+        candidates = await adapter.rank(n, http);
+        record = { rank_frame: adapter.rankFrame };
+      } else {
+        const source = getDrawSource(eco);
+        if (!source) {
+          onProgress?.(`[${eco}] no name list for a random draw yet — skipping`);
+          continue;
+        }
+        const drawn = await drawActive(source, n, seed, http, ctx, onProgress, { journal: journalPath(snapshotId, eco) });
+        candidates = drawn.candidates;
+        record = { rank_frame: "random", draw: drawn.record };
+      }
+    } catch (err) {
+      // One registry rate-limiting or down must not cost the others their sample.
+      const error = err instanceof Error ? err.message : String(err);
+      failures.push({ ecosystem: eco, error });
+      onProgress?.(`[${eco}] ${layer} failed: ${error}`);
+      continue;
+    }
+
     await Bun.write(
       path,
       JSON.stringify(
@@ -108,6 +178,7 @@ export async function runRank(
     onProgress?.(`[${eco}] ${layer}: ${candidates.length} -> ${path}`);
   }
 
+  if (failures.length) throw new RankIncompleteError(results, failures);
   return results;
 }
 

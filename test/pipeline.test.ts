@@ -15,7 +15,7 @@ const { HttpClient } = await import("../src/http/client.ts");
 const { ResponseCache } = await import("../src/http/cache.ts");
 const { openDb, closeDb } = await import("../src/db/open.ts");
 const { packages, packageVersions, sampleMembers, versionSignals, signalAvailability, advisoryMatches } = await import("../src/db/schema.ts");
-const { runRank } = await import("../src/stages/rank.ts");
+const { RankIncompleteError, runRank } = await import("../src/stages/rank.ts");
 const { runFetch } = await import("../src/stages/fetch.ts");
 const { runExtract } = await import("../src/stages/extract.ts");
 const { runAggregate } = await import("../src/stages/aggregate.ts");
@@ -238,6 +238,36 @@ describe("pipeline", () => {
     const csv = await Bun.file(join(dir, "signals.csv")).text();
     expect(csv.split("\n")[0]).toStartWith("ecosystem,package,version");
     expect(await Bun.file(join(dir, "charts/adoption-build_provenance.svg")).text()).toStartWith("<svg");
+    closeDb(db);
+  });
+
+  test("one registry failing does not stop the others, and a re-run keeps every sample made the same way", async () => {
+    const db = openDb(":memory:");
+    // npm's registry is down; PyPI answers.
+    const npmDown: Transport = { name: "mock", fetch: (req) => (new URL(req.url).host.includes("npmjs") ? Promise.reject(new Error("connection reset")) : transport.fetch(req)) };
+    const http = new HttpClient({ transport: npmDown, cache: new ResponseCache(), maxRetries: 0 });
+    const err = await runRank(["npm", "pypi"], 2, "snap-rerank", db, http).catch((e) => e);
+    expect(err).toBeInstanceOf(RankIncompleteError);
+    expect(err.failures).toMatchObject([{ ecosystem: "npm" }]);
+    expect(err.results).toMatchObject([{ ecosystem: "pypi", layer: "top", count: 2 }]);
+    await runRank(["pypi"], 5, "snap-rerank", db, http, undefined, { layer: "random", seed: "fixed" });
+
+    // Run again without a network: both PyPI samples are kept, not ranked or drawn again.
+    const offline = new HttpClient({ cache: new ResponseCache(), transport: { name: "none", fetch: () => Promise.reject(new Error("no network")) }, maxRetries: 0 });
+    const [top] = await runRank(["pypi"], 2, "snap-rerank", db, offline);
+    const [random] = await runRank(["pypi"], 5, "snap-rerank", db, offline, undefined, { layer: "random", seed: "fixed" });
+    expect(top).toMatchObject({ count: 2, reused: true });
+    expect(random).toMatchObject({ count: 2, reused: true });
+    expect(db.select().from(sampleMembers).all()).toHaveLength(4);
+
+    // Another seed, another size or --fresh makes the sample again.
+    const redraw = await runRank(["pypi"], 5, "snap-rerank", db, offline, undefined, { layer: "random", seed: "other" }).catch((e) => e);
+    expect(redraw).toBeInstanceOf(RankIncompleteError);
+    const [smaller] = await runRank(["pypi"], 1, "snap-rerank", db, http);
+    expect(smaller).toMatchObject({ count: 1 });
+    expect(smaller!.reused).toBeUndefined();
+    const [fresh] = await runRank(["pypi"], 1, "snap-rerank", db, http, undefined, { fresh: true });
+    expect(fresh!.reused).toBeUndefined();
     closeDb(db);
   });
 

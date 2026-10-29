@@ -4,7 +4,7 @@
  *
  *   PyPI       Simple API root (every project)          activity: the project's Simple API page
  *   crates.io  daily database dump                      activity: from the dump
- *   RubyGems   weekly PostgreSQL dump                   activity: from the dump
+ *   RubyGems   weekly PostgreSQL dump                   activity: from the dump (a gem with no indexed version is gone)
  *   Go         module index, over the activity window   activity: from the index
  *   Packagist  packages/list.json                       activity: the package's p2 metadata
  *   npm        deps.dev BigQuery                        activity: the packument
@@ -120,12 +120,14 @@ const rubygems: DrawSource = {
   async nameList(http, ctx) {
     const key = await rubygemsDumpKey(http, ctx.asOf);
     const file = await http.download(`${RUBYGEMS_DUMPS}/${key}`, join(ctx.dir, "rubygems-public_postgresql.tar"));
-    const latest = await derived(file, `latest-${ctx.asOf.toISOString()}`, () => rubygemsLatest(file.path!, ctx.asOf));
+    const latest = await derived(file, `indexed-latest-${ctx.asOf.toISOString()}`, () => rubygemsLatest(file.path!, ctx.asOf));
     return {
       names: latest.names,
       latestRelease: new Map(latest.releases),
+      // Yanking unindexes a version, and RubyGems answers 404 for a gem with no indexed version left.
+      gone: { names: new Set(latest.gone), reason: "every version yanked or removed (none indexed)" },
       files: [publicFile(file)],
-      method: "RubyGems.org weekly PostgreSQL dump: rubygems, and versions.created_at",
+      method: "RubyGems.org weekly PostgreSQL dump: rubygems, and versions.created_at and indexed",
     };
   },
 };
@@ -176,6 +178,8 @@ interface Latest {
   names: string[];
   /** [name, newest release at or before the snapshot]; names without one are absent. */
   releases: Array<[string, string]>;
+  /** Names the registry no longer serves as packages, though the list still holds them. */
+  gone?: string[];
 }
 
 /** Newest `created_at` per crate from the dump's `crates.csv` and `versions.csv`, read in one pass. */
@@ -226,10 +230,15 @@ async function rubygemsDumpKey(http: HttpClient, asOf: Date): Promise<string> {
   return dated[0].key;
 }
 
-/** Newest `versions.created_at` per gem, from the `COPY` blocks of the dump's SQL. */
+/**
+ * Newest `versions.created_at` per gem, from the `COPY` blocks of the dump's SQL, yanked versions
+ * included; and the gems with versions but none still indexed, which RubyGems no longer serves.
+ */
 export async function rubygemsLatest(path: string, asOf: Date): Promise<Latest> {
   const names = new Map<string, string>();
   const newest = new Map<string, string>();
+  const withVersions = new Set<string>();
+  const indexed = new Set<string>();
   const tar = extract();
   createReadStream(path).pipe(tar);
   for await (const entry of tar) {
@@ -254,6 +263,8 @@ export async function rubygemsLatest(path: string, asOf: Date): Promise<Latest> 
       if (block.table === "rubygems") names.set(col("id")!, col("name")!);
       else {
         const id = col("rubygem_id")!;
+        withVersions.add(id);
+        if (col("indexed") === "t") indexed.add(id);
         const t = newestBefore([newest.get(id), pgTime(col("created_at"))], asOf);
         if (t) newest.set(id, t);
       }
@@ -263,6 +274,7 @@ export async function rubygemsLatest(path: string, asOf: Date): Promise<Latest> 
   return {
     names: [...names.values()],
     releases: [...newest].flatMap(([id, t]): Array<[string, string]> => (names.has(id) ? [[names.get(id)!, t]] : [])),
+    gone: [...withVersions].filter((id) => !indexed.has(id) && names.has(id)).map((id) => names.get(id)!),
   };
 }
 
@@ -313,7 +325,16 @@ async function crawlGoIndex(http: HttpClient, ctx: DrawContext): Promise<BulkFil
   }
   const fetchedAt = new Date().toISOString();
   const files = months.map((_, i) => join(parts, `${String(i).padStart(2, "0")}.jsonl`));
-  await Promise.all(months.map((m, i) => crawlGoMonth(http, m.from, m.to, m.last, files[i]!)));
+  // How far each month's cursor has got through it, for progress.
+  const share = months.map(() => 0);
+  const report = (i: number, cursor: string, done: boolean) => {
+    const { from, to } = months[i]!;
+    share[i] = done ? 1 : Math.min(1, Math.max(0, (Date.parse(cursor) - from.getTime()) / (to.getTime() - from.getTime())));
+    const finished = share.filter((s) => s === 1).length;
+    const pct = Math.round((share.reduce((a, s) => a + s, 0) / months.length) * 100);
+    ctx.progress?.(`[go] index.golang.org: ${finished}/${months.length} months crawled, ${pct}% of the window`);
+  };
+  await Promise.all(months.map((m, i) => crawlGoMonth(http, m.from, m.to, m.last, files[i]!, (cursor, done) => report(i, cursor, done))));
 
   const sink = Bun.file(path).writer();
   for (const f of files) for await (const chunk of Bun.file(f).stream()) sink.write(chunk);
@@ -331,12 +352,20 @@ interface IndexEntry {
 }
 
 /** One month of the index, [from, to) (the last month includes `to`, the snapshot instant). */
-async function crawlGoMonth(http: HttpClient, from: Date, to: Date, inclusive: boolean, file: string): Promise<void> {
+async function crawlGoMonth(
+  http: HttpClient,
+  from: Date,
+  to: Date,
+  inclusive: boolean,
+  file: string,
+  onPage?: (cursor: string, done: boolean) => void,
+): Promise<void> {
   const cursorFile = Bun.file(`${file}.cursor`);
   // `atCursor`: versions already written at the cursor's timestamp, which the next page repeats.
   let state = (await cursorFile.exists())
     ? ((await cursorFile.json()) as { cursor: string; atCursor: string[]; done: boolean })
     : { cursor: from.toISOString(), atCursor: [] as string[], done: false };
+  onPage?.(state.cursor, state.done);
   const end = to.getTime();
   while (!state.done) {
     const body = await (await http.request(`${GO_INDEX}?since=${state.cursor}&limit=${GO_PAGE}`)).text();
@@ -364,6 +393,7 @@ async function crawlGoMonth(http: HttpClient, from: Date, to: Date, inclusive: b
     if (lines.length) await appendFile(file, lines.join(""));
     state = { cursor, atCursor: [...atCursor], done };
     await Bun.write(cursorFile, JSON.stringify(state));
+    onPage?.(state.cursor, state.done);
   }
   if (!(await Bun.file(file).exists())) await Bun.write(file, "");
 }

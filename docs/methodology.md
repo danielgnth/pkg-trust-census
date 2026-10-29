@@ -48,7 +48,8 @@ measure rare signals. Prior work measured whole registries, and sampled where a 
 Schorlemmer et al. (IEEE S&P 2024) measured a random tenth of Maven Central.
 
 **Population.** A package is *active* if the registry lists at least one release published in the 36 months
-before the snapshot. Yanked releases count; deleted ones cannot.
+before the snapshot. Yanked releases count; deleted ones cannot. A package the registry no longer serves is
+no package, even if a name list still holds it.
 "Active" keeps out the long tail of abandoned and empty packages, which would push every signal towards 0% and
 say little.
 
@@ -66,7 +67,7 @@ recorded too, and left out of the share of active packages the draw estimates.
 | PyPI | Simple API root (every project) | the project's releases, dated by their earliest file |
 | npm | deps.dev `PackageVersions` | packument `time`, versions still published |
 | crates.io | daily database dump, `crates.csv` | the dump's `versions.csv` `created_at` |
-| RubyGems | weekly PostgreSQL dump (sanitized of user data) | the dump's `versions.created_at` |
+| RubyGems | weekly PostgreSQL dump (sanitized of user data) | the dump's `versions.created_at`; no indexed version left: no package |
 | Go | module index, over the window | the index's time of each tagged version |
 | Maven Central | deps.dev `PackageVersions` | `maven-metadata.xml` `<lastUpdated>` |
 | Packagist | `packages/list.json` | p2 metadata, tagged releases |
@@ -79,11 +80,22 @@ window only: a module without a version there is inactive anyway. Its time is wh
 cached a version, not when the version was tagged; the two differ for versions fetched long after tagging.
 A pseudo-version is a commit, not a release, and does not make a module active.
 
+RubyGems' dump keeps gems whose every version has been yanked or removed, but RubyGems no longer serves them:
+yanking unindexes a version (source `rubygemsDeletion`), and the gems API answers 404 for a gem with no
+indexed version (source `rubygemsApiGems`). Such a gem is therefore recorded as no package, like a PyPI
+project deleted since the list was made, and the draw moves on to the next name. A yanked version still dates
+a gem that keeps an indexed one. The rule exists because without it the snapshot of 25 October 2026 drew 413
+such gems among its 1000 RubyGems packages. All 413 answered 404 during `fetch` and none had an indexed
+version in the dump, while each of the 587 gems that answered had one. Most were single-version gems published
+in March and April 2024 under generated-looking names. Left in, they would have cut the RubyGems layer to
+587 measurable packages against 1000 elsewhere, with 413 empty rows, and the share of active packages the
+draw estimates would have counted packages nobody can install.
+
 The random layer is backfilled over the same quarters as the top layer (from 2024Q1). Packages that are still publishing are
 followed back, but those quarters describe *today's* active packages in the past, not the registry as it was
 then (survivorship). Spam packages, which some registries host in large numbers, are part of the population
 and stay in the sample: filtering them would need a classifier, and a random sample full of spam is a
-finding in itself.
+finding in itself. Spam the registry has since removed is no package, though (RubyGems, above).
 
 ### Statistics
 

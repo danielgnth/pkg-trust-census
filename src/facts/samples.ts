@@ -56,8 +56,13 @@ export const SAMPLE_NOTES: MethodNote[] = [
   {
     label: "RubyGems",
     ecosystem: "rubygems",
-    note: "Names and release dates come from the weekly PostgreSQL dump taken before the snapshot: the `rubygems` table, and `created_at` in `versions`, yanked versions included.",
-    sources: [cite("rubygemsDataDumps", "We provide weekly dumps of the RubyGems.org PostgreSQL data. This dump is sanitized, removing all user information.")],
+    note: "Names and release dates come from the weekly PostgreSQL dump taken before the snapshot: the `rubygems` table, and `created_at` in `versions`, yanked versions included. A gem none of whose versions is still indexed (all yanked or removed) is no package: yanking unindexes a version, and the gems API answers 404 for a gem without an indexed version.",
+    sources: [
+      cite("rubygemsDataDumps", "We provide weekly dumps of the RubyGems.org PostgreSQL data. This dump is sanitized, removing all user information."),
+      cite("rubygemsDeletion", "version.update!(indexed: false, yanked_at: Time.now.utc)"),
+      cite("rubygemsApiGems", "if @rubygem.hosted? && @rubygem.public_versions.indexed.present?"),
+      cite("rubygemsApiGems", "render plain: t(:this_rubygem_could_not_be_found), status: :not_found"),
+    ],
   },
   {
     label: "Go",

@@ -60,7 +60,7 @@ months before the snapshot; [methodology](methodology.md#random-sample)). Inputs
 | PyPI | `GET /simple/` (PEP 691 JSON, 45 MB): `projects[].name` | the project's Simple API page (the adapter's first request): newest release, dated by its earliest file |
 | npm | deps.dev BigQuery `PackageVersions`, `System = 'NPM'` | the packument (the adapter's request): `time` of versions still in `versions` |
 | crates.io | `static.crates.io/db-dump.tar.gz` (daily, 2 GB): `crates.csv` | from the dump: newest `versions.csv` `created_at` |
-| RubyGems | weekly PostgreSQL dump (680 MB), the newest taken before the snapshot: `rubygems` | from the dump: newest `versions.created_at` |
+| RubyGems | weekly PostgreSQL dump (680 MB), the newest taken before the snapshot: `rubygems` | from the dump: newest `versions.created_at`, yanked versions included; a gem with no `versions.indexed` left is no package |
 | Go | `index.golang.org/index?since=…`, paged 2,000 at a time over the window | from the index: newest non-pseudo version's `Timestamp` |
 | Maven Central | deps.dev BigQuery `PackageVersions`, `System = 'MAVEN'` | `maven-metadata.xml` (the adapter's request): `<lastUpdated>` |
 | Packagist | `GET /packages/list.json`: `packageNames` | `repo.packagist.org/p2/{p}.json`: `time` of tagged releases |

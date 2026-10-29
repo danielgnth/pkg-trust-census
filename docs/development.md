@@ -53,6 +53,7 @@ Or stage by stage. Each stage can be re-run on its own and is keyed by snapshot 
 ```sh
 bun run cli rank      --ecosystem pypi,npm --n 500
 bun run cli rank      --snapshot <id> --layer random --n 1000   # [--seed s], default: the snapshot id
+bun run cli rank      --snapshot <id> --layer random --n 1000 --fresh   # draw again, discarding the kept one
 bun run cli fetch     --snapshot <id>     # omit --snapshot to continue the latest
 bun run cli extract   --snapshot <id>
 bun run cli aggregate --snapshot <id>
@@ -60,7 +61,9 @@ bun run cli report    --snapshot <id>
 ```
 
 `rank` and `fetch` are the stages that touch the network (`registry` and `publish --upload` aside), and
-both skip anything already cached, so an interrupted run resumes for free. After each package's registry
+both skip anything already cached, so an interrupted run resumes for free. Re-running `rank` on a snapshot
+keeps every sample it already has of the same size (and, for a draw, the same seed); `--fresh` makes it
+again. After each package's registry
 responses, `fetch` asks OSV about that package's versions. `extract` is pure, so parsers can be refined and
 re-run offline without re-hitting any registry.
 
@@ -75,15 +78,29 @@ exactly those.
 
 The random draw downloads its inputs once per snapshot into `data/names/{snapshot}/`: PyPI's project list
 (45 MB), Packagist's (12 MB), the crates.io dump (2 GB) and the RubyGems dump (680 MB), and it crawls Go's
-module index over the 36-month window, month by month, four months at a time, which still takes hours.
+module index over the 36-month window, month by month, two months at a time, which still takes hours.
 Each is stored with its sha256 and reused on a restart, and each month of the Go crawl resumes from its own
-cursor. The draw itself is seeded, so a restarted `rank` repeats it with cache hits. The rank stage writes
-each layer's sample in one transaction, so an interrupted draw leaves no partial sample.
+cursor. The draw itself is seeded, and every activity check it makes is kept in a journal
+(`data/names/{snapshot}/{ecosystem}-draw.jsonl`, headed by the seed), so a restarted `rank` continues where
+the draw stopped without reading a response again; a different seed or `--fresh` starts the journal over.
+The rank stage writes each layer's sample in one transaction, so an interrupted draw leaves no partial sample.
 
-Maven Central enforces consumption limits on its heaviest users and lowers them over time. A run that
-meets HTTP 429 there backs off as `Retry-After` asks. When retries run out during `fetch`, the packages are
-recorded as `fetch_error` and fetched later by re-running `fetch`; during the draw's activity checks, `rank`
-stops and is re-run later, continuing from the cache.
+A registry that fails during `rank` does not stop the others. The stage finishes the rest, then exits with
+an error naming the registries still to do and the command that finishes them. `run` then fetches and
+extracts what was sampled and stops before `aggregate` and `report`, printing the commands to complete
+the snapshot.
+
+Registries rate-limit heavy clients with HTTP 429: Maven Central enforces consumption limits that it lowers
+over time and lengthens for clients that keep retrying (source `mavenConsumptionLimits`), and Go's module index
+has answered 429 to a crawl at two requests per second, though it publishes no limit. A 429 pauses every
+request to that host, for `Retry-After` when given and otherwise for a backoff from 30 seconds that doubles
+per 429, up to 10 minutes. The host is then held to one request at a time at half its pace or less. After
+every 50 successful responses it speeds up by a tenth of its policy's rate, but for the rest of the run never
+past 80% of the rate that met the 429, so it settles under the host's limit rather than meeting it again.
+After an hour of 429s (`PKG_TRUST_RATE_LIMIT_PATIENCE`), the host's requests fail
+without being sent until the block ends. `fetch` records them as `fetch_error`, and re-running `fetch`
+later retries exactly those. In `rank`, the draw stops at the failed check, and a re-run continues from the
+journal.
 
 ### Interactive prompts
 
@@ -153,6 +170,7 @@ Set in a git-ignored `.env`, which Bun loads automatically (see [`.env.example`]
 | `PKG_TRUST_DATA_DIR` | Where the database, cache and output live (default `data`) |
 | `PKG_TRUST_GCP_PROJECT` | Google Cloud project that runs BigQuery queries (npm/Maven name lists, `cli registry`) |
 | `PKG_TRUST_BQ_MAX_GIB` | Bytes one BigQuery query may bill, in GiB (default 100) |
+| `PKG_TRUST_RATE_LIMIT_PATIENCE` | Minutes a host may answer HTTP 429 before its requests fail instead of waiting (default 60) |
 
 ## Database
 
@@ -203,9 +221,11 @@ and the claim needs re-checking. A page that moved should get its new URL in the
 ## HTTP
 
 [`src/http/client.ts`](../src/http/client.ts) is the only way adapters reach the network. ky retries
-transient statuses (POST too: it is only used for OSV queries) and honours `Retry-After`; a p-queue per host enforces the request rate and concurrency
-in `HOST_POLICIES` (crates.io: one request per second, as its crawler policy asks). Every response goes
-through the cache, and `extract` replays from the cache alone.
+transient statuses four times (POST too: it is only used for OSV queries). A limiter per host
+([`src/http/limiter.ts`](../src/http/limiter.ts)) enforces the request rate and concurrency in `HOST_POLICIES`
+through a p-queue (crates.io: one request per second, as its crawler policy asks), and answers HTTP 429 for
+the whole host: it waits out the block, slows the host down, and gives up after the patience (see *Long
+runs*). Every response goes through the cache, and `extract` replays from the cache alone.
 
 Bun's `fetch` cannot traverse an HTTPS CONNECT proxy, which sandboxed environments often use. When
 `HTTPS_PROXY` is set, a curl-backed transport is used instead; `PKG_TRUST_TRANSPORT=fetch|curl` pins the
