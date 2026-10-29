@@ -1,0 +1,21 @@
+{
+  "key": "c952e53b230d7deca25210f2bfc79894c8507456dc4a3dbbfeb7ff679a1963e8",
+  "sql": "SELECT MAX(Time) AS time FROM `bigquery-public-data.deps_dev_v1.Snapshots` WHERE Time <= TIMESTAMP(@asOf)",
+  "params": {
+    "asOf": "2026-10-25T18:32:16.601Z"
+  },
+  "depsdevSnapshot": null,
+  "stats": {
+    "estimatedBytes": 1856,
+    "bytesProcessed": 1856,
+    "bytesBilled": 10485760,
+    "runMs": 1746,
+    "ranAt": "2026-10-25T18:41:57.581Z",
+    "jobId": "88e6cec5-c854-4167-8389-b4796a9c2890"
+  },
+  "rows": [
+    {
+      "time": "2026-10-19T21:00:03.578565000Z"
+    }
+  ]
+}
