@@ -1,0 +1,55 @@
+{
+  "snapshot_id": "20261025-1832Z",
+  "manifest": {
+    "sha256": "8db88a13516ab32fdabcf9e08a9f64f9d4f5dc969adbd29d60bb997078b8af65",
+    "entries": 105670,
+    "bytes": 2101667489
+  },
+  "first_fetched": "2026-10-25T18:32:17.226Z",
+  "last_fetched": "2026-10-28T13:39:09.711Z",
+  "hosts": {
+    "api.npmjs.org": {
+      "200": 4050,
+      "404": 1
+    },
+    "api.osv.dev": {
+      "200": 13364
+    },
+    "crates.io": {
+      "200": 4522
+    },
+    "packages.ecosyste.ms": {
+      "200": 21
+    },
+    "packagist.org": {
+      "200": 1502
+    },
+    "proxy.golang.org": {
+      "200": 14682,
+      "404": 158
+    },
+    "pypi.org": {
+      "200": 5019
+    },
+    "raw.githubusercontent.com": {
+      "200": 1
+    },
+    "registry.npmjs.org": {
+      "200": 2457
+    },
+    "repo.packagist.org": {
+      "200": 3072
+    },
+    "repo1.maven.org": {
+      "200": 24064,
+      "404": 12953
+    },
+    "rubygems.org": {
+      "200": 14798,
+      "404": 826
+    },
+    "sum.golang.org": {
+      "200": 4180
+    }
+  }
+}
